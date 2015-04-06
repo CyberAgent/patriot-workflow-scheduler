@@ -5,7 +5,7 @@ $:.push File.expand_path("../lib", __FILE__)
 Gem::Specification.new do |s|
   s.name        = "patriot-sqlite3-client"
   s.version     = "0.5.0"
-  s.licenses    = ["TBD"]
+  s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
   s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler"
