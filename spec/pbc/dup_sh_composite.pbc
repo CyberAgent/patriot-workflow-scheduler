@@ -1,0 +1,8 @@
+composite_job{
+  name 'composite'
+  sh {
+    name "echo"
+    commands "echo 'dup'"
+  }
+}
+

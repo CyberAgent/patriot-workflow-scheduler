@@ -1,0 +1,313 @@
+require 'init_test'
+
+describe <%= job_store_class %> do
+
+  include Patriot::JobStore::Factory
+  include JobStoreMatcher
+
+  before :all do
+    <%= init_conf_statement %>
+  end
+
+  describe "basic operation" do
+    before :all do
+      @node = 'dummy_node1'
+      @host = 'dummy_host1'
+      @update_id = Time.now.to_i
+      @job_store = <%= job_store_class %>.new("root", @config)
+      @anyjob  = TestEnvirionment.build_job({})
+      @nodejob = TestEnvirionment.build_job({:node => @node})
+      @hostjob = TestEnvirionment.build_job({:host => @host})
+      @bothjob = TestEnvirionment.build_job({:node => @node, :host => @host})
+      @p_job   = TestEnvirionment.build_job({:node => @node, :produce => ['p']})
+      @c_job   = TestEnvirionment.build_job({:node => @node, :require => ['p']})
+      @job_store.register(@update_id, [@anyjob, @nodejob, @hostjob, @bothjob, @p_job,@c_job])
+    end
+
+    it "should get executable jobs without nodes" do
+      job_entries = @job_store.get_job_tickets(@host,[])
+      expect(job_entries.size).to eq 2
+      job_entries.each{|job_entry| expect(job_entry).to be_a Patriot::JobStore::JobTicket }
+
+      job_entries = @job_store.get_job_tickets('unknown', [])
+      expect(job_entries.size).to eq 1
+      job_entries.each{|job_entry| expect(job_entry).to be_a Patriot::JobStore::JobTicket }
+    end
+
+    it "should get executable jobs with nodes" do
+      job_entries = @job_store.get_job_tickets(@host, [@node])
+      expect(job_entries.size).to eq 5
+      job_entries.each{|job_entry| expect(job_entry).to be_a Patriot::JobStore::JobTicket }
+
+      job_entries = @job_store.get_job_tickets(@host, ['unknown'])
+      expect(job_entries.size).to eq 2
+    end
+
+    it "should not get executable jobs of other hosts" do
+      job_entries = @job_store.get_job_tickets('unknown', [@node])
+      expect(job_entries.size).to eq 3
+      job_entries.each{|job_entry| expect(job_entry).to be_a Patriot::JobStore::JobTicket }
+
+      job_entries = @job_store.get_job_tickets('unknown', [])
+      expect(job_entries.size).to eq 1
+    end
+
+    it "should include dependency" do 
+      job = @job_store.get(@c_job.job_id, :include_dependency=>true)
+      expect(job['consumers']).to be_empty
+      expect(job['producers'].keys).to contain_exactly(@p_job.job_id)
+      job = @job_store.get(@p_job.job_id, :include_dependency=>true)
+      expect(job['consumers'].keys).to contain_exactly(@c_job.job_id)
+      expect(job['producers']).to be_empty
+    end
+
+    it "should include product" do 
+      job = @job_store.get(@c_job.job_id, :include_products=>true)
+      expect(job[Patriot::Command::PRODUCTS_ATTR]).to be_empty
+      expect(job[Patriot::Command::REQUISITES_ATTR]).to contain_exactly("p")
+      job = @job_store.get(@p_job.job_id, :include_products=>true)
+      expect(job[Patriot::Command::PRODUCTS_ATTR]).to contain_exactly("p")
+      expect(job[Patriot::Command::REQUISITES_ATTR]).to be_empty
+    end
+
+    describe "get_producers" do
+      it "should return producers" do
+        producers = @job_store.get_producers("p")
+        expect(producers.size).to eq 1
+        expect(producers.has_key?(@p_job.job_id)).to eq true
+      end
+    end
+
+    describe "get_consumers" do
+      it "should return consumers" do
+        consumers = @job_store.get_consumers("p")
+        expect(consumers.size).to eq 1
+        expect(consumers.has_key?(@c_job.job_id)).to be true
+      end
+    end
+  end
+
+  describe "administration function" do
+    before :all do
+      @update_id = Time.now.to_i
+      @job_store = <%= job_store_class %>.new("root", @config)
+      # set state to suspend to avoid effects of other tests
+      @job1 = TestEnvirionment.build_job({:job_id => 'j1', :state => Patriot::JobStore::JobState::SUSPEND})
+      @job2 = TestEnvirionment.build_job({:job_id => 'j2', :state => Patriot::JobStore::JobState::FAILED})
+      @job3 = TestEnvirionment.build_job({:job_id => 'j3', :state => Patriot::JobStore::JobState::FAILED})
+      @job4 = TestEnvirionment.build_job({:job_id => 'j4', :state => Patriot::JobStore::JobState::SUSPEND, :produce => ['p']})
+      @job5 = TestEnvirionment.build_job({:job_id => 'j5', :state => Patriot::JobStore::JobState::SUSPEND, :require => ['p']})
+      @job_store.register(@update_id, [@job1, @job2, @job3, @job4, @job5])
+    end
+
+    describe "find_jobs_by_state" do
+      it "should support limit" do
+        suspended = @job_store.find_jobs_by_state(Patriot::JobStore::JobState::SUSPEND, {:limit => 2})
+        expect(suspended).to contain_exactly @job5.job_id, @job4.job_id
+      end
+      it "should support limit and offset" do
+        suspended = @job_store.find_jobs_by_state(Patriot::JobStore::JobState::SUSPEND, {:limit => 2, :offset => 2})
+        expect(suspended).to contain_exactly @job1.job_id
+      end
+
+      it "should support filter" do
+        suspended = @job_store.find_jobs_by_state(Patriot::JobStore::JobState::SUSPEND, {:filter_exp => '%j1%'})
+        expect(suspended).to contain_exactly @job1.job_id
+        failed = @job_store.find_jobs_by_state(Patriot::JobStore::JobState::FAILED, {:filter_exp => '%j1%'})
+        expect(failed.size).to eq 0
+      end
+    end
+
+    describe "get_job_size" do
+      it "should return the number of jobs by state" do
+        summary= @job_store.get_job_size()
+        expect(summary[Patriot::JobStore::JobState::SUSPEND]).to eq 3
+        expect(summary[Patriot::JobStore::JobState::SUCCEEDED]).not_to be nil
+      end
+
+      it "should return the number of jobs by state except succeeded" do
+        summary= @job_store.get_job_size(
+          :ignore_states => [Patriot::JobStore::JobState::SUCCEEDED]
+        )
+        expect(summary[Patriot::JobStore::JobState::SUSPEND]).to eq 3
+        expect(summary[Patriot::JobStore::JobState::SUCCEEDED]).to be nil
+      end
+
+    end
+  end
+
+  describe "support job execution" do
+    before :each do
+      @update_id = Time.now.to_i
+      @node      = 'dummy_node'
+      @host      = 'dummy_host'
+      @job_store = <%= job_store_class %>.new("root", @config)
+      @job       = TestEnvirionment.build_job({})
+      @job_ticket = Patriot::JobStore::JobTicket.new(@job.job_id, @update_id)
+      @p_job     = TestEnvirionment.build_job({:job_id => 'with_node', :node => @node, :produce => ['p']})
+      @c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      @job_store.register(@update_id, [@job, @p_job, @c_job])
+    end
+
+    it "should reregister job" do
+      update_id = Time.now.to_i
+      @job_store.register(update_id, [@c_job])
+      c_job = @job_store.get(@c_job.job_id)
+      expect(c_job.update_id).to eq update_id
+    end
+
+    it "should reregister job with keeping state" do
+      update_id = Time.now.to_i
+      c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      c_job[Patriot::Command::STATE_ATTR] = Patriot::JobStore::JobState::SUSPEND
+      @job_store.register(update_id, [c_job])
+      c_job = @job_store.get(@c_job.job_id)
+      expect(c_job[Patriot::Command::STATE_ATTR]).to eq Patriot::JobStore::JobState::SUSPEND
+      c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      c_job.delete(Patriot::Command::STATE_ATTR)
+      @job_store.register(update_id, [c_job])
+      c_job = @job_store.get(@c_job.job_id)
+      expect(c_job[Patriot::Command::STATE_ATTR]).to eq Patriot::JobStore::JobState::SUSPEND
+    end
+
+    it "should reset exec_node and host" do
+      update_id = Time.now.to_i
+      job = @job_store.get(@p_job.job_id)
+      expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq @node
+      expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
+      job = TestEnvirionment.build_job({:job_id => 'with_node', :produce => ['p']})
+      @job_store.register(update_id, [job])
+      job = @job_store.get(@p_job.job_id)
+      expect(job[Patriot::Command::EXEC_NODE_ATTR]).to be nil
+      expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
+
+      update_id = Time.now.to_i
+      job = @job_store.get(@c_job.job_id)
+      expect(job[Patriot::Command::EXEC_HOST_ATTR]).to eq @host
+      expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
+      job = TestEnvirionment.build_job({:job_id => 'with_host', :require => ['c']})
+      @job_store.register(update_id, [job])
+      job = @job_store.get(@c_job.job_id)
+      expect(job[Patriot::Command::EXEC_HOST_ATTR]).to be nil
+      expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
+    end
+
+    it "should support to execute a job" do
+      history = @job_store.get_execution_history(@job.job_id)
+      expect(history).to be_empty
+      begin_at = Time.now
+      @job_store.set_state(@job_ticket.update_id, [@job.job_id], Patriot::JobStore::JobState::WAIT)
+      @job_ticket.exec_node = 'test_node'
+      @job_ticket.exec_host = 'test_host'
+      response = @job_store.offer_to_execute(@job_ticket)
+      command  = response[:command]
+      expect(@job).to be_running_in @job_store
+      history = @job_store.get_execution_history(@job.job_id)
+      expect(history.size).to eq 1
+      expect(history[0]).to a_hash_including(:job_id      => @job.job_id,
+                                             :node        => 'test_node',
+                                             :host        => 'test_host')
+      expect(history[0][:begin_at].to_s).to eq begin_at.to_s
+      expect(history[0][:end_at]).to be nil
+      expect(history[0][:state]).to be nil
+      expect(history[0][:description]).to be nil
+      expect(command).to be_a Patriot::Command::ShCommand
+      end_at = Time.now
+      @job_ticket.execution_id = response[:execution_id]
+      @job_ticket.exit_code    = Patriot::Command::ExitCode::SUCCEEDED
+      @job_ticket.description  = "test desc"
+      @job_store.report_completion_status(@job_ticket)
+      expect(@job).to be_succeeded_in @job_store
+      history = @job_store.get_execution_history(@job.job_id)
+      expect(history.size).to eq 1
+      expect(history[0]).to a_hash_including(:job_id   => @job.job_id,
+                                             :node     => 'test_node',
+                                             :host     => 'test_host',
+                                             :state    => Patriot::Command::ExitCode::SUCCEEDED,
+                                             :description => "test desc")
+      expect(history[0][:begin_at].to_s).to eq begin_at.to_s
+      expect(history[0][:end_at].to_s).to eq end_at.to_s
+    end
+
+    it "should not change state if previous state is wrong " do
+      response = @job_store.offer_to_execute(@job_ticket)
+      command  = response[:command]
+      @job_store.set_state(@job_ticket.update_id, [@job.job_id], Patriot::JobStore::JobState::WAIT)
+      @job_ticket.exit_code = Patriot::Command::ExitCode::SUCCEEDED
+      @job_store.report_completion_status(@job_ticket)
+      expect(@job).to be_waited_in @job_store
+    end
+
+    it "should fail with deserialization failure" do
+      allow_any_instance_of(Patriot::JobStore::Job).to receive(:to_command).and_raise("error")
+      expect{@job_store.offer_to_execute(@job_ticket)}.to raise_error
+      expect(@job).to be_failed_in @job_store
+    end
+
+    it "should delete a consumer job from db" do
+      job_id = @c_job.job_id
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].keys).to include(job_id)
+      @job_store.delete_job(job_id)
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].keys).not_to include(job_id)
+      expect(@job_store.get(job_id)).to be nil
+    end
+
+    it "should delete a producer job from db" do
+      job_id = @p_job.job_id
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].keys).to include(job_id)
+      @job_store.delete_job(job_id)
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].keys).not_to include(job_id)
+      expect(@job_store.get(job_id)).to be nil
+    end
+
+    it "should validate command" do
+      command = Patriot::Command::CommandGroup.new(@config)
+      command.instance_eval(<<EOJ
+      sh do 
+        produce ["product1_#{@hour}"]  
+        require ["product2_#{@hour}"]  
+        param 'hour' => ['00','08','16']
+        exec_date '1970-01-01'
+        start_after '#{@hour}:00:00'
+        name 'test_import_#{@hour}'
+        commands 'echo \'#{@hour}\''
+      end
+EOJ
+                           )
+      command = command.build[0]
+      expect(@job_store.acceptable?(command.to_job)).to be true
+    end
+  end
+
+  describe 'dependency management' do
+    before :each do
+      @job_store = <%= job_store_class %>.new("root", @config)
+      @producer1 = TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})
+      @consumer1 = TestEnvirionment.build_job({:job_id => 'c1', :command => 'echo \'c1\'', :require => ['1']})
+      @producer2 = TestEnvirionment.build_job({:job_id => 'p2', :command => 'echo \'p2\'', :produce => ['2']})
+      @consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
+      jobs = [@producer1,@producer2,@consumer1,@consumer2]
+      @job_store.register(Time.now.to_i, jobs)
+    end
+
+    it "sholud not destroy dependency when producers are reregistered" do
+      jobs = [TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})]
+      @job_store.register(Time.now.to_i, jobs)
+      job = @job_store.get(@producer1.job_id, :include_dependency => true)
+      expect(job['consumers'].keys).to include(@consumer1.job_id)
+    end
+
+    it "sholud remove the deprecated dependency " do
+      consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
+      consumer2['requisites'] << "1"
+      consumer2['requisites'].delete("2")
+      jobs = [consumer2]
+      @job_store.register(Time.now.to_i, jobs)
+      job = @job_store.get(@producer2.job_id, :include_dependency => true)
+      expect(job['consumers']).not_to include(@consumer2.job_id)
+      job = @job_store.get(@producer1.job_id, :include_dependency => true)
+      expect(job['consumers']).to include(@consumer2.job_id)
+    end
+  end
+end
+

@@ -1,0 +1,5 @@
+      exec_node 'node1'
+      sh{
+        name 'c1'
+        commands 'echo "c1"'
+      }

@@ -1,0 +1,44 @@
+module Patriot
+  module Util
+    module Script
+      include Patriot::Util::DateUtil
+      def get_batch_files(path, date, opt = {})
+        return [path] if File.file?(path) && File.extname(path) == ".pbc" 
+        files = []
+        opt   = target_option(date, opt)
+        files = Dir.glob("#{path}/**/*.pbc").find_all do |file|
+          target_file?(file, opt)
+        end
+        return files
+      end
+
+      def target_option(date, opt = {})
+        opt = {:all => false}.merge(opt)
+        unless opt[:all]
+          d = date.split('-')
+          opt[:day] = true unless opt.has_key?(:day)
+          unless opt.has_key?(:month)
+            opt[:month] = date_add(date,1) =~ /[\d]{4}-[\d]{2}-01/ ? true : false 
+          end
+          unless opt.has_key?(:week)
+            opt[:week]  = Date.new(d[0].to_i, d[1].to_i, d[2].to_i).wday
+          end
+        end
+        return opt
+      end
+      private :target_option
+
+      def target_file?(file, options)
+        case
+        when options[:all]                            then true
+        when file =~ /\/daily\// && options[:day]     then true
+        when file =~ /\/monthly\// && options[:month] then true
+        when file =~ /\/weekly\/#{options[:week]}\//  then true
+        else false
+        end
+      end
+      private :target_file?
+
+    end
+  end
+end

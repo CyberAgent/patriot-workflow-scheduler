@@ -1,0 +1,4 @@
+      sh{
+        name 'c2'
+        commands 'echo "c2"'
+      }

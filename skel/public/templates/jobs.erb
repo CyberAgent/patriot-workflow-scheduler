@@ -1,0 +1,21 @@
+<div class="clearfix">
+  <h1> <%= Patriot::JobStore::JobState.name_of(state.to_i) %> Jobs </h1>
+  <form class="inline" method="GET" action="/jobs/">
+    <input id="state" type="hidden" name="state" value="<%= state %>">
+    <input id="filter_exp" class="sidebarinput" type="text" placeholder="filter by job_id" name="filter_exp">
+  </form>
+</div>
+<%= erb :_jobs, :locals => {:jobs => jobs, :state => state}, :layout => false %>
+
+
+<% limit, offset = limit.to_i, offset.to_i %>
+<div class ="pagination">
+  <ul>
+    <li class="prev<%= offset > 0 ? "" : " disabled"%>">
+    <a href="?state=<%= state %>&limit=<%= limit%>&offset=<%= offset - limit < 0 ? 0 : offset-limit %><%= filter_exp ? "&filter_exp=#{ERB::Util.url_encode(filter_exp)}" : "" %>">prev</a>
+    </li>
+    <li class="next<%= jobs.size == limit.to_i ? "" : " disabled"%>">
+      <a href="?state=<%= state %>&limit=<%= limit%>&offset=<%= offset.to_i + limit.to_i %><%= filter_exp ? "&filter_exp=#{ERB::Util.url_encode(filter_exp)}" : "" %>">next </a>
+    </li>
+  <ul>
+</div>

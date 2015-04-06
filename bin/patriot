@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+Encoding.default_external = 'utf-8'
+$home = File.expand_path(File.dirname(File.expand_path(__FILE__)) + "/..")
+$: << File.join($home,"lib")
+require 'rubygems'
+require 'patriot'
+
+Patriot::Tool::PatriotCommand.start(ARGV)

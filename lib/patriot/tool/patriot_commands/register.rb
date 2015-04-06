@@ -1,0 +1,85 @@
+module Patriot
+  module Tool
+    module PatriotCommands
+      module Register
+
+        Patriot::Tool::PatriotCommand.class_eval do
+          desc 'register [OPTIONS] yyyy-mm-dd[,yyyy-mm-dd] path [path file ...]', 'register jobs'
+          method_option :filter,
+              :aliases  => '-f',
+              :type     => :string,
+              :desc     => 'regular expression for Ruby'
+          method_option :debug,
+              :aliases  => '-d',
+              :type     => :boolean,
+              :default  => false,
+              :desc     => 'debug mode flag'
+          method_option :priority,
+              :aliases  => '-p',
+              :type     => :numeric,
+              :desc     => 'job priority'
+          method_option :state,
+              :aliases  => '-s',
+              :type     => :numeric,
+              :desc     => 'register as specified state'
+          method_option :keep_state,
+              :type     => :boolean,
+              :default  => false,
+              :desc     => "don't change current state of jobs (only change definition)"
+          method_option :retry_dep, 
+              :type     => :boolean, 
+              :desc     =>  'set states of dependent jobs to WAIT'
+          method_option :update_id,
+              :type     => :string,
+              :default  => Time.now.to_i,
+              :desc     => 'default value is current unixtime (default value is Time.now.to_i)'
+          def register(date, *paths)
+            begin
+              # set config/options
+              opts        = symbolize_options(options)
+              conf        = {:type => 'register'}
+              conf[:path] = opts[:config] if opts.has_key?(:config)
+              config      = load_config(conf)
+              opts        = {:update_id      => Time.now.to_i,
+                             :store_id       => Patriot::JobStore::ROOT_STORE_ID,
+                             :retry_interval => 300,
+                             :retry_limite   => 10}.merge(opts)
+              opts[:state] = nil if opts[:keep_state]
+
+              job_store = Patriot::JobStore::Factory.create_jobstore(opts[:store_id], config)
+              parser  = Patriot::Tool::BatchParser.new(config)
+              jobs    = []
+              parser.process(date, paths, opts) do |cmd|
+                job = cmd.to_job
+                job[Patriot::Command::PRIORITY_ATTR] = opts[:priority] if opts.has_key?(:priority)
+                job[Patriot::Command::STATE_ATTR] = opts[:state] if opts.has_key?(:state)
+                jobs << job
+              end
+              return if opts[:debug]
+              Patriot::Util::Retry.execute_with_retry{ job_store.register(opts[:update_id], jobs) }
+              if opts[:retry_dep]
+                jobs.each do |j|
+                  dep_ids = get_dependent_jobs(job_store, j.job_id)
+                  job_store.set_state(opts[:update_id], dep_ids, Patriot::JobStore::JobState::WAIT)
+                end
+              end
+            rescue => e
+              puts e
+              $@.each{|m| puts m}
+              raise e.message
+            end
+          end
+
+          no_tasks do
+            def get_dependent_jobs(job_store, job_id)
+              job     = job_store.get(job_id, :include_dependency => true)
+              dep_ids = job['consumers'].keys
+              dep_ids |= dep_ids.map{|did| get_dependent_jobs(job_store, did)}
+              return dep_ids.flatten.compact.uniq
+            end
+          end
+        end
+      end
+    end
+  end
+end

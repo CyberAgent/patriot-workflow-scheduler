@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+target=ARGV[0]
+unless File.exist?(target)
+  puts "directory #{target} does not exist"
+  Dir.mkdir(target)
+end
+base_dir = File.join(File.dirname(File.expand_path(__FILE__)), "..")
+skel_dir = File.join(base_dir, "skel")
+Dir.glob(File.join(skel_dir,"*")).each do |d|
+  if File.exist?(File.join(target, File.basename(d)))
+    puts "#{d} already exists"
+  else
+    puts "copy #{d} to  #{target}"
+    FileUtils.cp_r(d, target)
+  end
+end
+
+
+def mkdir_ifnot_exist(dir)
+  if File.exist?(dir)
+    puts "#{dir} already exist"
+  else
+    puts "mkdir #{dir}"
+    FileUtils.mkdir_p(dir)
+  end
+end
+
+mkdir_ifnot_exist(File.join(target, "bin"))
+FileUtils.cp(File.join(base_dir,"bin","patriot"),File.join(target,"bin","patriot"))
+mkdir_ifnot_exist(File.join(target, "plugins"))
+mkdir_ifnot_exist(File.join(target, "run"))
+
+

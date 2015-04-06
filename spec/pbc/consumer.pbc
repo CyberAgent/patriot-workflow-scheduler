@@ -1,0 +1,11 @@
+sh{
+  require ["second"]
+  name "consumer"
+  commands 'echo third'
+}
+sh{
+  require ["fisrt"]
+  produce ["second"]
+  name "middle"
+  commands 'echo second'
+}

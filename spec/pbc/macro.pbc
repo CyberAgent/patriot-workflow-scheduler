@@ -1,0 +1,11 @@
+job_group{
+  load_macro "#{$ROOT_PATH}/spec/pbc/testmacro.pat"
+  sh{
+    name "test1"
+    commands macro1("test1")
+  }
+  sh{
+    name "test2"
+    commands '#{macro1("test2")}'
+  }
+}

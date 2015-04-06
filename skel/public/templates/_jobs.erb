@@ -1,0 +1,97 @@
+<% job_state = Hash.new(Patriot::JobStore::JobState.name_of(state)) if job_state.nil? && !state.nil? %>
+<% prefix = "" if prefix.nil? %>
+<form id="state_update_form" method="POST" action="/jobs/">
+  <input type="hidden" name="_method" value="put">
+  <table class="bordered-table" id="<%= prefix %>job_list" >
+    <tr>
+      <th><input type="checkbox" id="selectAllJob" onclick="$('input:checkbox[name=\'job_ids[]\']').prop('checked', $(this).prop('checked'));"></input></th>
+      <th>job_id</th>
+      <th>State</th>
+      <% jobs.each do |job_id| %>
+        </tr><tr>
+        <td><input type="checkbox" data-job-id="<%= job_id %>" data-job-state="<%= job_state[job_id] %>" name="job_ids[]" value="<%= job_id %>"></td>
+          <td><%= to_job_link(job_id) %></td>
+          <td> <%= job_state[job_id] %></td>
+      <% end %>
+    </tr>
+  </table>
+  <div class="inline">
+    <select id="<%= prefix %>state_selection" name="state" onchange="$('#<%= prefix %>new_state').text(name_of_state($('#<%= prefix %>state_selection').val()))">
+      <option value="<%= Patriot::JobStore::JobState::SUCCEEDED %>" > SUCCEEDED </option>
+      <option value="<%= Patriot::JobStore::JobState::WAIT %>" > WAIT </option>
+      <option value="<%= Patriot::JobStore::JobState::SUSPEND %>" > SUSPEND </option>
+      <option value="<%= Patriot::JobStore::JobState::FAILED %>" > FAILED </option>
+      <option value="<%= Patriot::JobStore::JobState::DISCARDED %>" > DISCARDED </option>
+    </select>
+    <button
+      class="confirm_change_state btn danger"
+      type="button"
+      data-toggle="modal"
+      data-backdrop="true"
+      data-keyboard="true"
+      data-controls-modal="<%= prefix %>change_state_confirm_modal"
+      data-target-job-list="#<%= prefix %>target_job_list"
+      data-job-list="#<%= prefix %>job_list"
+      >update state</button>
+      <% if defined?(state) && !state.nil? && state.to_i == Patriot::JobStore::JobState::DISCARDED %>
+        <button
+          class="confirm_delete_jobs btn danger"
+          type="button"
+          data-toggle="modal"
+          data-backdrop="true"
+          data-keyboard="true"
+          data-controls-modal="<%= prefix %>delete_jobs_confirm_modal"
+          data-target-job-list="#<%= prefix %>target_job_list_delete"
+          data-job-list="#<%= prefix %>job_list">delete</button>
+      <% end %>
+  </div>
+</form>
+
+<div class="modal hide" id="<%= prefix %>change_state_confirm_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        Are you sure?
+      </div>
+      <div class="modal-body">
+        Change state of following jobs to <span id="<%= prefix %>new_state"></span>
+        <ul id= "<%= prefix %>target_job_list">
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="$('#state_update_form').submit();">Yes</button>
+        <button type="button" class="btn btn-default" onclick="$('#<%= prefix %>change_state_confirm_modal').modal('hide');">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if defined?(state) && !state.nil? && state.to_i == Patriot::JobStore::JobState::DISCARDED %>
+  <div class="modal hide" id="<%= prefix %>delete_jobs_confirm_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          Are you sure?
+        </div>
+        <form method="POST" action="/jobs/">
+          <input type="hidden" name="_method" value="delete">
+          <div class="modal-body">
+            Delete following jobs
+            <ul id= "<%= prefix %>target_job_list_delete">
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Yes</button>
+            <button type="button" class="btn btn-default" onclick="$('#<%= prefix %>delete_jobs_confirm_modal').modal('hide');">No</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<% end %>

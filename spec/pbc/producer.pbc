@@ -1,0 +1,5 @@
+sh{
+  produce ["fisrt"]
+  name "producer"
+  commands 'echo first'
+}

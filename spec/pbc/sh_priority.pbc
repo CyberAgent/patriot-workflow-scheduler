@@ -1,0 +1,5 @@
+sh {
+  priority 99
+  name "echo_priority"
+  commands "echo #{$dt}"
+}

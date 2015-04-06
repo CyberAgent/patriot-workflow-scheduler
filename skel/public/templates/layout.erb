@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>Home</title>
+<script src="js/jquery-1.6.4.min.js"></script>
+<script src="js/bootstrap-modal.js"></script>
+<script src="js/bootstrap-buttons.js"></script>
+<script src="js/bootstrap-dropdown.js"></script>
+<script src="js/bootstrap-alerts.js"></script>
+<script src="js/bootstrap-scrollspy.js"></script>
+<script src="js/bootstrap-tabs.js"></script>
+<script src="js/bootstrap-twipsy.js"></script>
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/original.css">
+<style type="text/css">
+body {
+    padding-top: 60px;
+}
+</style>
+<script>
+  function name_of_state(state){
+    switch(Number(state)){
+      case -2 :
+        return "<%= Patriot::JobStore::JobState.name_of(-2) %>";
+      case -1 :
+        return "<%= Patriot::JobStore::JobState.name_of(-1) %>";
+      case 0 :
+        return "<%= Patriot::JobStore::JobState.name_of(0) %>";
+      case 1 :
+        return "<%= Patriot::JobStore::JobState.name_of(1) %>";
+      case 2 :
+        return "<%= Patriot::JobStore::JobState.name_of(2) %>";
+      case 3 :
+        return "<%= Patriot::JobStore::JobState.name_of(3) %>";
+      case 4 :
+        return "<%= Patriot::JobStore::JobState.name_of(4) %>";
+      default :
+        return "UNKNOWN";
+     }
+  }
+
+$(function(){
+  $(".confirm_change_state").click(function(){
+    target_job_list = $(this).attr('data-target-job-list')
+    job_list = $(this).attr('data-job-list')
+    $(target_job_list).empty();
+    $(job_list +" input:checkbox[name='job_ids[]']").each(function(){
+      if($(this).prop('checked')){
+      $(target_job_list).append("<li>" + $(this).attr("data-job-id")  + "</li>")
+      }
+    });
+  });
+
+  $(".confirm_delete_jobs").click(function(){
+    target_job_list = $(this).attr('data-target-job-list')
+    job_list = $(this).attr('data-job-list')
+    $(target_job_list).empty();
+    $(job_list +" input:checkbox[name='job_ids[]']").each(function(){
+      if($(this).prop('checked')){
+      $(target_job_list).append("<input type='hidden' name='job_ids[]' value='" + $(this).attr("data-job-id") + "'/>")
+      $(target_job_list).append("<li>" + $(this).attr("data-job-id")  + "</li>")
+      }
+    });
+  });
+});
+</script>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="container-fluid">
+        <a href="./" class="brand">Patriot Workflow Scheduler</a>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="sidebar">
+      <div class = "well">
+        <h3> #Jobs </h3>
+        <table>
+          <tr>
+            <td>Succeeded    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::SUCCEEDED %>'><%= @size[Patriot::JobStore::JobState::SUCCEEDED] || '***' %></a></td>
+          </tr><tr>
+            <td>Initiating    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::INIT %>'><%= @size[Patriot::JobStore::JobState::INIT] || 0 %></a></td>
+          </tr><tr>
+            <td>Waiting    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::WAIT %>'><%= @size[Patriot::JobStore::JobState::WAIT] || 0 %></a></td>
+          </tr><tr>
+            <td>Running    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::RUNNING %>'><%= @size[Patriot::JobStore::JobState::RUNNING] || 0 %></a></td>
+          </tr><tr>
+            <td>Suspended    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::SUSPEND %>'><%= @size[Patriot::JobStore::JobState::SUSPEND] || 0 %></a></td>
+          </tr><tr>
+            <td>Failed    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::FAILED %>'><%= @size[Patriot::JobStore::JobState::FAILED] || 0 %></a></td>
+          </tr><tr>
+            <td>Discarded    :</td><td><a href='/jobs/?state=<%= Patriot::JobStore::JobState::DISCARDED %>'><%= @size[Patriot::JobStore::JobState::DISCARDED] || 0 %></a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="content">
+      <%= yield %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<div class="clearfix">
+  <h1> <%= job.job_id %> </h1> 
+</div>
+<% producers = job.attributes.delete('producers') %>
+<% consumers = job.attributes.delete('consumers') %>
+<h3> Job Info. </h3>
+<form id="job_update_form" method="POST" action="/jobs/<%= ERB::Util.url_encode(job.job_id) %>">
+  <input type="hidden" name="_method" value="put"/>
+  <select id='update_new_state_selection' name="state"
+           onchange="$('#new_state_of_this_job').text(name_of_state($('#update_new_state_selection').val()))">
+    <option value="<%= Patriot::JobStore::JobState::WAIT %>" > WAIT </option>
+    <option value="<%= Patriot::JobStore::JobState::SUCCEEDED %>" > SUCCEEDED </option>
+    <option value="<%= Patriot::JobStore::JobState::SUSPEND %>" > SUSPEND </option>
+    <option value="<%= Patriot::JobStore::JobState::FAILED %>" > FAILED </option>
+    <option value="<%= Patriot::JobStore::JobState::DISCARDED %>" > DISCARDED </option>
+  </select>
+  <select id='update_include_subsequent_selection' name='include_subsequent'
+          onchange="$('#update_include_subsequent').text($('#update_include_subsequent_selection').val())">
+    <option value="false" > ONLY THIS </option>
+    <option value="true" > WITH SUBSEQUENT JOBS </option>
+  </select>
+  <button
+    class="btn danger"
+    type="button"
+    data-toggle="modal"
+    data-backdrop="true"
+    data-keyboard="true"
+    data-controls-modal="update_job_confirm_modal">update</button>
+</form>
+<div class="modal hide" id="update_job_confirm_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        Are you sure?
+      </div>
+      <div class="modal-body">
+        Update Job <%= job.job_id %>
+        <table>
+          <tr>
+            <td> state </td> <td id='new_state_of_this_job'>WAIT<td>
+          </tr><tr>
+            <td> with subsequent? </td> <td id='update_include_subsequent'>false<td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="$('#job_update_form').submit();">Yes</button>
+        <button type="button" class="btn btn-default" onclick="$('#update_job_confirm_modal').modal('hide');">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+<table class="bordered-table">
+  <tr>
+    <td class="original main">Command Class</td><td colspan='3'><%= job.delete(Patriot::Command::COMMAND_CLASS_KEY) %></td>
+  </tr><tr>
+    <td class="original main">Updated at</td><td><%= Time.at(job.update_id) %></td>
+    <td class="original main">State</td><td><%= Patriot::JobStore::JobState.name_of(job.delete(Patriot::Command::STATE_ATTR)) %></td>
+  </tr><tr>
+    <td class="original main">Priority</td><td><%= job.delete(Patriot::Command::PRIORITY_ATTR) %></td>
+    <td class="original main">Start After</td><td><%= job.delete(Patriot::Command::START_DATETIME_ATTR)%></td>
+  </tr><tr>
+    <td class="original main">Host</td><td><%= job.delete(Patriot::Command::EXEC_HOST_ATTR) || 'ANY' %></td>
+    <td class="original main">Node</td><td><%= job.delete(Patriot::Command::EXEC_NODE_ATTR) || 'ANY' %></td>
+  </tr><tr>
+    <td class="original main">Produced Products</td><td colspan='3'><%= job.delete(Patriot::Command::PRODUCTS_ATTR) %></td>
+  </tr><tr>
+    <td class="original main">Requred Products</td><td colspan='3'><%= job.delete(Patriot::Command::REQUISITES_ATTR) %></td>
+  </tr><tr>
+    <td class="original main" colspan='4'> content </td>
+<% job.attributes.each do |attr, val| %>
+  </tr><tr>
+  <% if val.is_a? Array %>
+    <td class="original main" rowspan='<%= val.size %>'><%= attr %></td>
+    <% val.inject(nil) do |prev, subcmd| %>
+      <%= "</tr><tr>" unless prev.nil? %>
+      <td colspan='3'><%= subcmd %></td>
+    <% end %>
+  <% else %>
+    <td class="original main"><%= attr %></td><td colspan='3'><%= val %></td>
+  <% end %>
+<% end %>
+  </tr>
+</table>
+<h3> Execution History </h3>
+<table class="bordered-table">
+  <tr>
+    <th> host </th>
+    <th> node </th>
+    <th> begin_at </th>
+    <th> end_at </th>
+    <th> result </th>
+    <th> description </th>
+<% histories.each do |history| %>
+  </tr><tr>
+  <td> <%= history[:host] %> </td>
+  <td> <%= history[:node] %> </td>
+  <td> <%= history[:begin_at] %> </td>
+  <td> <%= history[:end_at] %> </td>
+  <td> <%= history[:state].nil? ? "" : Patriot::JobStore::JobState.name_of(history[:state]) %> </td>
+  <td> <%= history[:description] %> </td>
+<% end %>
+  </tr>
+</table>
+<h3> Dependency Info. </h3>
+<% if !producers.nil? && !producers.empty? %>
+<h5> Before </h5>
+<% p_job_state = {}; producers.each{|jid, attr| p_job_state[jid] = Patriot::JobStore::JobState.name_of(attr[:state].to_i)} %>
+<%= erb :_jobs, :locals => {:jobs => producers.keys, :job_state => p_job_state, :prefix => "p_"}, :layout => false %>
+<% end %>
+<% if !consumers.nil? && !consumers.empty? %>
+<h5> After </h5>
+<% c_job_state = {}; consumers.each{|jid, attr| c_job_state[jid] = Patriot::JobStore::JobState.name_of(attr[:state].to_i)} %>
+<%= erb :_jobs, :locals => {:jobs => consumers.keys, :job_state => c_job_state, :prefix => "c_"}, :layout => false %>
+<% end %>
+
