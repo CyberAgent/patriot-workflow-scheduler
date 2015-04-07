@@ -36,17 +36,45 @@ module Patriot
       def execute_command(command, &blk)
         so, se = nil
 
-        # TODO refactor
-        ## ts = 現在時刻（UNIXタイム）
-        ## dt = 今日の年月日（yyyy-mm-dd形式）
         time_obj = Time.now
         ts       = time_obj.to_i
         dt       = time_obj.strftime("%Y-%m-%d")
 
         tmp_dir_base  = @config.get(PATRIOT_TMP_DIR_KEY, DEFAULT_PATRIOT_TMP_DIR)
 
-        cid = do_fork(command, dt, ts, tmp_dir_base)
-        tmpdir = tmp_dir(cid, dt, ts, tmp_dir_base)
+        # the forked variable is used for checking whether fork invocation hangs.
+        #  (due to https://redmine.ruby-lang.org/issues/5240 ?)
+        forked = false
+        until forked
+          cid = do_fork(command, dt, ts, tmp_dir_base)
+          tmpdir = tmp_dir(cid, dt, ts, tmp_dir_base)
+          i = 0
+          # If fork hangs, output directory would not be created.
+          # wait at most 5 seconds for the directory created.
+          until forked || i > 5
+            sleep(1)
+            forked = File.exist?(tmpdir)
+            i = i+1
+          end
+          # fork hanged, kill the hanged process.
+          unless forked
+            # check whether cid is id of child process to avoid to kill unrelated processes
+            begin
+              if Process.waitpid(cid, Process::WNOHANG).nil?
+                @logger.warn("forked process :#{cid} hanged. kill #{cid}")
+                Process.kill("KILL", cid)
+                @logger.warn("SIGKILL sent to #{cid}")
+                Process.waitpid(cid)
+                @logger.warn("#{cid} is killed")
+              else
+                raise ExternalCommandException, "#{cid} is not a child of this"
+              end
+            rescue Exception => e
+              @logger.warn "failed to kill hanged process #{cid}"
+              raise e
+            end
+          end
+        end
 
         @logger.info "executing #{command}: results stored in #{tmpdir}" 
         pid, status = Process.waitpid2(cid)
