@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-workflow-scheduler"
-  s.version     = "0.5.7"
+  s.version     = "0.5.8"
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
