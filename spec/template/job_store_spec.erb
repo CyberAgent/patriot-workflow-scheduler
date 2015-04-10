@@ -262,6 +262,7 @@ describe <%= job_store_class %> do
 
     it "should validate command" do
       command = Patriot::Command::CommandGroup.new(@config)
+      command.target_datetime = DateTime.new(2015,4,1)
       command.instance_eval(<<EOJ
       sh do 
         produce ["product1_#{@hour}"]  

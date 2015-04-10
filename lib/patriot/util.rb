@@ -8,5 +8,6 @@ module Patriot
     require 'patriot/util/retry'
     require 'patriot/util/db_client'
     require 'patriot/util/system'
+    require 'patriot/util/cron_format_parser'
   end
 end

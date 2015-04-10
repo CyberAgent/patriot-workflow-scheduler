@@ -11,7 +11,7 @@ module Patriot
         include Patriot::Command::CommandMacro
       end
 
-      attr_accessor :parser, :test_mode
+      attr_accessor :parser, :test_mode, :target_datetime
 
       # comman attributes handled distinctively (only effective in top level commands)
       volatile_attr :requisites, :products, :priority, :start_after, :exec_date, :exec_node, :exec_host, :skip_on_fail
@@ -68,13 +68,25 @@ module Patriot
         return @skip_on_fail == 'true' || @skip_on_fail == true
       end
 
+      def _month_
+        return @target_datetime.strftime("%Y-%m")
+      end
+
+      def _date_
+        return @target_datetime.strftime("%Y-%m-%d")
+      end
+
+      def _hour_
+        return @target_datetime.hour
+      end
+
       # start datetime of this command.
       # This command should be executed after the return value of this method
       # @return [DateTime]
       def start_date_time
         return nil if @exec_date.nil? && @start_after.nil?
         # set tomorrow as default
-        date = (@exec_date || date_add($dt, 1)).split("-").map(&:to_i)
+        date = (@exec_date || date_add(_date_, 1)).split("-").map(&:to_i)
         # set midnight as default
         time = (@start_after || "00:00:00").split(":").map(&:to_i)
         return DateTime.new(date[0], date[1], date[2], time[0], time[1], time[2])

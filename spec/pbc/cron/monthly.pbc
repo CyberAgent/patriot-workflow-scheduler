@@ -1,0 +1,5 @@
+#interval end_of_every_month
+sh {
+  name "echo_#{_month_}"
+  commands 'echo #{_month_}'
+}

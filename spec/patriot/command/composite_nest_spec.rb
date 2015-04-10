@@ -1,13 +1,12 @@
 require 'init_test'
 $: << File.dirname(File.expand_path(__FILE__))
 
-$dt = '2011-12-12'
-
 tmp_file = "/tmp/pac3_composite_nest_spec_msg"
 
 describe Patriot::Command::CompositeCommand do 
   include Patriot::Command::Parser
   before :all do 
+    @target_datetime = DateTime.new(2011,12,12)
     @config = config_for_test
     @valid_cmd1 = new_command(Patriot::Command::CompositeCommand) do 
       param 'tmp_file' => "/tmp/pac3_composite_nest_spec_msg"

@@ -1,6 +1,6 @@
 module Patriot
   module Command
-    ##  GroupedCommandを継承し、command_group内でつかえる関数はすべて使えるようにする
+    ##  inherit GroupedCommand so that any commands are available in a composite command
     class CompositeCommand < Patriot::Command::CommandGroup 
       declare_command_name :composite_command 
       declare_command_name :composite_job 
@@ -18,7 +18,7 @@ module Patriot
       end
 
       def configure
-        @name_suffix ||= $dt
+        @name_suffix ||= _date_
         # don't do flatten to handle nested composite commands
         @subcommands.map do |cmd|
            cmd.build(@param).each do |cmd|

@@ -17,7 +17,7 @@ module Patriot
       end
 
       def configure
-        @name_suffix ||= $dt
+        @name_suffix ||= _date_
         return self
       end
 

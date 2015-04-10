@@ -3,7 +3,7 @@ require 'init_test'
 describe Patriot::Command::CommandGroup do
   include Patriot::Command::Parser
   before :each do
-    $dt = '2013-01-01'
+    @target_datetime = DateTime.new(2013,1,1)
     @config = config_for_test
     @grouped_command = Patriot::Command::CommandGroup.new(@config)
   end
@@ -13,9 +13,6 @@ describe Patriot::Command::CommandGroup do
       it "should be nil" do
         expect(@grouped_command.subcommands).to eq []
       end
-    end
-    context "when some commands exists" do
-      ## TODO
     end
   end
 
