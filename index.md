@@ -17,8 +17,8 @@ dependency flows.
 % gem build patriot-workflow-scheduler.gemspec
 % gem install patriot-workflow-scheduler-${VERSION}>.gem
 % rehash
-% patriot-init ${install_dir}
-% cd ${install_dir}
+% patriot-init ${INSTALL_DIR}
+% cd ${INSTALL_DIR}
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
 ```
 
@@ -74,7 +74,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     % cd dbclient/patriot-mysql2-client # assuming you are in the cloned directory
     % gem build patriot-mysql2-client.gemspec
     % sudo gem install patriot-mysql2-client-${VERSION}.gem
-    % cd ${install_dir}
+    % cd ${INSTALL_DIR}
     % ./bin/patriot plugin install patriot-mysql2-client
     ```
 
@@ -84,7 +84,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     See [configuration](config.html) for more detail.
 
     ```
-    % cat ${install_dir}/config/patriot.ini
+    % cat ${INSTALL_DIR}/config/patriot.ini
     [common]
     plugins=patriot-mysql2-client
     jobstore.root.class=Patriot::JobStore::RDBJobStore
@@ -120,7 +120,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
 5. Register jobs
 
     ```
-    % ${install_dir}/bin/patriot register YYYY-mm-DD ${batch config file}
+    % ${INSTALL_DIR}/bin/patriot register YYYY-mm-DD ${batch config file}
     ```
 
     Jobs defined in the batch config file will be executed by the worker.

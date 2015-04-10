@@ -111,7 +111,7 @@ job_group{
 sh{
   require ["table_#{$dt}"]
   name "select_#{$dt}"
-  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = '#{$dt}' > result_#{$dt}"]
+  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = \'#{$dt}\'' > result_#{$dt}"]
 }
 ```
 
@@ -120,6 +120,15 @@ sh{
 Until now, the every batch configurations need 'hive -e' and have
 cumbersome quotes and escapes.
 These issues can be removed by using custom command.
+
+A custom command can be developed by implementing only 3 methods in a sub class of __Patriot::Command::Base__ together with setting command name and its attributes.
+The three methods are
+
+* __job_id__ which returns an identifier of the job in String.
+* __description__ which builds a string expressing what this job does.
+* __execute__ in which the process of the job is implemented
+
+The command name is an expression used in the PBC and the attributes are used for implementing the above methods. The command name and the attributes can be set by using class macros, __declare\_command\_name__ and __command_attr__, respectively.
 
 Below is a custom command example which executes a Hive LOAD statement.
 
@@ -201,21 +210,45 @@ end
 These command can be integrated by putting file in the plugins directory and set init.rb and patriot.ini to load the commands.
 
 ```
-mkdir -p ${INSTALL_DIR}/plugins/my_custom_commnads/lib
-cp hive_load_command.rb ${INSTALL_DIR}/plugins/my_custom_commnads/lib
-cp hive2db_command.rb ${INSTALL_DIR}/plugins/my_custom_commnads/lib
-vi ${INSTALL_DIR}/plugins/my_custom_commnads/init.rb
-cat ${INSTALL_DIR}/plugins/my_custom_commnads/init.rb
+mkdir -p ${INSTALL_DIR}/plugins/my_custom_commands/lib
+cp hive_load_command.rb ${INSTALL_DIR}/plugins/my_custom_commands/lib
+cp hive2db_command.rb ${INSTALL_DIR}/plugins/my_custom_commands/lib
+vi ${INSTALL_DIR}/plugins/my_custom_commands/init.rb
+cat ${INSTALL_DIR}/plugins/my_custom_commands/init.rb
 require 'patriot'
 require 'hive_load_command'
 require 'hive2db_command'
 
 vi ${INSTALL_DIR}/config/patriot.ini
 ...
-plugins=my_custom_commands
+plugins=my_custom_commands,patriot-mysql2-client
 ...
 
 ```
+
+By using the custom commands, the configurations can be written as below.
+
+```
+job_group{
+  produce ["table_#{$dt}"]
+  ["1", "2"].each do |i|
+    hive_load{
+      table 'table'
+      partition 'dt' => $dt, 'type' => i
+      source "path_to_source#{i}"
+    }
+  end
+}
+
+hive2db{
+  require ["table_#{$dt}"]
+  name "select_#{$dt}"
+  db 'dbname'
+  table 'tablename'
+  query "SELECT count(1) FROM table WHERE dt = '#{$dt}'"
+}
+```
+
 
 
 
