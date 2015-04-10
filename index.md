@@ -54,23 +54,24 @@ sh{
 The JobStore has a role of managing dependency among jobs.
 By using the JobStore, multiple jobs can be executed by workers in parallel and distributively (see [architecture](arch.html)).
 
-1. Configure database. 
-The recommended implementation of JobStore uses MySQL to manage the dependency.
-So MySQL database and tables should be configured.
-The three variables (PATRIOT\_DB, PATRIOT\_USER, PATRIOT\_PASSWORD) have to be set by users.
+1. Configure database.
+
+    The recommended implementation of JobStore uses MySQL to manage the dependency. So MySQL database and tables should be configured. The three variables (PATRIOT\_DB, PATRIOT\_USER, PATRIOT\_PASSWORD) have to be set by users. The DDL file is included in this repository (in the __misc__ directory).
 
     ```
     % mysql
     > create database ${PATRIOT_DB}
     > grant all on ${PATRIOT_DB}.* on ${PATRIOT_USER} identified by '${PATRIOT_PASSWORD}'
     > exit;
-    % mysql -u ${PATRIOT_USER} --password ${PATRIOT_PASSWORD} ${PATRIOT_DB} < ${install_dir}/misc/mysql.sql
+    % mysql -u ${PATRIOT_USER} --password ${PATRIOT_PASSWORD} ${PATRIOT_DB} <  misc/mysql.sql
     ```
 
 2. Install the DB adapter
 
+    The DB adapter is included in the this repository and is implemented as a plugin.
+
     ```
-    % cd ${install_dir}/dbclient/patriot-mysql2-client
+    % cd dbclient/patriot-mysql2-client # assuming you are in the cloned directory
     % gem build patriot-mysql2-client.gemspec
     % sudo gem install patriot-mysql2-client-${VERSION}.gem
     % cd ${install_dir}
