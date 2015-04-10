@@ -11,7 +11,7 @@ describe Patriot::Tool::PatriotCommands::Plugin do
   describe "plugin" do
 
     before :all do
-      @config = File.join($ROOT_PATH, "spec", "config", "test.ini")
+      @config = File.join(ROOT_PATH, "spec", "config", "test.ini")
     end
 
     before :each do

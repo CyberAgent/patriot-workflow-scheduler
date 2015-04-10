@@ -9,7 +9,7 @@ describe Patriot::Util::Logger::WebrickLogFactory do
 
   before :all do
     @name   = 'test'
-    file = File.join($ROOT_PATH, 'spec', 'config', 'logger.webrick.ini')
+    file = File.join(ROOT_PATH, 'spec', 'config', 'logger.webrick.ini')
     @config = load_config(:path => file)
   end
 

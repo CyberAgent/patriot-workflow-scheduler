@@ -17,7 +17,7 @@ describe Patriot::Util::Config do
     end
 
     it "should ignore plugin" do
-      file = File.join($ROOT_PATH, 'spec', 'config', 'test.plugin.ini')
+      file = File.join(ROOT_PATH, 'spec', 'config', 'test.plugin.ini')
       expect(@obj).not_to receive(:load_plugin)
       @obj.load_config({:ignore_plugin => true, :path => file})
     end

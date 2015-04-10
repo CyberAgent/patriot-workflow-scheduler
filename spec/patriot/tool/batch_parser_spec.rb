@@ -8,15 +8,15 @@ describe "Patriot::Tool::BatchParser" do
 
   describe ".parse" do
     it "should be node1" do
-      file     = File.join($ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc')
+      file     = File.join(ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc')
       commands = @obj.parse(@date, file)
       expect(commands[0][Patriot::Command::EXEC_NODE_ATTR]).to eq "node1"
     end
 
     it "should be each configured value" do
       files = [
-        File.join($ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc'),
-        File.join($ROOT_PATH, 'spec', 'pbc', 'exec_node2.pbc')
+        File.join(ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc'),
+        File.join(ROOT_PATH, 'spec', 'pbc', 'exec_node2.pbc')
       ]
       commands = @obj.parse(@date, files)
       expect(commands[0][Patriot::Command::EXEC_NODE_ATTR]).to eq "node1"
@@ -25,8 +25,8 @@ describe "Patriot::Tool::BatchParser" do
 
     it "should filter by job_id" do
       files = [
-        File.join($ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc'),
-        File.join($ROOT_PATH, 'spec', 'pbc', 'exec_node2.pbc')
+        File.join(ROOT_PATH, 'spec', 'pbc', 'exec_node1.pbc'),
+        File.join(ROOT_PATH, 'spec', 'pbc', 'exec_node2.pbc')
       ]
       commands = @obj.parse(@date, files, {:filter => 'sh_c1_'})
       expect(commands.size).to eq 1
@@ -39,7 +39,7 @@ describe "Patriot::Tool::BatchParser" do
 
     it "should process macro" do
       files = [
-          $ROOT_PATH + '/spec/pbc/macro.pbc',
+          ROOT_PATH + '/spec/pbc/macro.pbc',
         ]
       commands = @obj.parse(@date, files)
       expect(commands.size).to eq 2

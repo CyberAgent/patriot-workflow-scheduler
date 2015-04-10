@@ -33,7 +33,7 @@ module  TestEnvirionment
   end
 
   def path_to_test_config(type = "test")
-    File.join($ROOT_PATH,'spec', 'config', "#{type}.ini")
+    File.join(ROOT_PATH,'spec', 'config', "#{type}.ini")
   end
 
   def config_for_test(type=nil, opt = "test")

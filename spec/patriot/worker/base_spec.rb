@@ -14,7 +14,7 @@ describe Patriot::Worker::Base do
 
   describe "initialize" do
     it "should set pid file" do
-      expect(@worker_base.instance_variable_get(:@pid_file)).to eq File.join($ROOT_PATH, "run","patriot-worker_default.pid" )
+      expect(@worker_base.instance_variable_get(:@pid_file)).to eq File.join(ROOT_PATH, "run","patriot-worker_default.pid" )
     end
   end
 

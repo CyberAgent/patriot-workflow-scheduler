@@ -1,5 +1,5 @@
 job_group{
-  load_macro "#{$ROOT_PATH}/spec/pbc/testmacro.pat"
+  load_macro "#{ROOT_PATH}/spec/pbc/testmacro.pat"
   sh{
     name "test1"
     commands macro1("test1")

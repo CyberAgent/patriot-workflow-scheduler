@@ -3,18 +3,10 @@ require 'init_test'
 describe Patriot::Util::Script do 
   include Patriot::Util::Script
 
-  ## グローバル変数の保護
-  before :all do
-    @original_dt = $dt
-  end
-  after :all do
-    $dt = @original_dt
-  end
-
   describe "get_batch_files" do
     context "all" do
       it "should be expected" do
-        path    = "#{$ROOT_PATH}/spec/pbc/sh"
+        path    = "#{ROOT_PATH}/spec/pbc/sh"
         date    = '2013-01-01'
         options = {:all => true}
         files   = get_batch_files(path, date, options)
@@ -25,7 +17,7 @@ describe Patriot::Util::Script do
 
     context "daily" do
       it "should be expected" do
-        path    = "#{$ROOT_PATH}/spec/pbc/sh/daily"
+        path    = "#{ROOT_PATH}/spec/pbc/sh/daily"
         date    = '2013-01-01'
         options = {:all => true}
         files   = get_batch_files(path, date, options)
@@ -36,7 +28,7 @@ describe Patriot::Util::Script do
 
     context "weekly" do
       it "should be expected" do
-        path    = "#{$ROOT_PATH}/spec/pbc/sh/weekly"
+        path    = "#{ROOT_PATH}/spec/pbc/sh/weekly"
         date    = '2013-01-01'
         files   = get_batch_files(path, date)
         expect(files).to be_a Array
@@ -51,7 +43,7 @@ describe Patriot::Util::Script do
 
     context "monthly" do
       it "should be expected" do
-        path    = "#{$ROOT_PATH}/spec/pbc/sh/monthly"
+        path    = "#{ROOT_PATH}/spec/pbc/sh/monthly"
         date    = '2013-12-31'
         files   = get_batch_files(path, date)
         expect(files).to be_a Array
