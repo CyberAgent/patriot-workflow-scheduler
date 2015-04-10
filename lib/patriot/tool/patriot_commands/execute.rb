@@ -35,7 +35,6 @@ module Patriot
                 message = "invalid option: both of debug and test are specified"
                 raise ArgumentError, message
               end
-              $test = true if opts[:test]
 
               # parse and process commands
               parser = Patriot::Tool::BatchParser.new(config)

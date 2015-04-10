@@ -35,7 +35,7 @@ describe Patriot::Tool::PatriotCommands::Execute do
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
     end
 
-    it "single file with debug" do
+    it "single file in test mode" do
       args = [
           'execute', 
           '--test',
@@ -46,8 +46,6 @@ describe Patriot::Tool::PatriotCommands::Execute do
       expect_any_instance_of(Patriot::Command::ShCommand).to receive(:test_mode=).with(true)
       expect_any_instance_of(Patriot::Command::ShCommand).to receive(:execute_command)
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      # for backward compatibility to be removed
-      expect($test).to eq true
     end
 
     it "directory" do
