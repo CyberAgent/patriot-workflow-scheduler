@@ -11,7 +11,8 @@ describe Patriot::Util::Logger do
     it "should respond to create logger" do
       file = File.join(ROOT_PATH, 'spec', 'config', 'logger.base.ini')
       conf = load_config(:path => file)
-      expect(@obj).to respond_to(:create_logger).with(1).argument
+      logger = @obj.create_logger(conf)
+      expect(logger).to be_a Patriot::Util::Logger::Facade
     end
   end
 

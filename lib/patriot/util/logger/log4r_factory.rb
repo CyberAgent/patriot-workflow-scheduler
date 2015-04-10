@@ -9,7 +9,9 @@ module Patriot
     module Logger
       class Log4rFactory < Patriot::Util::Logger::Factory
         LOG_LEVEL_KEY  = :log_level
+        DEFAULT_LOG_LEVEL = 'DEBUG'
         FORMAT_KEY     = :log_format
+        DEFAULT_LOG_FORMAT = '%m'
         OUTPUTTERS_KEY = :log_outputters
         OUTPUTTER_KEY_PREFIX = :log_outputter
 
@@ -45,19 +47,19 @@ module Patriot
         private :set_outputters
 
         def get_log_level(_conf)
-          log_level = _conf.get(LOG_LEVEL_KEY)
+          log_level = _conf.get(LOG_LEVEL_KEY, DEFAULT_LOG_LEVEL)
           log_level = eval("Log4r::#{log_level}")
           return log_level
         end
         private :get_log_level
 
         def get_format_config(_conf)
-          return _conf.get(FORMAT_KEY)
+          return _conf.get(FORMAT_KEY, DEFAULT_LOG_FORMAT)
         end
         private :get_format_config
 
         def get_outputters(_conf, _formatter)
-          outputters = _conf.get(OUTPUTTERS_KEY)
+          outputters = _conf.get(OUTPUTTERS_KEY, [])
           outputters = [outputters] unless outputters.is_a?(Array)
           return outputters.map{|o| get_outputter(o, _conf, _formatter)}
           return outputters

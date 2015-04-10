@@ -6,6 +6,8 @@ module Patriot
       class Factory
         FACTORY_CLASS_KEY = :log_factory
 
+        DEFAULT_LOGGER_FACTORY_CLASS = 'Patriot::Util::Logger::Log4rFactory'
+
         def self.create_logger(name, config)
           klass = get_factory_class_name(config)
           # implentations of logger facotory should include Singleton
@@ -14,7 +16,7 @@ module Patriot
         end
 
         def self.get_factory_class_name(config)
-          return config.get(FACTORY_CLASS_KEY).to_s
+          return config.get(FACTORY_CLASS_KEY, DEFAULT_LOGGER_FACTORY_CLASS).to_s
         end
 
         def initialize
