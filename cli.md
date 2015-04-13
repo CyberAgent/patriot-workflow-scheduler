@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-## Patriot script
+## Patriot CLI tools
 
 ```
 % ./bin/patriot
@@ -19,26 +19,22 @@ Options:
   -c, [--config=CONFIG]  # path to configuration file
 ```
 
-### execute
-
-execute patriot jobs directly
-
-```
-./bin/patriot help execute
-Usage:
-  patriot execute [options] <yyyy-mm-dd[,yyyy-mm-dd]> <files/paths>+
-
-Options:
-  -f, [--filter=FILTER]          # regular expression for job_id
-  -d, [--debug], [--no-debug]    # run in debug mode
-  -t, [--test], [--no-test]      # run in test mode
-      [--strict], [--no-strict]  # run in strict mode (according to dependency)
-  -c, [--config=CONFIG]          # path to configuration file
-```
-
 ### register
 
-register jobs to jobstore
+By using this tool, jobs described in given PBC files can be
+registered to JobStore so that workers can execute the jobs according to their dependency.
+
+This tool requires two arguments, date (or date range) and files (or a directory) to be parsed.
+The date should be formatted in yyyy-MM-dd (e.g., 2014-12-31) and be comma-separated in case of range (e.g., 2015-01-01,2015-01-31).
+
+#### specifying execution interval
+
+Jobs may have different execution intervals (e.g., daily and monthly).
+This tool determines the interval by directory names.
+If the pass to a PBC file contains a directory named _'daily'_, the jobs in the PBC files are treated as daily jobs.
+PBC files located in a sub directory of _'monthly'_ directory, the PBC files are regarded as ones of monthly jobs and processed on only the end of each month.
+For weekly jobs, PBC files should be stored in the directory _'weekly/${wday}'_ where the _wday_ is a number for the day of week (0 is Sunday).
+
 
 ```
 % ./bin/patriot help register
@@ -59,9 +55,38 @@ Options:
 ```
 
 
+
+### execute
+
+This tool executes jobs defined in given PBC files directory.
+
+This tool is developed for testing before registering the jobs to JobStore.
+Two additional modes can be defined for this tool, _debug_ and _test_.
+In the debug mode, this tool only outputs description for the jobs without executing the jobs.
+The test mode is for implementing command-specific behavior for inspecting problems.
+
+This tool also handle the interval in the same way as the register tool.
+
+```
+./bin/patriot help execute
+Usage:
+  patriot execute [options] <yyyy-mm-dd[,yyyy-mm-dd]> <files/paths>+
+
+Options:
+  -f, [--filter=FILTER]          # regular expression for job_id
+  -d, [--debug], [--no-debug]    # run in debug mode
+  -t, [--test], [--no-test]      # run in test mode
+      [--strict], [--no-strict]  # run in strict mode (according to dependency)
+  -c, [--config=CONFIG]          # path to configuration file
+```
+
+
 ### validate
 
-validate pbc files
+This tool just validate PBC files so that
+
+1. they do not include grammatical errors.
+2. their identifiers are not duplicated.
 
 ```
 % ./bin/patriot help validate
@@ -75,7 +100,9 @@ Options:
 ```
 ### worker
 
-controll local worker
+This tool just starts or stops a worker.
+In stopping the worker, this tool sends a SIGNAL to the worker to terminate after the completion of the jobs currently executed by the worker.
+Therefore, the worker would not stop immediately.
 
 ```
 Usage:
@@ -90,7 +117,13 @@ controll worker
 
 ### worker_admin
   
-controll remote workers
+This tool administrates one or all of remote workers.
+The remote worker should be configured in the _worker_hosts_ in the configuration file.
+The tool supoorts below operations.
+
+* start/stop/restart workers
+* sleep/wake up workers (in the sleep state, workers do not execute any jobs)
+* monitor status of workers
 
 ```
 Usage:
@@ -104,7 +137,7 @@ Options:
 
 ### job
 
-manage job(s) in job store
+This tool manage jobs in JobStore.
 
 ```
 % ./bin/patriot help job
@@ -118,7 +151,7 @@ Options:
 
 ###  plugin
 
-manage plugins
+This tool is used for installing plugins build as gem packages.
 
 ```
 % ./bin/patriot help plugin
