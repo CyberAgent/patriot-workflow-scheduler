@@ -88,7 +88,7 @@ module Patriot
       # @param [Array] products a list of product name
       # @param [Hash] opts
       # @option opt [Array] :include_attrs a list of attribute included in results
-      # @return [Hash] a hash from product name to producer jobs
+      # @return [Hash] a hash from job_id to its state
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         raise NotImplementedError
       end
@@ -97,7 +97,7 @@ module Patriot
       # @param [Array] products a list of product name
       # @param [Hash] opts
       # @option opt [Array] :include_attrs a list of attribute included in results
-      # @return [Hash] a hash from product name to consumer jobs
+      # @return [Hash] a hash from job_id to its state
       def get_consumers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         raise NotImplementedError
       end
