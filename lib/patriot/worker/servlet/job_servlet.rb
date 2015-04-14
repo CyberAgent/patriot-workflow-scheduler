@@ -94,11 +94,12 @@ module Patriot
         def set_state_of_jobs(job_ids, state, opts = {})
           opts = {:include_subsequent => false}.merge(opts)
           update_id = Time.now.to_i
-          if opts[:include_subsequent]
-            dep_ids = job_ids.map{|did| get_subsequent(did)}.flatten
-            job_ids |= dep_ids
-          end
           @@job_store.set_state(update_id, job_ids, state)
+          if opts[:include_subsequent]
+            @@job_store.process_subsequent(job_ids) do |job_store, jobs|
+              @@job_store.set_state(update_id, jobs.map(&:job_id), state)
+            end
+          end
           update_job_size(state)
           respond_with :state_updated, {:jobs => job_ids, :state => state}
         end
@@ -110,14 +111,6 @@ module Patriot
           respond_with :jobs_deleted, {:jobs => job_ids}
         end
         private :delete_jobs
-
-        def get_subsequent(job_id)
-          job     = @@job_store.get(job_id, :include_dependency => true)
-          dep_ids = job['consumers'].keys
-          dep_ids |= dep_ids.map{|did| get_subsequent(did)}
-          return dep_ids.flatten.compact.uniq
-        end
-        private :get_subsequent
 
       end
     end

@@ -134,6 +134,25 @@ module Patriot
         raise NotImplementedError
       end
 
+      # Process subsequent jobs with a given block.
+      # The block is called for each dependency depth.
+      # @param jobs_ids [Array<String>]
+      # @yieldparam job_store [Patriot::JobStore::Base] this job_store
+      # @yieldparam jobs [Patriot::JobStore::Job] subsequet jobs
+      def process_subsequent(job_ids, &blk)
+        products = job_ids.map{|jid|
+          job = get_job(jid)
+          job.nil? ? nil : job[Patriot::Command::PRODUCTS_ATTR]
+        }.compact.flatten
+        consumers = get_consumers(products)
+        while !consumers.empty?
+          jobs = consumers.keys.map{|jid| get_job(jid)}.compact
+          yield self, jobs
+          products = jobs.map{|j| j[Patriot::Command::PRODUCTS_ATTR]}.compact.flatten
+          consumers = get_consumers(products)
+        end
+      end
+
     end
   end
 end
