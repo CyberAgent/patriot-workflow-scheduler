@@ -21,15 +21,15 @@ describe Patriot::Controller::WorkerAdminController  do
 
     it "should get status" do
       @worker.status = Patriot::Worker::Status::ACTIVE
-      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to eq Patriot::Worker::Status::ACTIVE
+      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to match Patriot::Worker::Status::ACTIVE
     end
 
     it "should sleep and wake up workers" do
       @worker.status = Patriot::Worker::Status::ACTIVE
       @controller.sleep_worker({:host => "127.0.0.1"})
-      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to eq Patriot::Worker::Status::SLEEP
+      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to match Patriot::Worker::Status::SLEEP
       @controller.wake_worker({:host => "127.0.0.1"})
-      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to eq Patriot::Worker::Status::ACTIVE
+      expect(@controller.status({:host => "127.0.0.1"})["127.0.0.1"]).to match Patriot::Worker::Status::ACTIVE
     end
   end
 
