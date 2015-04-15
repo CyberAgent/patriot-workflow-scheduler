@@ -1,29 +1,23 @@
-*.gem
-*.rbc
-.bundle
-.config
-coverage
-InstalledFiles
-lib/bundler/man
-lib/*.jar
-pkg
-rdoc
-spec/reports
-spec/pac3_test_db
-test/tmp
-test/version_tmp
-tmp
-/config
-/batch
-/run
-/script
+# ignore test tmp files
+spec/tmp
 
-.gitmodules
-plugins/*
+# ignore files for local execution
+*.gem
+config
+batch
+run
+script
 public
+
+# ignore plugins
+plugins/*
+!plugins/patriot-mysql2-client
+!plugins/patriot-sqlite3-client
+
 
 # YARD artifacts
 .yardoc
 _yardoc
 doc/
 
+!.gitignore
