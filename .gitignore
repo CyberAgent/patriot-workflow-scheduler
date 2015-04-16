@@ -1,5 +1,5 @@
-# ignore test tmp files
 spec/tmp
+pkg
 
 # ignore files for local execution
 *.gem

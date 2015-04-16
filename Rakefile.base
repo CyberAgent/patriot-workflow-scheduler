@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+require 'rubygems'
+require 'rake/clean'
+require 'rspec/core/rake_task'
+require 'bundler/gem_tasks'
+require 'yard'
+require 'yard/rake/yardoc_task'
+Rake::Task[:release].clear
+
+CLOBBER.include('pkg', 'doc')
+
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = ["-fd", "-c"]
+end
+
+YARD::Rake::YardocTask.new(:yard)
+
