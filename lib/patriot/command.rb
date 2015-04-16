@@ -24,9 +24,22 @@ module Patriot
 
     # return value of execute()
     module ExitCode
-      SUCCEEDED = 0
-      FAILED    = 1
-      SKIPPED   = -1
+      SUCCEEDED    = 0
+      FAILED       = 1
+      FAILURE_SKIPPED = 2
+      SKIPPED      = -1
+
+      def name_of(state)
+        state = state.to_i
+        return case state
+          when 0  then "SUCCEEDED"
+          when 1  then "FAILED"
+          when 2  then "FAILURE_SKIPPED"
+          when 4  then "FAILED" # for backward compatibility
+          else raise "unknown state #{state}"
+        end
+      end
+      module_function :name_of
     end
 
     require 'patriot/command/parser'

@@ -100,7 +100,7 @@
   <td> <%= history[:node] %> </td>
   <td> <%= history[:begin_at] %> </td>
   <td> <%= history[:end_at] %> </td>
-  <td> <%= history[:state].nil? ? "" : Patriot::JobStore::JobState.name_of(history[:state]) %> </td>
+  <td> <%= history[:state].nil? ? "" : Patriot::Command::ExitCode.name_of(history[:state]) %> </td>
   <td> <%= history[:description] %> </td>
 <% end %>
   </tr>

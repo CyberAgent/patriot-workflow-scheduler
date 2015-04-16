@@ -189,11 +189,11 @@ END_OB_QUERY
 
       # @see Patriot::JobStore::Base#report_completion_status
       def report_completion_status(job_ticket)
-        post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[job_ticket.exit_code]
-        raise "illegal exit_code #{job_ticket.exit_code}" if post_state.nil?
+        exit_code  = job_ticket.exit_code
+        post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[exit_code]
+        raise "illegal exit_code #{exit_code}" if post_state.nil?
         connect(@db_config) do |c|
-          # TODO set description
-          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :state => post_state, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
+          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :state => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
             @logger.warn "illegal state of history for #{job_ticket.job_id}"
           end
           return _check_and_set_state(job_ticket, Patriot::JobStore::JobState::RUNNING, post_state, c)
