@@ -14,9 +14,7 @@ dependency flows.
 ```
 % git clone https://github.com/CyberAgent/patriot-workflow-scheduler.git
 % cd patriot-workflow-scheduler
-% gem build patriot-workflow-scheduler.gemspec
-% gem install patriot-workflow-scheduler-${VERSION}>.gem
-% rehash
+% rake install
 % patriot-init ${INSTALL_DIR}
 % cd ${INSTALL_DIR}
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
@@ -71,11 +69,9 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     The DB adapter is included in the this repository and is implemented as a plugin.
 
     ```
-    % cd dbclient/patriot-mysql2-client # assuming you are in the cloned directory
-    % gem build patriot-mysql2-client.gemspec
-    % sudo gem install patriot-mysql2-client-${VERSION}.gem
+    % rake build:mysql2
     % cd ${INSTALL_DIR}
-    % ./bin/patriot plugin install patriot-mysql2-client
+    % ./bin/patriot plugin install ${CLONE_DIR}/plugins/patriot-mysql2-client/pkg/patriot-mysql-client-${VERSION}.gem
     ```
 
 3. Configure JobStore and workers.
