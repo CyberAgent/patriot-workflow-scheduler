@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-sqlite3-client"
-  s.version     = "0.5.0"
+  s.version     = "0.6.0"
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'sqlite3', '~>1.3'
-  s.add_dependency 'patriot-workflow-scheduler', '~>0.5'
+  s.add_dependency 'patriot-workflow-scheduler', '~>0.6'
 end
