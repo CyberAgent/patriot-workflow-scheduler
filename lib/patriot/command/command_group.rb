@@ -1,32 +1,26 @@
 module Patriot
   module Command 
-    ## Patriot::Command::Baseを継承
+    # define a group of jobs
     class CommandGroup < Base
       declare_command_name :command_group
       declare_command_name :job_group
       attr_accessor :subcommands
 
+      # @param config [Patriot::Util::Config::Base]
       def initialize(config)
         super
         @subcommands = []
       end
 
-      def job_id
-        raise "unsupported"
-      end
-
+      # add a command to this group
+      # @param cmd [Patriot::Command::Base] a command to be added to this group
       def add_subcommand(cmd)
         @subcommands << cmd
       end
 
-      def serialize
-        raise "Unsupported Exception"
-      end
-
-      def command_attrs
-        []
-      end
-
+      # configure thie group.
+      # pass the required/produced products and parameters to the commands in this group
+      # @return [Array<Patriot::Command::Base>] a list of commands in this group
       def configure
         return @subcommands.map{|cmd|
           cmd.require @requisites
@@ -35,6 +29,7 @@ module Patriot
         }.flatten
       end
 
+      # execute each command in this group
       def execute
         @subcommands.each do |k,v|
           v.execute
