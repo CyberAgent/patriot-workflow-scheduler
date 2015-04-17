@@ -7,7 +7,9 @@ module Patriot
       include Patriot::Util::Config
       include Patriot::Util::Logger
 
+      # a command line used for start/stop workers
       WORKER_COMMAND = File.join($home || Dir.pwd,'bin', 'patriot worker')
+      # a command line used for upgrade
       UPGRADE_COMMAND = File.join($home || Dir.pwd,'bin', 'patriot upgrade')
 
       # constructor

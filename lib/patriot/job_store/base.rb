@@ -2,6 +2,7 @@ require 'patriot/util'
 
 module Patriot
   module JobStore
+    # base class of JobStore
     class Base
       include Patriot::Util::Logger
 
@@ -136,7 +137,7 @@ module Patriot
 
       # Process subsequent jobs with a given block.
       # The block is called for each dependency depth.
-      # @param jobs_ids [Array<String>]
+      # @param job_ids [Array<String>]
       # @yieldparam job_store [Patriot::JobStore::Base] this job_store
       # @yieldparam jobs [Patriot::JobStore::Job] subsequet jobs
       def process_subsequent(job_ids, &blk)

@@ -1,9 +1,12 @@
 module Patriot
   module Util
     module Logger
+      # facade class for loggers
       class Facade
+        # supported log levels
         LEVELS = [:debug, :info, :warn, :error, :fatal]
 
+        # @param logger [Object] logger hidden in this facade
         def initialize(logger)
           @logger = logger
         end

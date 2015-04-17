@@ -1,7 +1,15 @@
 module Patriot
   module Util
+    # a module to find target files
     module Script
       include Patriot::Util::DateUtil
+
+      # get target batch files from a given path
+      # @param path [String] path to target directory
+      # @param date [String] target date in '%Y-%m-%d'
+      # @param opt [Hash]
+      # @option opt :all [Boolean] force target all files
+      # @return [Array<String>] a list of target files
       def get_batch_files(path, date, opt = {})
         return [path] if File.file?(path) && File.extname(path) == ".pbc" 
         files = []

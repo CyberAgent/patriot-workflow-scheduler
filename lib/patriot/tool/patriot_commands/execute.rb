@@ -1,6 +1,8 @@
 module Patriot
   module Tool
+    # namesapce for patriot comman line tools
     module PatriotCommands
+      # execute PBC directory
       module Execute
 
         Patriot::Tool::PatriotCommand.class_eval do

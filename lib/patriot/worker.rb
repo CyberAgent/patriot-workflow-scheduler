@@ -1,9 +1,13 @@
 module Patriot
+  # namespace for workers
   module Worker
     # states of worker
     module Status
+      # worker is active
       ACTIVE   = 'ACTIVE'
+      # worker sleeps (don't execute jobs)
       SLEEP    = 'SLEEP'
+      # worker is going to down
       SHUTDOWN = 'SHUTDOWN'
     end
 
@@ -15,8 +19,11 @@ module Patriot
     # SIGNAL used for getting thread dump
     SIGNAL_FOR_THREAD_DUMP       = ['QUIT']
 
+    # default fetch cycle for getting job tickets in minutes
     DEFAULT_FETCH_CYCLE = 300
+    # default limit of the number of jobs fetched at once
     DEFAULT_FETCH_LIMIT = 200
+    # default worker name (for logging)
     DEFAULT_WORKER_NAME = 'default'
 
     require 'patriot/worker/servlet'

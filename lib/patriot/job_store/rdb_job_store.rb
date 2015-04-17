@@ -2,19 +2,27 @@ require 'json'
 module Patriot
   module JobStore
 
-    # job store implementation on RDB
+    # a JobStore implementation on RDB
     class RDBJobStore < Patriot::JobStore::Base
 
+      # default  priority
       DEFAULT_PRIORITY=1 #  TODO move to Patriot::JobStore of core
 
-      # Tables
+      ####  Tables
+      # job definition table
       JOB_TABLE      = 'jobs'
+      # dependency relation table
       FLOW_TABLE     = 'flows'
+      # job and produced product table
       PRODUCER_TABLE = 'producers'
+      # job and required product table
       CONSUMER_TABLE = 'consumers'
+      # table for execution history
       HISTORY_TABLE  = 'job_profiles' # TODO rename job_histories
 
+      # attributes included in job_ticket
       TICKET_COLUMNS = ['job_id', 'update_id', 'node']
+      # all columns of the job table
       ALL_COLUMNS    = [:id,
                         :job_id,
                         :job_def_id,
@@ -25,6 +33,7 @@ module Patriot
                         :node,
                         :host,
                         :priority]
+      # mapping from command attributes to table columns
       ATTR_TO_COLUMN = {Patriot::Command::STATE_ATTR          => :state,
                         Patriot::Command::PRIORITY_ATTR       => :priority,
                         Patriot::Command::START_DATETIME_ATTR => :start_after,

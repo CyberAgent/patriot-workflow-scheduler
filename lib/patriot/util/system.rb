@@ -2,17 +2,27 @@ require 'fileutils'
 require 'time'
 module Patriot
   module Util
+    # module for interaction with OS
     module System
+      # exception in case of OS command failed
       class ExternalCommandException < Exception; end
 
+      # suffix of file where stdout is written
       STDOUT_SUFFIX=".stdout"
+      # suffix of file where stderr is written
       STDERR_SUFFIX=".stderr"
 
+      # configuration key for tmp directory where stdout/stderr are written
       PATRIOT_TMP_DIR_KEY        = "patriot.tmp.dir"
+      # defatul path to the tmp directory
       DEFAULT_PATRIOT_TMP_DIR    = "/tmp/patriot-workflow-scheduler"
+      # max size of error message included in exceptions
       MAX_ERROR_MSG_SIZE_KEY     = "patriot.max.error.size"
+      # defaut max size of error message
       DEFAULT_MAX_ERROR_MSG_SIZE = 256
 
+      # @private
+      # get path to tmp directory (visible for test)
       def tmp_dir(pid, dt, ts, tmp_dir = DEFAULT_PATRIOT_TMP_DIR)
         prefix = "p#{pid.to_s}"
         prefix = "j#{Thread.current[Patriot::Worker::JOB_ID_IN_EXECUTION]}" if Thread.current[Patriot::Worker::JOB_ID_IN_EXECUTION] 
@@ -20,6 +30,8 @@ module Patriot
         return File.join(tmp_dir, dt, "#{prefix}_#{ts_exp}")
       end
 
+      # @private
+      # fork and execute the command (visible for test)
       def do_fork(cmd, dt, ts, tmp_dir = DEFAULT_PATRIOT_TMP_DIR)
         cid = fork do 
           tmpdir = tmp_dir($$, dt, ts, tmp_dir)
@@ -33,6 +45,9 @@ module Patriot
         return cid
       end
 
+      # execute command on OS
+      # @param command [String] command to be executed
+      # @yield block for error handling
       def execute_command(command, &blk)
         so, se = nil
 

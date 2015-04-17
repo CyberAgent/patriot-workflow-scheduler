@@ -2,6 +2,7 @@ require 'thread'
 
 module Patriot
   module JobStore
+    # a JobStore implementation on memory
     class InMemoryStore < Patriot::JobStore::Base
       include Patriot::Util::Logger
       include Patriot::Util::Retry

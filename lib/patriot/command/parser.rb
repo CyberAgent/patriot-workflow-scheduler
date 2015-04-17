@@ -8,7 +8,6 @@ module Patriot
       # create a command
       # @param cls [Class] class of the command
       # @yield block to set attributes to the command
-      # @todo remove invoction of register_command by moving to the command_macro
       def new_command(cls, &blk)
         raise "configuration is not set" if @config.nil?
         command = cls.new(@config)

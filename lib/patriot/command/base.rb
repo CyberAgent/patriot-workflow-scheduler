@@ -1,6 +1,8 @@
 require 'active_support/core_ext/hash/deep_merge'
 module Patriot
   module Command
+    # The base class of every command.
+    # The command is an executable form of the job.
     class Base
       include Patriot::Command::Parser
       include Patriot::Util::Param
@@ -16,6 +18,7 @@ module Patriot
       # comman attributes handled distinctively (only effective in top level commands)
       volatile_attr :requisites, :products, :priority, :start_after, :exec_date, :exec_node, :exec_host, :skip_on_fail
 
+      # @param config [Patriot::Util::Config::Base] configuration for this command
       def initialize(config)
         @config     = config
         @logger     = create_logger(config)
@@ -26,56 +29,75 @@ module Patriot
         @test_mode  = false
       end
 
+      # convert this to a job so that it can be stored to JobStore
+      # @return [Patriot::JobStore::Job] a job for this command.
       def to_job
         job = Patriot::JobStore::Job.new(self.job_id)
         job.read_command(self)
         return job
       end
 
-      def [](key)
-        return instance_variable_get("@#{key}".to_sym)
+      # get the value of an attribute
+      # @param attr_name [String] attribute name
+      # @return [Object] the value of the attribute specified with argument
+      def [](attr_name)
+        return instance_variable_get("@#{attr_name}".to_sym)
       end
 
+      # build the identifier of the job for this command.
+      # This method should be overriden in sub-classes
+      # @return [String] the identifier of the job.
       def job_id
         raise NotImplementedError
       end
 
       # set default command name
       # replace :: to handle in JSON format
+      # @return [String] a simplified command namd
       def command_name
         return self.class.to_s.split("::").last.downcase.gsub(/command/,"")
       end
 
+      # add products required by this job.
+      # @param requisites [Array<String>] a list of products required by this job.
       def require(requisites)
         return if requisites.nil?
         @requisites |= requisites.flatten
       end
 
+      # add products produced by this job.
+      # @param products [Array<String>] a list of products produced by this job
       def produce(products)
         return if products.nil?
         @products |= products.flatten
       end
 
+      # mark this job to skip execution
       def skip
         param 'state' => Patriot::JobStore::JobState::SUCCEEDED
       end
 
+      # mark this job to suspend execution
       def suspend
         param 'state' => Patriot::JobStore::JobState::SUSPEND
       end
 
+      # mark this job to skip in case of failures
       def skip_on_fail?
         return @skip_on_fail == 'true' || @skip_on_fail == true
       end
 
+      # @return [String] the target month in '%Y-%m'
       def _month_
         return @target_datetime.strftime("%Y-%m")
       end
 
+      # @return [String] the target date in '%Y-%m-%d'
       def _date_
         return @target_datetime.strftime("%Y-%m-%d")
       end
 
+      # @return [Integer] the tergat hour
       def _hour_
         return @target_datetime.hour
       end

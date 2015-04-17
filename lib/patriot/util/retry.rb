@@ -1,6 +1,7 @@
 
 module Patriot
   module Util
+    # a mudule enables operations to be retried
     module Retry
       # execute block and retry the block 
       # @param retry_config :num_retry the max number of retry, :wait_time retry interval

@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # remote worker administration tool
       module WorkerAdmin
 
         Patriot::Tool::PatriotCommand.class_eval do

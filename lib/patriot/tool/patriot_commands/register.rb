@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # register jobs to JobStore
       module Register
 
         Patriot::Tool::PatriotCommand.class_eval do

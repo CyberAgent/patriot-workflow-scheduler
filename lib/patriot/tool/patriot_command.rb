@@ -2,6 +2,7 @@ require 'rubygems'
 require 'thor'
 
 module Patriot
+  # namespace for command line tools
   module Tool
 
     # new command can be added as follows

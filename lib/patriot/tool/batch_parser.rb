@@ -1,5 +1,6 @@
 module Patriot
   module Tool
+    # PBC parser
     class BatchParser
       include Patriot::Util::Logger
       include Patriot::Util::DateUtil
@@ -9,6 +10,7 @@ module Patriot
       # default interval is daily
       DEFAULT_INTERVAL = '0 0 * * *'
 
+      # @param config [Patriot::Util::Config::Base] configuration
       def initialize(config)
         @config = config
         @logger = create_logger(config)
@@ -78,6 +80,8 @@ module Patriot
         return commands
       end
 
+      # parse pre processors
+      # @param pre_process [Array<String>] a list of pre processors
       def parse_preprocess(pre_process)
         context = {}
         pre_process.each do |op|
@@ -88,6 +92,7 @@ module Patriot
         return context
       end
 
+      # return parser instance
       def dsl_parser
         # CommandGroup includes the Patriot::Parser module
         return Patriot::Command::CommandGroup.new(@config)

@@ -1,4 +1,5 @@
 module Patriot
+  # namespace for utility functions
   module Util
     require 'patriot/util/config'
     require 'patriot/util/logger'

@@ -5,6 +5,7 @@ module Patriot
 
       attr_accessor :job_id, :update_id, :attributes
 
+      # @param job_id [String]  the identifier of the job
       def initialize(job_id)
         @job_id     = job_id
         @attributes = {
@@ -13,21 +14,32 @@ module Patriot
                       }
       end
 
+      # set an attribute to this job
+      # @param k [String] attribute name
+      # @param v [Object] attribute value
       def []=(k,v)
         raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
         @attributes[k] = v
       end
 
+      # get an attribute to this job
+      # @param k [String] attribute name
+      # @return [Object] the attribute value
       def [](k)
         raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
         return @attributes[k]
       end
 
+      # delete an attribute
+      # @param k [String] attribute name
+      # @return [Object] the deleted attribute value
       def delete(k)
         raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
         return @attributes.delete(k)
       end
 
+      # read the content of command
+      # @param command [Patriot::Command::Base] a command loaded to this job
       def read_command(command)
         Patriot::Command::COMMON_ATTRIBUTES.each do |attr|
           value = command.instance_variable_get("@#{attr}".to_sym)
@@ -36,6 +48,7 @@ module Patriot
         _to_stdobj(command).each{|k,v| self[k] = v}
       end
 
+      # @private
       # convert a given object to an object only includes standand objects can be converted to JSON.
       # in other words, convert Command instances in the object to hash
       def _to_stdobj(obj)
@@ -59,12 +72,18 @@ module Patriot
       end
       private :_to_stdobj
 
+      # @param config [Patriot::Util::Command::Base] configuration for building a command
+      # @return [Patriot::Command::Base] an executable for this job
       def to_command(config)
         raise "configuration is not set" if config.nil?
         return _from_stdobj(self.attributes, config)
       end
 
+      # @private
       # convert corresponding objects in the given argument into Command instances.
+      # @param obj [Object] a object to be deserialized
+      # @param config [Patriot::util::Config::Base] configuration used for deserialization
+      # @return [Object] a starndard object (primitive or command, or array) for the obj
       def _from_stdobj(obj, config)
         if obj.is_a?(Hash)
           if obj.has_key?(Patriot::Command::COMMAND_CLASS_KEY)
@@ -87,6 +106,8 @@ module Patriot
         end
       end
 
+      # @param attrs [Array<String>] a list of attribute names
+      # @return [Hash] a set of attribute name value pairs for specified attributes
       def filter_attributes(attrs)
         filtered = {}
         attrs.each{|a| filtered[a] = self[a]}

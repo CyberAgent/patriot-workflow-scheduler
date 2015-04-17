@@ -14,6 +14,7 @@ module Patriot
         
       attr_accessor :host, :status, :cycle, :job_store
 
+      # @param config [Patriot::Util::Config::Base]
       def initialize(config)
         raise "configuration is nil" if config.nil?
         @logger      = create_logger(config)

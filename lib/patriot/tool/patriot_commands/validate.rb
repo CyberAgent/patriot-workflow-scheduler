@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # validate PBC files
       module Validate
 
         Patriot::Tool::PatriotCommand.class_eval do
