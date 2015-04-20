@@ -38,6 +38,10 @@ describe "Patriot::Tool::BatchParser" do
     expect(commands.size).to eq 1
     expect(commands[0].job_id).to eq "sh_echo_2015-02_2015-02-28"
     expect(commands[0][:commands]).to contain_exactly "echo 2015-02"
+
+    @obj = Patriot::Tool::BatchParser.new(config_for_test)
+    commands = @obj.parse('2015-03-01', pbc_file)
+    expect(commands.size).to eq 0
   end
 
   it "should parse weekly job" do
