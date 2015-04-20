@@ -64,10 +64,10 @@ describe Patriot::Worker::Base do
       expect(@job1).to be_succeeded_in @worker_base.instance_variable_get(:@job_store)
       history = @job_store.get_execution_history(@job1.job_id)
       expect(history.size).to eq 1
-      expect(history[0]).to a_hash_including(:job_id => @job1.job_id,
-                                            :node   => Thread.current[:name],
-                                            :host   => `hostname`.chomp,
-                                            :state  => Patriot::JobStore::JobState::SUCCEEDED)
+      expect(history[0]).to a_hash_including(:job_id    => @job1.job_id,
+                                             :node      => Thread.current[:name],
+                                             :host      => `hostname`.chomp,
+                                             :exit_code => Patriot::Command::ExitCode::SUCCEEDED)
       expect(history[0][:begin_at]).not_to be nil
       expect(history[0][:end_at]).not_to be nil
     end

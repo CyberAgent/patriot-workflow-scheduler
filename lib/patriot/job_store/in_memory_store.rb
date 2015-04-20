@@ -119,7 +119,7 @@ module Patriot
           raise "illegal state job_history is not set for #{job_id}" if last_history.nil? || last_history.empty?
           last_history = last_history[0]
           # TODO make the max number of histories configurable and keep multiple histories
-          @job_history[job_id] = [last_history.merge({:state => exit_code, :end_at => Time.now, :description => job_ticket.description})]
+          @job_history[job_id] = [last_history.merge({:exit_code => exit_code, :end_at => Time.now, :description => job_ticket.description})]
           return _check_and_set_state(job_id, update_id, Patriot::JobStore::JobState::RUNNING, state)
         end
       end

@@ -223,7 +223,7 @@ describe <%= job_store_class %> do
       expect(history[0]).to a_hash_including(:job_id   => @job.job_id,
                                              :node     => 'test_node',
                                              :host     => 'test_host',
-                                             :state    => Patriot::Command::ExitCode::SUCCEEDED,
+                                             :exit_code   => Patriot::Command::ExitCode::SUCCEEDED,
                                              :description => "test desc")
       expect(history[0][:begin_at].to_s).to eq begin_at.to_s
       expect(history[0][:end_at].to_s).to eq end_at.to_s
@@ -247,7 +247,7 @@ describe <%= job_store_class %> do
       @job_store.report_completion_status(@job_ticket)
       expect(@job).to be_succeeded_in @job_store
       history = @job_store.get_execution_history(@job.job_id, {:limit => 1})
-      expect(history[0][:state]).to eq Patriot::Command::ExitCode::FAILURE_SKIPPED
+      expect(history[0][:exit_code]).to eq Patriot::Command::ExitCode::FAILURE_SKIPPED
     end
 
     it "should fail with deserialization failure" do

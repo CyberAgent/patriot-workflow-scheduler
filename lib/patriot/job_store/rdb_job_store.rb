@@ -18,7 +18,7 @@ module Patriot
       # job and required product table
       CONSUMER_TABLE = 'consumers'
       # table for execution history
-      HISTORY_TABLE  = 'job_profiles' # TODO rename job_histories
+      HISTORY_TABLE  = 'job_histories'
 
       # attributes included in job_ticket
       TICKET_COLUMNS = ['job_id', 'update_id', 'node']
@@ -202,7 +202,7 @@ END_OB_QUERY
         post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[exit_code]
         raise "illegal exit_code #{exit_code}" if post_state.nil?
         connect(@db_config) do |c|
-          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :state => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
+          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :exit_code => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
             @logger.warn "illegal state of history for #{job_ticket.job_id}"
           end
           return _check_and_set_state(job_ticket, Patriot::JobStore::JobState::RUNNING, post_state, c)
