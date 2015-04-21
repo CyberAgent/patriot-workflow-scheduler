@@ -9,14 +9,20 @@ module Patriot
 
       include MonitorMixin
 
-      # type of node
+      ### type of node
+      # handle any jobs without label or same label
       ANY = 'any'
+      # handle only jobs with same label
       OWN = 'own' 
+      # supporte node types
       SUPPORTED_TYPES = [ANY,OWN]
 
-      # type of job
+      ### type of job
+      # executed by any node
       ANY_EXCLUDE_TYPE_OWN = 0
+      # executed by only same labeled node
       ONLY_SPECIFIED_NODE  = 1
+      # unknown
       UNEXPECTED           = 2
 
       # @see Patriot::Worker::Base#init_worker

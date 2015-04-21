@@ -3,7 +3,7 @@ require 'patriot/tool/patriot_commands/register'
 
 describe Patriot::Tool::PatriotCommands::Register do
   before :all do
-    @config = "#{$ROOT_PATH}/spec/config/test.ini"
+    @config = "#{ROOT_PATH}/spec/config/test.ini"
   end
 
   before :each do
@@ -24,7 +24,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc"
+          "#{ROOT_PATH}/spec/pbc/sh.pbc"
         ]
       expect(@job_store).not_to receive(:retry_dependent)
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
@@ -39,7 +39,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "--config=#{@config}",
           "--debug",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc"
+          "#{ROOT_PATH}/spec/pbc/sh.pbc"
         ]
       expect(@job_store).not_to receive(:register)
       expect(@job_store).not_to receive(:retry_dependent)
@@ -51,8 +51,8 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh1.pbc",
-          "#{$ROOT_PATH}/spec/pbc/sh2.pbc"
+          "#{ROOT_PATH}/spec/pbc/sh1.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh2.pbc"
         ]
       expect(@job_store).not_to receive(:retry_dependent)
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
@@ -65,7 +65,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01,2013-01-03',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc"
+          "#{ROOT_PATH}/spec/pbc/sh.pbc"
         ]
       expect(@job_store).not_to receive(:retry_dependent)
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
@@ -79,8 +79,8 @@ describe Patriot::Tool::PatriotCommands::Register do
           "--config=#{@config}",
           "--state=0",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/consumer.pbc",
-          "#{$ROOT_PATH}/spec/pbc/producer.pbc"
+          "#{ROOT_PATH}/spec/pbc/consumer.pbc",
+          "#{ROOT_PATH}/spec/pbc/producer.pbc"
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       job_ids = @job_store.instance_variable_get(:@jobs).keys.map(&:to_s)
@@ -93,7 +93,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "--config=#{@config}",
           "--retry_dep",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/producer.pbc"
+          "#{ROOT_PATH}/spec/pbc/producer.pbc"
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       job_ids = @job_store.instance_variable_get(:@jobs).keys.map(&:to_s)
@@ -109,7 +109,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "--config=#{@config}",
           "--state=3",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUSPEND
@@ -117,7 +117,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
@@ -128,7 +128,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh_skip.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh_skip.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_skip_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUCCEEDED
@@ -136,7 +136,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh_suspend.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh_suspend.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_suspend_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUSPEND
@@ -148,7 +148,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "--config=#{@config}",
           "--priority=50",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_2013-01-01")['priority']).to eq 50
@@ -158,7 +158,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           'register',
           "--config=#{@config}",
           '2013-01-01',
-          "#{$ROOT_PATH}/spec/pbc/sh_priority.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh_priority.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_priority_2013-01-01")['priority']).to eq 99

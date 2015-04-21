@@ -1,24 +1,30 @@
 module Patriot
   module Command
-    ##  GroupedCommandを継承し、command_group内でつかえる関数はすべて使えるようにする
+    # a command which is composed of multiple sub commands
     class CompositeCommand < Patriot::Command::CommandGroup 
       declare_command_name :composite_command 
       declare_command_name :composite_job 
       private_command_attr :contained_commands => []
       volatile_attr :name, :name_suffix
 
+      # @return [String] the identifier of this composite command
+      # @see Patriot::Command::Base#job_id
       def job_id  
         return "#{command_name}_#{@name}_#{@name_suffix}"
       end
 
+      # @see Patriot::Command::Base#description
       def description
         first_job = @contained_commands.first
         first_job = first_job.description unless first_job.nil?
         return "#{first_job} ... (#{@contained_commands.size} jobs)"
       end
 
+      # configure this composite command.
+      # pull up required/produced products from the sub commands
+      # @see Patriot::Command::Base#configure
       def configure
-        @name_suffix ||= $dt
+        @name_suffix ||= _date_
         # don't do flatten to handle nested composite commands
         @subcommands.map do |cmd|
            cmd.build(@param).each do |cmd|
@@ -30,6 +36,8 @@ module Patriot
         return self
       end
 
+      # execute the contained commands
+      # @see Patriot::Command::Base#execute
       def execute
         @contained_commands.each do |c|
           c.execute

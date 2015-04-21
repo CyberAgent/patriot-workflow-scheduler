@@ -4,7 +4,9 @@ require 'sinatra/contrib'
 module Patriot
   module Worker
     module Servlet
+      # excepton thrown in case job not found
       class JobNotFoundException < Exception; end
+      # provide job management functionalities
       class JobServlet < Sinatra::Base
         register Sinatra::Contrib
 
@@ -12,6 +14,8 @@ module Patriot
         set :views, File.join($home, "public", "templates")
         set :show_exceptions, :after_handler
 
+        # @param worker [Patriot::Wokrer::Base]
+        # @param config [Patriot::Util::Config::Base]
         def self.configure(worker, config)
           @@job_store = worker.job_store
           @@username  = config.get(USERNAME_KEY, "")
@@ -20,14 +24,17 @@ module Patriot
 
         ### Helper Methods
         helpers do
+          # return link to each job information
           def to_job_link(job_id)
             return "<a href='/jobs/#{ERB::Util.url_encode(job_id)}'>#{job_id}</a>"
           end
+          # require authorization for updating
           def protected!
             return if authorized?
             headers['WWW-Authenticate'] = 'Basic Realm="Admin Only"'
             halt 401, "Not Authorized"
           end
+          # authorize user (basic authentication)
           def authorized?
             @auth ||= Rack::Auth::Basic::Request.new(request.env)
             return @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [@@username, @@password]
@@ -87,18 +94,22 @@ module Patriot
           "Job #{env['sinatra.error'].message} is not found"
         end
 
+        # update jobs size
         def update_job_size(state)
           @size = @@job_store.get_job_size(:ignore_states => [Patriot::JobStore::JobState::SUCCEEDED])
         end
 
+        # @private
+        # update state of jobs
         def set_state_of_jobs(job_ids, state, opts = {})
           opts = {:include_subsequent => false}.merge(opts)
           update_id = Time.now.to_i
-          if opts[:include_subsequent]
-            dep_ids = job_ids.map{|did| get_subsequent(did)}.flatten
-            job_ids |= dep_ids
-          end
           @@job_store.set_state(update_id, job_ids, state)
+          if opts[:include_subsequent]
+            @@job_store.process_subsequent(job_ids) do |job_store, jobs|
+              @@job_store.set_state(update_id, jobs.map(&:job_id), state)
+            end
+          end
           update_job_size(state)
           respond_with :state_updated, {:jobs => job_ids, :state => state}
         end
@@ -110,14 +121,6 @@ module Patriot
           respond_with :jobs_deleted, {:jobs => job_ids}
         end
         private :delete_jobs
-
-        def get_subsequent(job_id)
-          job     = @@job_store.get(job_id, :include_dependency => true)
-          dep_ids = job['consumers'].keys
-          dep_ids |= dep_ids.map{|did| get_subsequent(did)}
-          return dep_ids.flatten.compact.uniq
-        end
-        private :get_subsequent
 
       end
     end

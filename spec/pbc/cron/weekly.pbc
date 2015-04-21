@@ -1,0 +1,5 @@
+#interval 15 1 * * 1,3
+sh {
+  name "echo_#{@target_datetime.strftime('%A')}"
+  commands 'echo #{_date_}'
+}

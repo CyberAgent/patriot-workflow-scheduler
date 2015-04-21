@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # upgrade tool
       module Upgrade
 
         Patriot::Tool::PatriotCommand.class_eval do

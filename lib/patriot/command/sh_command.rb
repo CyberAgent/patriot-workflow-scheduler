@@ -1,5 +1,6 @@
 module Patriot
   module Command
+    # a command which executes shell scripts
     class ShCommand < Patriot::Command::Base
       include Patriot::Util::System
 
@@ -12,19 +13,23 @@ module Patriot
       volatile_attr :name, :name_suffix
       validate_existence :name 
 
+      # @see Patriot::Command::Base#job_id
       def job_id  
         return "#{command_name}_#{@name}_#{@name_suffix}"
       end
 
+      # @see Patriot::Command::Base#configure
       def configure
-        @name_suffix ||= $dt
+        @name_suffix ||= _date_
         return self
       end
 
+      # @see Patriot::Command::Base#description
       def description
         return @commands.join(@connector)
       end
 
+      # @see Patriot::Command::Base#execute
       def execute
         @logger.info "start shell command "
         @commands.each do |c|

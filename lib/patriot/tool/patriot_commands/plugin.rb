@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # manage plugins
       module Plugin
 
         Patriot::Tool::PatriotCommand.class_eval do

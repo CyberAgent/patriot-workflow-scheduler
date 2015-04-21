@@ -2,19 +2,27 @@ require 'json'
 module Patriot
   module JobStore
 
-    # job store implementation on RDB
+    # a JobStore implementation on RDB
     class RDBJobStore < Patriot::JobStore::Base
 
+      # default  priority
       DEFAULT_PRIORITY=1 #  TODO move to Patriot::JobStore of core
 
-      # Tables
+      ####  Tables
+      # job definition table
       JOB_TABLE      = 'jobs'
+      # dependency relation table
       FLOW_TABLE     = 'flows'
+      # job and produced product table
       PRODUCER_TABLE = 'producers'
+      # job and required product table
       CONSUMER_TABLE = 'consumers'
-      HISTORY_TABLE  = 'job_profiles' # TODO rename job_histories
+      # table for execution history
+      HISTORY_TABLE  = 'job_histories'
 
+      # attributes included in job_ticket
       TICKET_COLUMNS = ['job_id', 'update_id', 'node']
+      # all columns of the job table
       ALL_COLUMNS    = [:id,
                         :job_id,
                         :job_def_id,
@@ -25,6 +33,7 @@ module Patriot
                         :node,
                         :host,
                         :priority]
+      # mapping from command attributes to table columns
       ATTR_TO_COLUMN = {Patriot::Command::STATE_ATTR          => :state,
                         Patriot::Command::PRIORITY_ATTR       => :priority,
                         Patriot::Command::START_DATETIME_ATTR => :start_after,
@@ -189,11 +198,11 @@ END_OB_QUERY
 
       # @see Patriot::JobStore::Base#report_completion_status
       def report_completion_status(job_ticket)
-        post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[job_ticket.exit_code]
-        raise "illegal exit_code #{job_ticket.exit_code}" if post_state.nil?
+        exit_code  = job_ticket.exit_code
+        post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[exit_code]
+        raise "illegal exit_code #{exit_code}" if post_state.nil?
         connect(@db_config) do |c|
-          # TODO set description
-          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :state => post_state, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
+          if c.update(HISTORY_TABLE, {:end_at => Time.now.to_s, :exit_code => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
             @logger.warn "illegal state of history for #{job_ticket.job_id}"
           end
           return _check_and_set_state(job_ticket, Patriot::JobStore::JobState::RUNNING, post_state, c)

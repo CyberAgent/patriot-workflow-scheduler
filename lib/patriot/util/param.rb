@@ -1,5 +1,6 @@
 module Patriot
   module Util
+    # namespace for parameter handling functions
     module Param
 
       # replace parameter values in command attribute valeus
@@ -19,6 +20,10 @@ module Patriot
         end
       end
 
+      # evaluate variables in a string expression
+      # @param str [String] a string expression to be evaluated
+      # @param vars [Hash] variables used in the evaluation
+      # @return [String] a evaluated string expression
       def eval_string_attr(str, vars = {})
         s = StringScanner.new(str)
         s.scan(/(.*?)\#\{/m)

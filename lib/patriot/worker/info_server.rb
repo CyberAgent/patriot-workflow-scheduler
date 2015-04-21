@@ -1,25 +1,35 @@
 module Patriot
   module Worker
+    # info server (web management console and for monitoring)
     class InfoServer
 
+      # configuratio key for port used by this server
       PORT_KEY = 'info_server.port'
+      # default port number
       DEFAULT_PORT = '36104'
 
+      # urls used by this server
       URLS_KEY           = 'info_server.urls'
+      # mapping from the url to a servlet for the url
       URL_MAP_KEY_PREFIX = 'info_server.urlmap'
 
+      # configuration key for rack handler used to start this server
       RACK_HANDLER_KEY   = 'info_server.rack.handler'
+      # default rack handler
       DEFAULT_RACK_HANDLER = 'Rack::Handler::WEBrick'
 
       include Patriot::Util::Config
       include Patriot::Util::Logger
 
+      # @param worker [Patriot::Worker::Base] worker managed through this server
+      # @param config [Patriot::Util::Config::Bae]
       def initialize(worker, config)
         @logger = create_logger(config)
         @worker = worker
         @config = config
       end
 
+      # start the server
       def start_server
         port = @config.get(Patriot::Worker::InfoServer::PORT_KEY,
                            Patriot::Worker::InfoServer::DEFAULT_PORT)
@@ -41,6 +51,7 @@ module Patriot
         return true
       end
 
+      # @return [Hash<String, Sinatra::Base>]
       def get_url_map
         urls = @config.get(URLS_KEY, nil)
         if urls.nil?
@@ -65,6 +76,7 @@ module Patriot
       end
       private :build_access_logger
 
+      # instruct to shutdown server
       def shutdown_server
         return false if @server.nil?
         unless @server_thread.nil?

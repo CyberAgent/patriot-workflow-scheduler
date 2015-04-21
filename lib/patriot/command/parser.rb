@@ -8,18 +8,20 @@ module Patriot
       # create a command
       # @param cls [Class] class of the command
       # @yield block to set attributes to the command
-      # @todo remove invoction of register_command by moving to the command_macro
       def new_command(cls, &blk)
         raise "configuration is not set" if @config.nil?
         command = cls.new(@config)
+        command.target_datetime = @target_datetime
         @macros.each{|n,b| command.batch_macro(n,&b)} unless @macros.nil?
         command.instance_eval(&blk) if block_given?
         return command
       end
 
       # parse DSL by processing the DSL description as block
+      # @param datetime [DateTime] the datetime for which the job works
       # @return a list of command defined in the DSL description
-      def parse(blk)
+      def parse(datetime, blk)
+        self.target_datetime = datetime
         self.instance_eval(blk)
         return self.build({})
       end

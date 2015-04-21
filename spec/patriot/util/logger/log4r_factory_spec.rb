@@ -8,7 +8,7 @@ describe Patriot::Util::Logger::Log4rFactory do
 
   before :all do
     @name  = 'test'
-    file = File.join($ROOT_PATH, 'spec', 'config', 'logger.log4r.ini')
+    file = File.join(ROOT_PATH, 'spec', 'config', 'logger.log4r.ini')
     @config = load_config(:path => file)
   end
 

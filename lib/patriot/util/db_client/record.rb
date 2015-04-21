@@ -14,8 +14,7 @@ module Patriot
         end
 
         # convert this record to hash 
-        # ==== Args
-        #   keys : attributes included in the returned hash
+        # @param keys [Hash] attributes included in the returned hash
         def to_hash(keys)
           raise NotImplementedError
         end

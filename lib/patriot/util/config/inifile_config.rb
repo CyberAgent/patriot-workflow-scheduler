@@ -2,10 +2,14 @@ require 'inifile'
 module Patriot
   module Util
     module Config
+      # a configuration implementation definied by the ini-file format
       class IniFileConfig < Patriot::Util::Config::Base
 
+        # comman section name
         COMMON_SECTION = 'common'
 
+        # @param path [String] path to a configuration file
+        # @param type [String] load type (section name to be loaded)
         def initialize(path, type = nil)
           raise "path in String is expected but #{path.class}" unless path.is_a?(String)
           @path = path
@@ -16,6 +20,10 @@ module Patriot
           read_section(config, type)
         end
 
+        # @private
+        # read configuration from a section
+        # @param config [IniFile] ini file configuration
+        # @param section [String] section name
         def read_section(config, section)
           sect = config[section]
           return if sect.nil?
@@ -35,6 +43,9 @@ module Patriot
           return v.nil? ? default : v
         end
 
+        # split configuration value by a delimiter
+        # @param value [String] the value to be splitted
+        # @param delimiter [String] delimiter for splitting
         def split_value(value, delimiter = ',')
           # don't allow spaces around value
           regexp = Regexp.new("\\s*#{delimiter}\\s*")

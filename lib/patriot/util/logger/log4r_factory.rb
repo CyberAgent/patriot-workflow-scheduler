@@ -7,14 +7,24 @@ require 'singleton'
 module Patriot
   module Util
     module Logger
+      # a logger factory implementation for Log4r logger
       class Log4rFactory < Patriot::Util::Logger::Factory
+        # configuration key for log level
         LOG_LEVEL_KEY  = :log_level
+        # default log level
+        DEFAULT_LOG_LEVEL = 'DEBUG'
+        # configuration key for log format
         FORMAT_KEY     = :log_format
+        # default log format
+        DEFAULT_LOG_FORMAT = '%m'
+        # configuration key for log outputers
         OUTPUTTERS_KEY = :log_outputters
+        # configuration prefix for log outputer
         OUTPUTTER_KEY_PREFIX = :log_outputter
 
         include Singleton
 
+        # @see Patriot::Util::Logger:Factory
         def build(name, config)
           logger  = Log4r::Logger.new(name)
           logger  = set_log_level(logger, config)
@@ -23,6 +33,7 @@ module Patriot
         end
         private :build
 
+        # set log level to the logger
         def set_log_level(logger, config)
           log_level    = get_log_level(config)
           logger.level = log_level
@@ -30,6 +41,7 @@ module Patriot
         end
         private :set_log_level
 
+        # set outputters to the logger
         def set_outputters(logger, config)
           formatter   = create_formatter(config)
           logger.outputters = get_outputters(config, formatter)
@@ -37,6 +49,7 @@ module Patriot
         end
         private :set_outputters
 
+        # create formatter based on the configuration
         def create_formatter(config)
           log_format = get_format_config(config)
           formatter  = Log4r::PatternFormatter.new(:pattern => log_format)
@@ -44,26 +57,30 @@ module Patriot
         end
         private :set_outputters
 
+        # @private
         def get_log_level(_conf)
-          log_level = _conf.get(LOG_LEVEL_KEY)
+          log_level = _conf.get(LOG_LEVEL_KEY, DEFAULT_LOG_LEVEL)
           log_level = eval("Log4r::#{log_level}")
           return log_level
         end
         private :get_log_level
 
+        # @private
         def get_format_config(_conf)
-          return _conf.get(FORMAT_KEY)
+          return _conf.get(FORMAT_KEY, DEFAULT_LOG_FORMAT)
         end
         private :get_format_config
 
+        # @private
         def get_outputters(_conf, _formatter)
-          outputters = _conf.get(OUTPUTTERS_KEY)
+          outputters = _conf.get(OUTPUTTERS_KEY, [])
           outputters = [outputters] unless outputters.is_a?(Array)
           return outputters.map{|o| get_outputter(o, _conf, _formatter)}
           return outputters
         end
         private :get_outputters
 
+        # @private
         def get_outputter(outputter_id, _conf, _formatter)
           class_key = [OUTPUTTER_KEY_PREFIX, outputter_id, "class"].join(".") 
           class_name = _conf.get(class_key)

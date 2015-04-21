@@ -14,6 +14,7 @@ module Patriot
         
       attr_accessor :host, :status, :cycle, :job_store
 
+      # @param config [Patriot::Util::Config::Base]
       def initialize(config)
         raise "configuration is nil" if config.nil?
         @logger      = create_logger(config)
@@ -46,25 +47,23 @@ module Patriot
         @logger.info " executing job: #{job_ticket.job_id}"
         command                 = response[:command]
         job_ticket.execution_id = response[:execution_id]
-        job_ticket.exit_code    = Patriot::Command::ExitCode::FAILED
+        job_ticket.exit_code    = command.skip_on_fail? ? Patriot::Command::ExitCode::FAILURE_SKIPPED : Patriot::Command::ExitCode::FAILED
         begin
           command.execute
           job_ticket.exit_code  = Patriot::Command::ExitCode::SUCCEEDED
         rescue Exception => e
           @logger.warn " job : #{job_ticket.job_id} failed"
           job_ticket.description = e.to_s
-          return Patriot::Command::ExitCode::FAILED
         else
           job_ticket.description = command.description
-          return job_ticket.exit_code
         ensure
-          job_ticket.exit_code = Patriot::Command::ExitCode::SUCCEEDED if command.skip_on_fail?
           begin
             execute_with_retry{ @job_store.report_completion_status(job_ticket) }
           rescue Exception => job_store_error
             @logger.error job_store_error
           end
         end
+        return job_ticket.exit_code
       end
 
       # @return [Integer] pid if the worker is running, otherwise nil

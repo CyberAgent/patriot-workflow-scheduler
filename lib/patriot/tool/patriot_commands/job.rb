@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # handle jobs in JobStore
       module Job
 
         Patriot::Tool::PatriotCommand.class_eval do

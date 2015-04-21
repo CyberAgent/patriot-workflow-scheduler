@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # a tool to start/stop a worker
       module Worker
 
         Patriot::Tool::PatriotCommand.class_eval do

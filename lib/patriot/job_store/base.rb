@@ -2,6 +2,7 @@ require 'patriot/util'
 
 module Patriot
   module JobStore
+    # base class of JobStore
     class Base
       include Patriot::Util::Logger
 
@@ -88,7 +89,7 @@ module Patriot
       # @param [Array] products a list of product name
       # @param [Hash] opts
       # @option opt [Array] :include_attrs a list of attribute included in results
-      # @return [Hash] a hash from product name to producer jobs
+      # @return [Hash] a hash from job_id to its state
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         raise NotImplementedError
       end
@@ -97,7 +98,7 @@ module Patriot
       # @param [Array] products a list of product name
       # @param [Hash] opts
       # @option opt [Array] :include_attrs a list of attribute included in results
-      # @return [Hash] a hash from product name to consumer jobs
+      # @return [Hash] a hash from job_id to its state
       def get_consumers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         raise NotImplementedError
       end
@@ -132,6 +133,25 @@ module Patriot
       # @param [String] job_id
       def delete_job(job_id)
         raise NotImplementedError
+      end
+
+      # Process subsequent jobs with a given block.
+      # The block is called for each dependency depth.
+      # @param job_ids [Array<String>]
+      # @yieldparam job_store [Patriot::JobStore::Base] this job_store
+      # @yieldparam jobs [Patriot::JobStore::Job] subsequet jobs
+      def process_subsequent(job_ids, &blk)
+        products = job_ids.map{|jid|
+          job = get_job(jid)
+          job.nil? ? nil : job[Patriot::Command::PRODUCTS_ATTR]
+        }.compact.flatten
+        consumers = get_consumers(products)
+        while !consumers.empty?
+          jobs = consumers.keys.map{|jid| get_job(jid)}.compact
+          yield self, jobs
+          products = jobs.map{|j| j[Patriot::Command::PRODUCTS_ATTR]}.compact.flatten
+          consumers = get_consumers(products)
+        end
       end
 
     end

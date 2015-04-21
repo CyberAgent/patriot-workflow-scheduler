@@ -19,7 +19,8 @@ describe "Patriot::Worker::Base #{__FILE__}" do
 
   it "sholud execute a job" do
     job_entry = Patriot::JobStore::JobTicket.new(@job.job_id, @update_id)
-    expect(@worker.execute_job(job_entry)).to eq Patriot::Command::ExitCode::FAILED
+    expect(@worker.execute_job(job_entry)).to eq Patriot::Command::ExitCode::FAILURE_SKIPPED
     expect(@job).to be_succeeded_in @job_store
+    expect(@job_store.get_execution_history(@job.job_id, {:limit => 1})[0][:exit_code]).to eq Patriot::Command::ExitCode::FAILURE_SKIPPED
   end
 end

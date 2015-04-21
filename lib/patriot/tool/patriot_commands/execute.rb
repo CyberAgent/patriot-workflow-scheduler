@@ -1,6 +1,8 @@
 module Patriot
   module Tool
+    # namesapce for patriot comman line tools
     module PatriotCommands
+      # execute PBC directory
       module Execute
 
         Patriot::Tool::PatriotCommand.class_eval do
@@ -35,7 +37,6 @@ module Patriot
                 message = "invalid option: both of debug and test are specified"
                 raise ArgumentError, message
               end
-              $test = true if opts[:test]
 
               # parse and process commands
               parser = Patriot::Tool::BatchParser.new(config)

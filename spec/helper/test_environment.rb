@@ -1,8 +1,8 @@
-$dt = '2011-12-12'
-
+require 'date'
 module  TestEnvirionment
   include Patriot::Util::Config
 
+  TEST_TARGET_DATE = DateTime.parse('2015-04-01')
   def build_job(opt = {})
     options = {
         :job_id       => rand(100000),
@@ -20,6 +20,7 @@ module  TestEnvirionment
     job_id = options[:job_id]
     n = (options[:node]) ? options[:node] : nil
     j = Patriot::Command::ShCommand.new(config)
+    j.target_datetime = TEST_TARGET_DATE
     j.name         "job_#{job_id}"
     j.require      options[:require]
     j.produce      options[:produce]
@@ -32,7 +33,7 @@ module  TestEnvirionment
   end
 
   def path_to_test_config(type = "test")
-    File.join($ROOT_PATH,'spec', 'config', "#{type}.ini")
+    File.join(ROOT_PATH,'spec', 'config', "#{type}.ini")
   end
 
   def config_for_test(type=nil, opt = "test")

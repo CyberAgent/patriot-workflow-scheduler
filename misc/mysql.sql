@@ -47,9 +47,9 @@ CREATE TABLE `flows` (
 CREATE  INDEX `index_flows_on_producer_id` ON `flows` (`producer_id`);
 CREATE  INDEX `index_flows_on_consumer_id` ON `flows` (`consumer_id`);
 
--- job_profiles
-DROP TABLE IF EXISTS `job_profiles`; 
-CREATE TABLE `job_profiles` (
+-- job_histories
+DROP TABLE IF EXISTS `job_histories`;
+CREATE TABLE `job_histories` (
   `id` integer PRIMARY KEY AUTO_INCREMENT NOT NULL, 
   `job_id` varchar(255) NOT NULL, 
   `node` varchar(255), 
@@ -58,8 +58,8 @@ CREATE TABLE `job_profiles` (
   `begin_at` datetime, 
   `end_at` datetime, 
   `description` text, 
-  `state` tinyint
+  `exit_code` tinyint
 ); 
-CREATE  INDEX `index_job_profiles_on_job_id` ON `job_profiles` (`job_id`);
-CREATE  INDEX `index_job_profiles_on_state` ON `job_profiles` (`state`);
+CREATE  INDEX `index_job_histories_on_job_id` ON `job_histories` (`job_id`);
+CREATE  INDEX `index_job_histories_on_exit_code` ON `job_histories` (`exit_code`);
 

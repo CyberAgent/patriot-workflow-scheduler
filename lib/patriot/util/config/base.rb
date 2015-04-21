@@ -1,6 +1,7 @@
 module Patriot
   module Util
     module Config
+      # base class of configuration classes
       class Base
         # get value for the specified key
         # @param [String] key

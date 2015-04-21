@@ -1,6 +1,7 @@
 module Patriot
   module Tool
     module PatriotCommands
+      # register jobs to JobStore
       module Register
 
         Patriot::Tool::PatriotCommand.class_eval do
@@ -58,9 +59,8 @@ module Patriot
               return if opts[:debug]
               Patriot::Util::Retry.execute_with_retry{ job_store.register(opts[:update_id], jobs) }
               if opts[:retry_dep]
-                jobs.each do |j|
-                  dep_ids = get_dependent_jobs(job_store, j.job_id)
-                  job_store.set_state(opts[:update_id], dep_ids, Patriot::JobStore::JobState::WAIT)
+                job_store.process_subsequent(jobs.map(&:job_id)) do |job_store, jobs|
+                  job_store.set_state(opts[:update_id], jobs.map(&:job_id), Patriot::JobStore::JobState::WAIT)
                 end
               end
             rescue => e
@@ -70,14 +70,6 @@ module Patriot
             end
           end
 
-          no_tasks do
-            def get_dependent_jobs(job_store, job_id)
-              job     = job_store.get(job_id, :include_dependency => true)
-              dep_ids = job['consumers'].keys
-              dep_ids |= dep_ids.map{|did| get_dependent_jobs(job_store, did)}
-              return dep_ids.flatten.compact.uniq
-            end
-          end
         end
       end
     end

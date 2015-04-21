@@ -1,0 +1,5 @@
+#interval 15 1 * * *
+sh {
+  name "echo_#{_date_}"
+  commands 'echo #{_hour_}'
+}

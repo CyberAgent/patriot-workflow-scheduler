@@ -11,10 +11,10 @@ describe Patriot::Tool::PatriotCommands::Validate do
 
   describe "validate_files" do
     before :all do
-      @sh_pbc = "#{$ROOT_PATH}/spec/pbc/sh.pbc"
-      @dup_sh_pbc = "#{$ROOT_PATH}/spec/pbc/dup_sh.pbc"
-      @dup_sh_composite_pbc = "#{$ROOT_PATH}/spec/pbc/dup_sh_composite.pbc"
-      @invalid_json_pbc = "#{$ROOT_PATH}/spec/pbc/invalid_json.pbc"
+      @sh_pbc = "#{ROOT_PATH}/spec/pbc/sh.pbc"
+      @dup_sh_pbc = "#{ROOT_PATH}/spec/pbc/dup_sh.pbc"
+      @dup_sh_composite_pbc = "#{ROOT_PATH}/spec/pbc/dup_sh_composite.pbc"
+      @invalid_json_pbc = "#{ROOT_PATH}/spec/pbc/invalid_json.pbc"
     end
 
     it "should validate correct a batch file" do

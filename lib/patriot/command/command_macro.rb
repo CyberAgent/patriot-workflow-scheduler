@@ -4,6 +4,7 @@ module Patriot
     module CommandMacro
 
       # add module methods to DSL methods
+      # @param command_module [Module] module defines methods for the use in DSL
       def add_dsl_function(command_module)
         class_eval{ include command_module } 
       end
@@ -24,6 +25,9 @@ module Patriot
       # declare command attributes to be able to use in DSL
       # @param attrs [String|Hash] attribute names or a Hash from attribute name to its default value
       # @yield block to preprocess attribute values
+      # @yieldparam [Patriot::Command::Base] command instance
+      # @yieldparam [String] attribute name
+      # @yieldparam [String] passed value
       def command_attr(*attrs, &blk)
         @command_attrs = {} if @command_attrs.nil?
         default_values = {} 
@@ -50,6 +54,7 @@ module Patriot
       end
 
       # declare command attributes for only internal use
+      # @param attrs [String] attribute name
       def private_command_attr(*attrs)
         command_attr(*attrs) do |cmd, attr_name, attr_val|
           raise "only internal call is expected for #{attr_name}"
@@ -59,6 +64,11 @@ module Patriot
       # declare command attributes to be able to use in DSL
       # values of thes attributes are supposed to be used in {Patriot::Command::Base#do_configure}
       # and would not be serialized
+      # @param attrs [String|Hash] attribute names or a Hash from attribute name to its default value
+      # @yield block to preprocess attribute values
+      # @yieldparam [Patriot::Command::Base] command instance
+      # @yieldparam [String] attribute name
+      # @yieldparam [String] passed value
       def volatile_attr(*attrs, &blk)
         @volatile_attrs = [] if @volatile_attrs.nil?
         attrs = command_attr(*attrs, &blk)

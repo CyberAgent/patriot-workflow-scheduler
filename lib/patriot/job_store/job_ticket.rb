@@ -18,6 +18,7 @@ module Patriot
         @node      = node
       end
 
+      # @return [String] returns string expression of this instance
       def to_s
         node = @node.nil? ? "any" : @node
         string = "job_id: #{job_id}, update_id: #{update_id}, node: #{node}"

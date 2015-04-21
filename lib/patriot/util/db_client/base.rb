@@ -116,11 +116,13 @@ module Patriot module Util
           raise NotImplementedError
         end
 
+        # get an expression used as values in insert statements
         def value_exp(val)
           raise "illegal type of value_exp #{val.class}" unless val.is_a?(Hash)
           return val.map{|k,v| v.nil? ? "#{k} = NULL" : "#{k} = #{quote(v)}"}.join(",")
         end
 
+        # get an expression of where clause
         def cond_exp(cond)
           cond = cond.map{|k,v| v.nil? ? "#{k} IS NULL" : "#{k} = #{quote(v)}"}.join(' AND ') if cond.is_a?(Hash)
           raise "illegal type of cond : #{cond.class}" unless cond.is_a?(String)

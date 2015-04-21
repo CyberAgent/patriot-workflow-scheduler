@@ -1,7 +1,22 @@
 # -*- coding: utf-8 -*-
-require 'rubygems'
-require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new(:spec) do |t|
-  t.rspec_opts = ["-fd", "-c"]
+load 'Rakefile.base'
+
+PLUGINS = {'mysql2'  => 'patriot-mysql2-client',
+           'sqlite3' => 'patriot-sqlite3-client'}
+TASKS   = ['build', 'install', 'spec', 'yard', 'clean', 'clobber']
+
+TASKS.each do |t|
+  namespace t do
+    PLUGINS.each do |key, plugin|
+      desc "#{t} #{plugin}"
+      task key.to_sym do
+        cd File.join('plugins', plugin) do
+          sh "rake #{t}"
+        end
+      end
+    end
+    desc "perform #{t} for core and plugins"
+    task :all => [t] | PLUGINS.keys.map{|plugin| "#{t}:#{plugin}"}
+  end
 end
 

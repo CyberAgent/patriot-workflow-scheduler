@@ -1,3 +1,4 @@
+require 'date'
 require 'init_test'
 $: << File.dirname(File.expand_path(__FILE__))
 
@@ -5,12 +6,11 @@ YEAR  = 1970
 MONTH = 01
 DAY   = 01
 
-$dt="#{YEAR}-#{MONTH}-#{DAY}"
-
 describe Patriot::Command::Base do 
   include Patriot::Command::Parser
   before :all do
     @config = config_for_test
+    @target_datetime = DateTime.new(YEAR, MONTH, DAY)
   end
 
   it "sholud extract start after" do

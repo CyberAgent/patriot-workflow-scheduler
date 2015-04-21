@@ -5,6 +5,7 @@ require 'rubygems/dependency_installer'
 require 'fileutils'
 
 module Patriot
+  # a name space for controllers which encapsulate complicated operations
   module Controller
     # Controller class for remote management of workers
     class PackageController
