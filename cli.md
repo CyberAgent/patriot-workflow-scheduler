@@ -28,12 +28,39 @@ This tool requires two arguments, date (or date range) and files (or a directory
 The date should be formatted in yyyy-MM-dd (e.g., 2014-12-31) and be comma-separated in case of range (e.g., 2015-01-01,2015-01-31).
 
 #### specifying execution interval
-
 Jobs may have different execution intervals (e.g., daily and monthly).
-This tool determines the interval by directory names.
+The interval can be specified by using pre processor at the top of each PBC file.
+For instance, 
+
+```
+#interval 0 0 1 * *
+sh{
+  name 'monthly'
+  commands 'echo monthly'
+}
+```
+the above job would be executed for the 1st day of every month.
+The default interval is set to daily (i.e., '0 0 * * *'), and therefore, you can ignore the pro processor for daily jobs.
+
+In addition, the interval can accept key works ('end_of_every_month') for jobs which should be executed for the end of every month.
+The below is an example of such job.
+
+```
+#interval end_of_every_month
+sh{
+  name 'end_of_month'
+  commands 'echo end of month'
+}
+```
+
+
+#### specifying execution interval by directory (deprecated)
+
+The interval can be also determined by directory names.
 If the pass to a PBC file contains a directory named _'daily'_, the jobs in the PBC files are treated as daily jobs.
 PBC files located in a sub directory of _'monthly'_ directory, the PBC files are regarded as ones of monthly jobs and processed on only the end of each month.
 For weekly jobs, PBC files should be stored in the directory _'weekly/${wday}'_ where the _wday_ is a number for the day of week (0 is Sunday).
+
 
 
 ```

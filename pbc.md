@@ -28,14 +28,14 @@ sh{
 hello world
 ```
 The initial target of this scheduler is daily batch jobs and the script takes a date (or range of dates) as an argument.
-The date given as the argument can be used via the global variable '$dt'.
+The date given as the argument can be used via the variable '_date_'.
 For instance, 
 
 ```
 % cat test.pbc
 sh{
   name 'test'
-  commands ["echo 'hello world (#{$dt})' > /tmp/out.txt"]
+  commands ["echo 'hello world (#{_date_})' > /tmp/out.txt"]
 }
 % ./bin/patriot execute 2015-04-01 test.pbc
 % cat /tmp/out.txt
@@ -53,21 +53,21 @@ This workflow can be defined in PBC as follows.
 
 ```
 sh{
-  produce ["table_#{$dt}"]
-  name "load1_#{$dt}"
-  commands ["hive -e 'LOAD DATA INPATH \'path_to_source1\' INTO TABLE table PARTITION (dt = \'#{$dt}\', type = \'1\')"]
+  produce ["table_#{_date_}"]
+  name "load1_#{_date_}"
+  commands ["hive -e 'LOAD DATA INPATH \'path_to_source1\' INTO TABLE table PARTITION (dt = \'#{_date_}\', type = \'1\')"]
 }
 
 sh{
-  produce ["table_#{$dt}"]
-  name "load2_#{$dt}"
-  commands ["hive -e 'LOAD DATA INPATH \'path_to_source2\' INTO TABLE table PARTITION (dt = \'#{$dt}\', type = \'2\')"]
+  produce ["table_#{_date_}"]
+  name "load2_#{_date_}"
+  commands ["hive -e 'LOAD DATA INPATH \'path_to_source2\' INTO TABLE table PARTITION (dt = \'#{_date_}\', type = \'2\')"]
 }
 
 sh{
-  require ["table_#{$dt}"]
-  name "select_#{$dt}"
-  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = '#{$dt}' > result_#{$dt}"]
+  require ["table_#{_date_}"]
+  name "select_#{_date_}"
+  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = '#{_date_}' > result_#{_date_}"]
 }
 ```
 
@@ -78,40 +78,40 @@ This can be consolidated by using job_group as follows.
 
 ```
 job_group{
-  produce ["table_#{$dt}"]
+  produce ["table_#{_date_}"]
   sh{
-    name "load1_#{$dt}"
-    commands ["hive -e 'LOAD DATA INPATH \'path_to_source1\' INTO TABLE table PARTITION (dt = \'#{$dt}\', type = \'1\')"]
+    name "load1_#{_date_}"
+    commands ["hive -e 'LOAD DATA INPATH \'path_to_source1\' INTO TABLE table PARTITION (dt = \'#{_date_}\', type = \'1\')"]
   }
   sh{
-    name "load2_#{$dt}"
-    commands ["hive -e 'LOAD DATA INPATH \'path_to_source2\' INTO TABLE table PARTITION (dt = \'#{$dt}\', type = \'2\')"]
+    name "load2_#{_date_}"
+    commands ["hive -e 'LOAD DATA INPATH \'path_to_source2\' INTO TABLE table PARTITION (dt = \'#{_date_}\', type = \'2\')"]
   }
 }
 
 sh{
-  require ["table_#{$dt}"]
-  name "select_#{$dt}"
-  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = '#{$dt}' > result_#{$dt}"]
+  require ["table_#{_date_}"]
+  name "select_#{_date_}"
+  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = '#{_date_}' > result_#{_date_}"]
 }
 ```
 Since PBC is an Ruby-internal DSL, this example can be written more concisely.
 
 ```
 job_group{
-  produce ["table_#{$dt}"]
+  produce ["table_#{_date_}"]
   ["1", "2"].each do |i|
     sh{
-      name "load#{i}_#{$dt}"
-      commands ["hive -e 'LOAD DATA INPATH \'path_to_source#{i}\' INTO TABLE table PARTITION (dt = \'#{$dt}\', type = \'#{i}\')"]
+      name "load#{i}_#{_date_}"
+      commands ["hive -e 'LOAD DATA INPATH \'path_to_source#{i}\' INTO TABLE table PARTITION (dt = \'#{_date_}\', type = \'#{i}\')"]
     }
   end
 }
 
 sh{
-  require ["table_#{$dt}"]
-  name "select_#{$dt}"
-  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = \'#{$dt}\'' > result_#{$dt}"]
+  require ["table_#{_date_}"]
+  name "select_#{_date_}"
+  commands ["hive -e 'SELECT count(1) FROM table WHERE dt = \'#{_date_}\'' > result_#{_date_}"]
 }
 ```
 
@@ -230,22 +230,22 @@ By using the custom commands, the configurations can be written as below.
 
 ```
 job_group{
-  produce ["table_#{$dt}"]
+  produce ["table_#{_date_}"]
   ["1", "2"].each do |i|
     hive_load{
       table 'table'
-      partition 'dt' => $dt, 'type' => i
+      partition 'dt' => _date_, 'type' => i
       source "path_to_source#{i}"
     }
   end
 }
 
 hive2db{
-  require ["table_#{$dt}"]
-  name "select_#{$dt}"
+  require ["table_#{_date_}"]
+  name "select_#{_date_}"
   db 'dbname'
   table 'tablename'
-  query "SELECT count(1) FROM table WHERE dt = '#{$dt}'"
+  query "SELECT count(1) FROM table WHERE dt = '#{_date_}'"
 }
 ```
 
