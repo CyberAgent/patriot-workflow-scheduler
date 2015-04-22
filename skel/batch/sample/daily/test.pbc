@@ -1,4 +1,4 @@
 sh{
   name "test"
-  commands 'echo \'#{$dt}\''
+  commands 'echo \'#{_date_}\''
 }
