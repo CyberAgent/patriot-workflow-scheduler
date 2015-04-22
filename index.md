@@ -14,7 +14,10 @@ dependency flows.
 ```
 % git clone https://github.com/CyberAgent/patriot-workflow-scheduler.git
 % cd patriot-workflow-scheduler
-% rake install
+% rake install 
+# or (if rspec or bundler is not installed)
+# % gem build patriot-workflow-scheduler.gemspec 
+# % gem install patriot-workflow-scheduler-<$VERSION>.gem
 % patriot-init ${INSTALL_DIR}
 % cd ${INSTALL_DIR}
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
@@ -59,7 +62,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     ```
     % mysql
     > create database ${PATRIOT_DB}
-    > grant all on ${PATRIOT_DB}.* on ${PATRIOT_USER} identified by '${PATRIOT_PASSWORD}'
+    > grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER} identified by '${PATRIOT_PASSWORD}'
     > exit;
     % mysql -u ${PATRIOT_USER} --password ${PATRIOT_PASSWORD} ${PATRIOT_DB} <  misc/mysql.sql
     ```
