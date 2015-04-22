@@ -72,9 +72,19 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     The DB adapter is included in the this repository and is implemented as a plugin.
 
     ```
-    % rake build:mysql2
+    % cd ${CLONE_DIR}
+    % rake install:mysql2
+    ```
+or
+    ```
+    % cd ${CLONE_DIR}/plugins/patriot-mysql2-client
+    % gem build patriot-mysql2-client.gemspce
+    % gem install patriot-mysql-client-${VERSION}.gem
+    ```
+then
+    ```
     % cd ${INSTALL_DIR}
-    % ./bin/patriot plugin install ${CLONE_DIR}/plugins/patriot-mysql2-client/pkg/patriot-mysql-client-${VERSION}.gem
+    % ./bin/patriot plugin install ${CLONE_DIR}/plugins/patriot-mysql2-client/pkg/patriot-mysql-client-${VERSION}.gem # (or ${CLONE_DIR}/plugins/patriot-mysql2-client/patriot-mysql-client-${VERSION}.gem
     ```
 
 3. Configure JobStore and workers.
