@@ -3,7 +3,7 @@ layout: default
 ---
 ## Overview
 The patriot workflow scheduler has developed at CyberAgent for
-managing batch jobs on Hadoop-based data analytic platform (Patriot).
+managing batch jobs on our data analytic platform.
 Batch jobs for the scheduler can be defined with original DSL (PBC:
 Patriot Batch Config) which allows modular description of complex
 dependency flows.
