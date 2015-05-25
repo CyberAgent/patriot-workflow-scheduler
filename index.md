@@ -9,7 +9,7 @@ Patriot Batch Config) which allows modular description of complex
 dependency flows.
 
 ## Getting Started
-### Executing a sample job
+### Install
 
 ```
 % git clone https://github.com/CyberAgent/patriot-workflow-scheduler.git
@@ -17,6 +17,15 @@ dependency flows.
 % gem build patriot-workflow-scheduler.gemspec
 % sudo gem install patriot-workflow-scheduler-<$VERSION>.gem
 % patriot-init ${INSTALL_DIR}
+```
+
+### Job Execution
+
+Command line tools are available for processing jobs defined in PBC.
+The tool can be triggered by the patriot script.
+The script takes three arguments: a tool name ('execute' for job execution), a target date of the jobs (in yyyy-MM-dd) and a path to the PBC file. In processing the PBC files, a variable '_date_' will be replaced with the target date.
+
+```
 % cd ${INSTALL_DIR}
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
 ```
@@ -24,23 +33,25 @@ dependency flows.
 The initial target of this scheduler is daily batch jobs and the
 script takes a date (or range of dates) as an argument.
 
+### Dependency Configuration
 
-### Configuring dependency
+Dependencies between jobs are defined through *products*. 
+The products produced/required by jobs are configured by _produce_ and _require_, respectively.
+A job becomes ready to be executed when all products required by the job are available.
+The products become available when all jobs which produce the product are finished.
 
-Dependencies between jobs are defined through *products*. A job
-becomes ready to be executed when all products required by the job are
-available. The products become available when all jobs which
-produce the product are finished.
+To run jobs according to dependencies, the _strict_ option should be passed to the execute tool.
+(or use JobStore explained later)
 
 ```
 % cat flow_sample.pbc
 sh{
-  require ['product'] # run after 'product' is created
+  require ['product1'] # run after 'product1' is created
   name "consumer"
   commands "echo 'this is a consumer'"
 }
 sh{
-  produce ['product'] # this job creates 'product'
+  produce ['product1'] # this job creates 'product1'
   name "producer"
   commands "echo 'this is a producer'"
 }
