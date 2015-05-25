@@ -2,13 +2,13 @@
 layout: default
 ---
 ## Overview
-The patriot workflow scheduler has developed at CyberAgent for
+The patriot workflow scheduler has been developed at CyberAgent for
 managing batch jobs on our data analytic platform.
 Batch jobs for the scheduler can be defined with original DSL (PBC:
 Patriot Batch Config) which allows modular description of complex
 dependency flows.
 
-## Requirement
+## Requirements
 
 * Ruby ( >= 1.9 )
 * MySQL ( recommended for production use )
@@ -45,7 +45,7 @@ The products produced/required by jobs are configured by _produce_ and _require_
 A job becomes ready to be executed when all products required by the job are available.
 The products become available when all jobs which produce the product are finished.
 
-To run jobs according to dependencies, the _strict_ option should be passed to the execute tool.
+To run jobs according to dependencies, the _strict_ option should be passed to the execution tool.
 (or use JobStore explained later)
 
 ```
