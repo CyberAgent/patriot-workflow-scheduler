@@ -8,6 +8,11 @@ Batch jobs for the scheduler can be defined with original DSL (PBC:
 Patriot Batch Config) which allows modular description of complex
 dependency flows.
 
+## Requirement
+
+* Ruby ( >= 1.9 )
+* MySQL ( recommended for production use )
+
 ## Getting Started
 ### Install
 
