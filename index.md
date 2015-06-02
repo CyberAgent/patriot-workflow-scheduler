@@ -26,8 +26,8 @@ dependency flows.
 
 ### Job Execution
 
-Command line tools are available for processing jobs defined in PBC.
-The tool can be triggered by the patriot script.
+Command line tools are available for processing jobs defined in [PBC](pbc.html).
+The tool can be triggered by [the patriot script](cli.html).
 The script takes three arguments: a tool name ('execute' for job execution), a target date of the jobs (in yyyy-MM-dd) and a path to the PBC file. In processing the PBC files, a variable '_date_' will be replaced with the target date.
 
 ```
@@ -72,14 +72,23 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
 
 1. Configure database.
 
-    The recommended implementation of JobStore uses MySQL to manage the dependency. So MySQL database and tables should be configured. The three variables (PATRIOT\_DB, PATRIOT\_USER, PATRIOT\_PASSWORD) have to be set by users. The DDL file is included in this repository (in the __misc__ directory).
+    The recommended implementation of JobStore uses MySQL to manage the dependency. So MySQL database and tables should be configured.
+    The DDL file is included in this repository (in the __misc__ directory).
+
+    The below four variables have to be set by users.
+    * PATRIOT\_DB : database which stores workflow information
+    * PATRIOT\_DBHOST : host where database is located
+    * PATRIOT\_USER : user for accessing the database
+    * PATRIOT\_PASSWORD : password for accessing the database
+
+    To configure the database, login to the PATRIOT\_DBHOST, then
 
     ```
     % mysql
     > create database ${PATRIOT_DB}
     > grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER}@'%' identified by '${PATRIOT_PASSWORD}'
     > exit;
-    % mysql -u ${PATRIOT_USER} --password ${PATRIOT_PASSWORD} ${PATRIOT_DB} <  misc/mysql.sql
+    % mysql -u ${PATRIOT_USER} -h ${PATRIOT_DBHOST} --password=${PATRIOT_PASSWORD} ${PATRIOT_DB} <  misc/mysql.sql
     ```
 
 2. Install the DB adapter
@@ -99,6 +108,8 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     % ./bin/patriot plugin install ${CLONE_DIR}/plugins/patriot-mysql2-client/patriot-mysql-client-${VERSION}.gem
     ```
 
+    For more detail on the plugin tool, please refer to [the cli page](cli.html#plugin).
+
 3. Configure JobStore and workers.
 
     An example configuration is as below.
@@ -111,7 +122,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     jobstore.root.class=Patriot::JobStore::RDBJobStore
     jobstore.root.adapter=mysql2
     jobstore.root.database=${PATRIOT_DB}
-    jobstore.root.host=127.0.0.1
+    jobstore.root.host=${PATRIOT_DBHOST}
     jobstore.root.username=${PATRIOT_USER}
     jobstore.root.password=${PATRIOT_PASSWORD}
 
@@ -133,6 +144,8 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
 
 4. Start a worker
 
+    A worker process for executing jobs stored in the JobStore can be started by [the worker tool](cli.html#worker).
+
     ```
     % mkdir ${LOG_DIR} # if necessary
     % sudo ./bin/patriot worker start
@@ -140,11 +153,13 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
 
 5. Register jobs
 
+    Jobs defined in PBC files can be registered to the JobStore by [the register tool](cli.html#register).
+
     ```
     % ${INSTALL_DIR}/bin/patriot register YYYY-mm-DD ${batch config file}
     ```
 
-    Jobs defined in the batch config file will be executed by the worker.
+    The jobs defined in the batch config file will be executed by the worker.
     See [batch config](pbc.html) for more detail on batch config files.
 
     In addition, a job management web console is available at 'http://${HOST}:36104/jobs/'

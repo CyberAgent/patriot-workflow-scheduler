@@ -19,7 +19,7 @@ Options:
   -c, [--config=CONFIG]  # path to configuration file
 ```
 
-### register
+### <a name="register"></a>Register
 
 By using this tool, jobs described in given PBC files can be
 registered to JobStore so that workers can execute the jobs according to their dependency.
@@ -27,7 +27,7 @@ registered to JobStore so that workers can execute the jobs according to their d
 This tool requires two arguments, date (or date range) and files (or a directory) to be parsed.
 The date should be formatted in yyyy-MM-dd (e.g., 2014-12-31) and be comma-separated in case of range (e.g., 2015-01-01,2015-01-31).
 
-#### specifying execution interval
+##### Specifying Execution Interval
 Jobs may have different execution intervals (e.g., daily and monthly).
 The interval can be specified by using pre processor at the top of each PBC file.
 For instance, 
@@ -54,7 +54,7 @@ sh{
 ```
 
 
-#### specifying execution interval by directory (deprecated)
+##### Specifying Execution Interval by Directories (deprecated)
 
 The interval can be also determined by directory names.
 If the pass to a PBC file contains a directory named _'daily'_, the jobs in the PBC files are treated as daily jobs.
@@ -83,7 +83,7 @@ Options:
 
 
 
-### execute
+### <a name="execute"></a>Execute
 
 This tool executes jobs defined in given PBC files directory.
 
@@ -108,7 +108,7 @@ Options:
 ```
 
 
-### validate
+### <a name="validate"></a>Validate
 
 This tool just validate PBC files so that
 
@@ -125,7 +125,7 @@ Options:
       [--date=DATE]                                    # date passed to parser
   -c, [--config=CONFIG]                                # path to configuration file
 ```
-### worker
+### <a name="worker"></a>Worker
 
 This tool just starts or stops a worker.
 In stopping the worker, this tool sends a SIGNAL to the worker to terminate after the completion of the jobs currently executed by the worker.
@@ -142,7 +142,7 @@ Options:
 controll worker
 ```
 
-### worker_admin
+### <a name="worker_admin"></a>Worker\_Admin
   
 This tool administrates one or all of remote workers.
 The remote worker should be configured in the _worker_hosts_ in the configuration file.
@@ -162,7 +162,7 @@ Options:
   -c, [--config=CONFIG]    # path to configuration file
 ```
 
-### job
+### <a name="job"></a>Job
 
 This tool manage jobs in JobStore.
 
@@ -176,7 +176,7 @@ Options:
 
 ```
 
-###  plugin
+### <a name="plugin"></a>Plugin
 
 This tool is used for installing plugins build as gem packages.
 
