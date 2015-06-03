@@ -84,9 +84,9 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     To configure the database, login to the PATRIOT\_DBHOST, then
 
     ```
-    % mysql
-    > create database ${PATRIOT_DB}
-    > grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER}@'%' identified by '${PATRIOT_PASSWORD}'
+    % mysql -u root -p
+    > create database ${PATRIOT_DB};
+    > grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER}@'%' identified by '${PATRIOT_PASSWORD}';
     > exit;
     % mysql -u ${PATRIOT_USER} -h ${PATRIOT_DBHOST} --password=${PATRIOT_PASSWORD} ${PATRIOT_DB} <  misc/mysql.sql
     ```
