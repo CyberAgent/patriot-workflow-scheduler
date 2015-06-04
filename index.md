@@ -99,7 +99,7 @@ By using the JobStore, multiple jobs can be executed by workers in parallel and 
     ```
     % cd ${CLONE_DIR}/plugins/patriot-mysql2-client
     % gem build patriot-mysql2-client.gemspec
-    % sudo gem install patriot-mysql-client-${VERSION}.gem
+    % sudo gem install patriot-mysql2-client-${VERSION}.gem
     ```
 
     then
