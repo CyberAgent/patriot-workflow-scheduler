@@ -29,7 +29,7 @@ Getting Started
 % git clone https://github.com/CyberAgent/patriot-workflow-scheduler.git
 % cd patriot-workflow-scheduler
 % gem build patriot-workflow-scheduler.gemspec
-% gem install patriot-workflow-scheduler-${VERSION}>.gem
+% gem install patriot-workflow-scheduler-${VERSION}.gem
 % patriot-init ${install_dir}
 % cd ${install_dir}
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
