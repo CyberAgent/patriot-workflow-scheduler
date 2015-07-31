@@ -102,6 +102,11 @@ module Patriot
         return @target_datetime.hour
       end
 
+      # @return [String] the tergat hour in %H format
+      def _HH_
+        return @target_datetime.strftime("%H")
+      end
+
       # start datetime of this command.
       # This command should be executed after the return value of this method
       # @return [DateTime]

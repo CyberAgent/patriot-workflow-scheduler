@@ -1,6 +1,6 @@
 #interval 0 * * * *
 sh {
   name_suffix nil
-  name "echo_#{sprintf('%02d', _hour_)}"
+  name "echo_#{_HH_}"
   commands 'echo #{_hour_}'
 }
