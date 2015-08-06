@@ -21,7 +21,7 @@ describe Patriot::Command::ShCommand do
       param 'msg' => 'hello'
       start_after '12:00:00'
       name 'test_import'
-      commands 'cat #{$home}/tmp/no_file' # 存在しないファイルをcat
+      commands 'cat #{$home}/tmp/no_file' # the file is not exist
     end
     @invalid_cmd1 = @invalid_cmd1.build[0]
   end
