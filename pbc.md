@@ -134,7 +134,7 @@ Below is a custom command example which executes a Hive LOAD statement.
 
 ```
 # writtern in hive_load_command.rb
-class HiveLoadCommand << Patriot::Command::Base
+class HiveLoadCommand < Patriot::Command::Base
   # define command name
   declare_command_name :hive_load
   # set attributes of this command
@@ -174,7 +174,7 @@ Assuming the results of the SELECT statement needs to be stored other database (
 
 ```
 # writtern in hive2db_command.rb
-class Hive2DBCommand << Patriot::Command::Base
+class Hive2DBCommand < Patriot::Command::Base
   # define command name
   declare_command_name :hive2db
   # set attributes of this command
