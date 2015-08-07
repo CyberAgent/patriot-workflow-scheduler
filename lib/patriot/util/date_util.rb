@@ -35,7 +35,7 @@ module Patriot
         min = min%60
         hour = hour%24
    
-        new_dt = DateTime.new(year, month, day, hour, min,sec)
+        new_dt = DateTime.new(year, month, day, hour, min, sec)
         new_dt = new_dt >> diff[:month]
         new_dt = new_dt + diff[:day]
         return new_dt.strftime(fmt)

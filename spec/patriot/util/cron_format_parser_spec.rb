@@ -9,7 +9,7 @@ describe Patriot::Util::CronFormatParser do
       expect(expanded).to be_a Array
       expect(expanded.size).to eq 24
       (0..23).each do |h|
-        expect(expanded).to include DateTime.new(2013,8,1,h,30,0)
+        expect(expanded).to include Time.new(2013,8,1,h,30,0)
       end
     end
     
@@ -19,7 +19,7 @@ describe Patriot::Util::CronFormatParser do
       expect(expanded.size).to eq 96
       (0..23).each do |h|
         [0,15,30,45].each do |m|
-          expect(expanded).to include DateTime.new(2013,8,1,h,m,0)
+          expect(expanded).to include Time.new(2013,8,1,h,m,0)
         end
       end
     end

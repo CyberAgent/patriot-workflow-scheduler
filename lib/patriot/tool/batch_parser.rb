@@ -48,7 +48,9 @@ module Patriot
       # @return an array of commands
       def parse(date, files, options = {}, &blk)
         return if files.empty?
-        datetime = DateTime.parse(date)
+        ds = date.split('-')
+        raise "illegal format of date #{date}" unless ds.size == 3
+        datetime = Time.new(ds[0], ds[1], ds[2])
         # for backward compatibility to be removed
         $dt    = date
         $month = date.split('-').values_at(0,1).join('-')

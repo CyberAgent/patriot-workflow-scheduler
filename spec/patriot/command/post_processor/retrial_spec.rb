@@ -8,7 +8,7 @@ describe Patriot::Command::PostProcessor::Retrial do
   before :each do 
     @config = config_for_test
     @worker = Patriot::Worker::Base.new(@config)
-    @cmds   = Patriot::Command::CommandGroup.new(@config).parse(DateTime.new(2015,8,1), <<'EOJ'
+    @cmds   = Patriot::Command::CommandGroup.new(@config).parse(Time.new(2015,8,1), <<'EOJ'
   sh{
     retrial 'count' => 3, 'interval' => 2
     name 'test_#{_date_}'

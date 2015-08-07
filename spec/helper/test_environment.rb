@@ -1,8 +1,7 @@
-require 'date'
 module  TestEnvirionment
   include Patriot::Util::Config
 
-  TEST_TARGET_DATE = DateTime.parse('2015-04-01')
+  TEST_TARGET_DATE = Time.new(2015, 4, 1)
   def build_job(opt = {})
     options = {
         :job_id          => rand(100000),

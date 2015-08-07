@@ -111,14 +111,14 @@ module Patriot
 
       # start datetime of this command.
       # This command should be executed after the return value of this method
-      # @return [DateTime]
+      # @return [Time]
       def start_date_time
         return nil if @exec_date.nil? && @start_after.nil?
         # set tomorrow as default
         date = (@exec_date || date_add(_date_, 1)).split("-").map(&:to_i)
         # set midnight as default
         time = (@start_after || "00:00:00").split(":").map(&:to_i)
-        return DateTime.new(date[0], date[1], date[2], time[0], time[1], time[2])
+        return Time.new(date[0], date[1], date[2], time[0], time[1], time[2])
       end
 
       # update parameters with a given hash.

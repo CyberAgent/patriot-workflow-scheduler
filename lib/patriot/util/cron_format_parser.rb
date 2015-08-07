@@ -21,14 +21,16 @@ module Patriot
       # the list of minutes
       MINUTES = 0.upto(59).to_a
 
+      DAY_IN_SECOND = 60 * 60 * 24
+
       # expand a given date to the array of time which should be executed in case of a given cron field
-      # @param date [DateTime] target datetime
+      # @param date [Time] target datetime
       # @param cron_field [String] interval in cron format
-      # @return [Array<DateTime>] a list of datetime which match the cron format
+      # @return [Array<Time>] a list of datetime which match the cron format
       def expand_on_date(date, cron_field = nil)
         cron_field = DEFAULT_CRON_FIELD if cron_field.nil? || cron_field.empty?
         if cron_field == END_OF_EVERY_MONTH
-          return date.next.day == 1 ? [date] : []
+          return (date + DAY_IN_SECOND).day == 1 ? [date] : []
         end
         field_splits = cron_field.split
         raise "illegal cron field format #{cron_field}" unless field_splits.size == 5
@@ -36,13 +38,13 @@ module Patriot
         return [] unless is_target_day?(date, day, month, week)
         return target_hours(hour).map do |h|
           target_minutes(minute).map do |m|
-            DateTime.new(date.year, date.month, date.day, h, m, 0)
+            Time.new(date.year, date.month, date.day, h, m, 0)
           end
         end.flatten
       end
 
       # check a given date is a target or not
-      # @param date [DateTime] a datetime to be checked
+      # @param date [Time] a datetime to be checked
       # @param day [String] day field in cron format
       # @param month [String] month field in cron format
       # @param week [String] week field in cron format

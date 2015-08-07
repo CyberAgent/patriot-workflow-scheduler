@@ -5,7 +5,7 @@ describe Patriot::Command::ShCommand do
   include Patriot::Command::Parser
   tmp_file="/tmp/pac3_shcommand_spec_msg"
   before :all do 
-    @target_datetime = DateTime.new(2011,12,12)
+    @target_datetime = Time.new(2011,12,12)
     @config = config_for_test
     @valid_cmd1 = new_command(Patriot::Command::ShCommand) do 
       produce ["product1"]  

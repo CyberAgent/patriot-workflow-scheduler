@@ -10,7 +10,7 @@ describe Patriot::Command::Base do
   include Patriot::Command::Parser
   before :all do
     @config = config_for_test
-    @target_datetime = DateTime.new(YEAR, MONTH, DAY)
+    @target_datetime = Time.new(YEAR, MONTH, DAY)
   end
 
   it "sholud extract start after" do
@@ -25,7 +25,7 @@ describe Patriot::Command::Base do
     end
     cmds = cmd.build
     expect(cmds.size).to eq 1
-    expect(cmds[0].start_date_time).to eq DateTime.new(YEAR,MONTH,DAY,0,0,0)
+    expect(cmds[0].start_date_time).to eq Time.new(YEAR,MONTH,DAY,0,0,0)
   end
 
   it "sholud not have reserved word" do

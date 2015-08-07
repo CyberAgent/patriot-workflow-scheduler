@@ -3,7 +3,7 @@ require 'init_test'
 describe Patriot::Command::CommandGroup do
   include Patriot::Command::Parser
   before :each do
-    @target_datetime = DateTime.new(2013,1,1)
+    @target_datetime = Time.new(2013,1,1)
     @config = config_for_test
     @grouped_command = Patriot::Command::CommandGroup.new(@config)
   end
@@ -45,7 +45,7 @@ describe Patriot::Command::CommandGroup do
       expect(cmd).to be_a Patriot::Command::ShCommand
       expect(cmd[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
       expect(cmd[Patriot::Command::PRIORITY_ATTR]).to eq 9999
-      expect(cmd[Patriot::Command::START_DATETIME_ATTR]).to eq DateTime.new(2013,1,2,10,00,00)
+      expect(cmd[Patriot::Command::START_DATETIME_ATTR]).to eq Time.new(2013,1,2,10,00,00)
       expect(cmd.post_processors[0]).to be_a Patriot::Command::PostProcessor::SkipOnFail
     end
   end
