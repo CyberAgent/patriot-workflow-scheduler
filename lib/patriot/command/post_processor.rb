@@ -6,6 +6,7 @@ module Patriot
       POST_PROCESSOR_CLASS_KEY   = "POST_PROCESSOR_CLASS"
       require 'patriot/command/post_processor/base'
       require 'patriot/command/post_processor/skip_on_fail'
+      require 'patriot/command/post_processor/retrial'
     end
   end
 end

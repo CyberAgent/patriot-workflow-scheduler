@@ -14,6 +14,7 @@ module Patriot
       end
 
       attr_accessor :config, :parser, :test_mode, :target_datetime, :post_processors
+      attr_writer   :start_datetime
 
       # comman attributes handled distinctively (only effective in top level commands)
       volatile_attr :requisites,
