@@ -40,9 +40,8 @@ module Patriot
     # mapping from exit code to job state
     # @see Patriot::Command::ExitCode
     EXIT_CODE_TO_STATE = {
-      Patriot::Command::ExitCode::SUCCEEDED       => Patriot::JobStore::JobState::SUCCEEDED,
-      Patriot::Command::ExitCode::FAILURE_SKIPPED => Patriot::JobStore::JobState::SUCCEEDED,
-      Patriot::Command::ExitCode::FAILED          => Patriot::JobStore::JobState::FAILED
+      Patriot::Command::ExitCode::SUCCEEDED => Patriot::JobStore::JobState::SUCCEEDED,
+      Patriot::Command::ExitCode::FAILED    => Patriot::JobStore::JobState::FAILED
     }
 
     # a prefix for configuration key

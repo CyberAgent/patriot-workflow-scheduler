@@ -47,7 +47,7 @@ module Patriot
         @logger.info " executing job: #{job_ticket.job_id}"
         command                 = response[:command]
         job_ticket.execution_id = response[:execution_id]
-        job_ticket.exit_code    = command.skip_on_fail? ? Patriot::Command::ExitCode::FAILURE_SKIPPED : Patriot::Command::ExitCode::FAILED
+        job_ticket.exit_code    = Patriot::Command::ExitCode::FAILED
         begin
           command.execute
           job_ticket.exit_code  = Patriot::Command::ExitCode::SUCCEEDED
@@ -59,6 +59,12 @@ module Patriot
         ensure
           begin
             execute_with_retry{ @job_store.report_completion_status(job_ticket) }
+            unless command.post_processors.nil?
+              command.post_processors.each do |pp|
+                @logger.info "executing post process by #{pp}"
+                pp.process(command, self, job_ticket.exit_code)
+              end
+            end
           rescue Exception => job_store_error
             @logger.error job_store_error
           end

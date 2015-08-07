@@ -10,7 +10,7 @@ module Patriot
       command_attr :commands do |cmd, a, v|
         cmd.commands = v.is_a?(Array)? v : [v]
       end
-      volatile_attr :name, :name_suffix
+      command_attr :name, :name_suffix
       validate_existence :name 
 
       # @see Patriot::Command::Base#job_id

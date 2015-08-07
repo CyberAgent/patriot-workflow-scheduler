@@ -34,7 +34,7 @@ describe Patriot::Command::CommandGroup do
       cmd = new_command(Patriot::Command::CommandGroup) do 
         exec_node 'node'
         priority   9999
-        skip_on_fail true
+        skip_on_fail
         start_after '10:00:00'
         sh {
           name 'YES'
@@ -46,7 +46,7 @@ describe Patriot::Command::CommandGroup do
       expect(cmd[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
       expect(cmd[Patriot::Command::PRIORITY_ATTR]).to eq 9999
       expect(cmd[Patriot::Command::START_DATETIME_ATTR]).to eq DateTime.new(2013,1,2,10,00,00)
-      expect(cmd[Patriot::Command::SKIP_ON_FAIL_ATTR]).to be true
+      expect(cmd.post_processors[0]).to be_a Patriot::Command::PostProcessor::SkipOnFail
     end
   end
 end

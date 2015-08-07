@@ -5,15 +5,14 @@ module  TestEnvirionment
   TEST_TARGET_DATE = DateTime.parse('2015-04-01')
   def build_job(opt = {})
     options = {
-        :job_id       => rand(100000),
-        :node         => nil,
-        :host         => nil,
-        :state        => Patriot::JobStore::JobState::WAIT,
-        :skip_on_fail => 'false',
-        :commands     => 'echo 1',
-        :require      => [],
-        :produce      => [],
-        :config       => config_for_test
+        :job_id          => rand(100000),
+        :node            => nil,
+        :host            => nil,
+        :state           => Patriot::JobStore::JobState::WAIT,
+        :commands        => 'echo 1',
+        :require         => [],
+        :produce         => [],
+        :config          => config_for_test,
       }.merge(opt)
     config = options.delete(:config)
 
@@ -24,11 +23,11 @@ module  TestEnvirionment
     j.name         "job_#{job_id}"
     j.require      options[:require]
     j.produce      options[:produce]
-    j.skip_on_fail options[:skip_on_fail]
     j.commands     options[:commands]
     j.exec_host    options[:host] unless options[:host].nil?
     j.exec_node    options[:node] unless options[:node].nil?
     j.instance_variable_set(:@state, options[:state])
+    j.post_processors = options[:post_processors] unless options[:post_processors].nil?
     return j.build[0].to_job
   end
 

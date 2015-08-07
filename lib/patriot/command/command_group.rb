@@ -26,6 +26,7 @@ module Patriot
         return @subcommands.map{|cmd|
           cmd.require @requisites
           cmd.produce @products
+          cmd.post_processors = @post_processors + (cmd.post_processors || []) unless @post_processors.nil?
           cmd.build(@param)
         }.flatten
       end

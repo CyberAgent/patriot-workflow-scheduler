@@ -13,10 +13,16 @@ module Patriot
         include Patriot::Command::CommandMacro
       end
 
-      attr_accessor :parser, :test_mode, :target_datetime
+      attr_accessor :config, :parser, :test_mode, :target_datetime, :post_processors
 
       # comman attributes handled distinctively (only effective in top level commands)
-      volatile_attr :requisites, :products, :priority, :start_after, :exec_date, :exec_node, :exec_host, :skip_on_fail
+      volatile_attr :requisites,
+                    :products,
+                    :priority,
+                    :start_after,
+                    :exec_date,
+                    :exec_node,
+                    :exec_host
 
       # @param config [Patriot::Util::Config::Base] configuration for this command
       def initialize(config)
@@ -80,11 +86,6 @@ module Patriot
       # mark this job to suspend execution
       def suspend
         param 'state' => Patriot::JobStore::JobState::SUSPEND
-      end
-
-      # mark this job to skip in case of failures
-      def skip_on_fail?
-        return @skip_on_fail == 'true' || @skip_on_fail == true
       end
 
       # @return [String] the target month in '%Y-%m'
@@ -185,6 +186,13 @@ module Patriot
       # @raise if sub command is not supported
       def add_subcommand
         raise "sub command is not supported"
+      end
+
+      # add a post processor
+      # @param [Patriot::Command::PostProcessor::Base] a post processor for this job
+      def add_post_processor(post_processor)
+        @post_processors ||= []
+        @post_processors << post_processor
       end
 
       # @return description of this command
