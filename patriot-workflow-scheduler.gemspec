@@ -28,5 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rest-client', '~>1.6'
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-contrib', '~>1.4'
+  s.add_dependency 'mail', '~>2.6'
   s.add_dependency 'tilt', '~>1.4'
 end

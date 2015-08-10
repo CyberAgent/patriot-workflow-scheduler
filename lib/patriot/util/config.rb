@@ -17,6 +17,8 @@ module Patriot
       PLUGIN_LIB_DIR = 'lib' 
       # plugin initiation script
       PLUGIN_INIT_SCRIPT = 'init.rb'
+      # admin user mail address
+      ADMIN_USER_KEY = 'admin_user'
 
       # load configuration file
       # @param option [Hash]
