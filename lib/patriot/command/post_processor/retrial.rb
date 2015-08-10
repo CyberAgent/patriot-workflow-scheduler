@@ -13,7 +13,7 @@ module Patriot
           raise "#{INTERVAL_PROP_KEY} is not specified" unless props.has_key?(INTERVAL_PROP_KEY)
         end
 
-        def process_failure(cmd, worker)
+        def process_failure(cmd, worker, job_ticket)
           found = false
           cmd.post_processors.each do |pp|
             next unless pp.is_a?(Patriot::Command::PostProcessor::Retrial)

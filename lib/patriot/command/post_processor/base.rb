@@ -29,17 +29,17 @@ module Patriot
         def validate_props(props)
         end
 
-        def process(cmd, worker, exit_code)
-          case exit_code.to_i
-          when Patriot::Command::ExitCode::SUCCEEDED then process_success(cmd, worker)
-          when Patriot::Command::ExitCode::FAILED    then process_failure(cmd, worker)
+        def process(cmd, worker, job_ticket)
+          case job_ticket.exit_code
+          when Patriot::Command::ExitCode::SUCCEEDED then process_success(cmd, worker, job_ticket)
+          when Patriot::Command::ExitCode::FAILED    then process_failure(cmd, worker, job_ticket)
           end
         end
 
-        def process_success(cmd, worker)
+        def process_success(cmd, worker, job_ticket)
         end
 
-        def process_failure(cmd, worker)
+        def process_failure(cmd, worker, job_ticket)
         end
 
       end

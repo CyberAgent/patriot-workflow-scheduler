@@ -251,7 +251,7 @@ describe <%= job_store_class %> do
       @job_store.report_completion_status(@skip_on_fail_job_ticket)
       worker = double("")
       allow(worker).to receive(:job_store).and_return(@job_store)
-      command.post_processors.each{|pp| pp.process(command, worker, Patriot::Command::ExitCode::FAILED)}
+      command.post_processors.each{|pp| pp.process(command, worker, @skip_on_fail_job_ticket)}
       expect(@skip_on_fail_job).to be_succeeded_in @job_store
       history = @job_store.get_execution_history(@skip_on_fail_job.job_id, {:limit => 1})
       expect(history[0][:exit_code]).to eq Patriot::Command::ExitCode::FAILED

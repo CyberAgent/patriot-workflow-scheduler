@@ -58,12 +58,14 @@ module Patriot
       # @param code_name [Patriot::Command::ExitCode]
       # @return [Fixnum] exit code of the code name
       def value_of(code_name)
+        return code_name if code_name.is_a?(Fixnum)
         return case code_name
         when /SUCCEEDED/i then SUCCEEDED
         when /FAILED/i    then FAILED
         else raise "unknown exit code name: #{code_name}"
         end
       end
+      module_function :value_of
     end
 
     require 'patriot/command/parser'

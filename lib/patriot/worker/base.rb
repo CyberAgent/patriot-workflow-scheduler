@@ -12,7 +12,7 @@ module Patriot
       include Patriot::Util::Retry
       include Patriot::JobStore::Factory
         
-      attr_accessor :host, :status, :cycle, :job_store
+      attr_accessor :host, :status, :cycle, :job_store, :config
 
       # @param config [Patriot::Util::Config::Base]
       def initialize(config)
@@ -59,14 +59,19 @@ module Patriot
         ensure
           begin
             execute_with_retry{ @job_store.report_completion_status(job_ticket) }
-            unless command.post_processors.nil?
-              command.post_processors.each do |pp|
-                @logger.info "executing post process by #{pp}"
-                pp.process(command, self, job_ticket.exit_code)
-              end
-            end
           rescue Exception => job_store_error
             @logger.error job_store_error
+          end
+          unless command.post_processors.nil?
+            command.post_processors.each do |pp|
+              begin
+                @logger.info "executing post process by #{pp}"
+                pp.process(command, self, job_ticket)
+              rescue Exception => post_process_error
+                @logger.error "post process by #{pp} failed"
+                @logger.error post_process_error
+              end
+            end
           end
         end
         return job_ticket.exit_code
