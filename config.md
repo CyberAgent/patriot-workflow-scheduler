@@ -11,7 +11,7 @@ The default configuration defined in the 'common' section will be overwritten by
 
 | property name | description |
 | :------------ | :---------- |
-| info_server_port | port number used by the management web console |
+| info_server.port | port number used by the management web console |
 | info_server.admin.username | admin user name of the web console|
 | info_server.admin.password | admin user password of the web console |
 | worker_hosts | a comma-separated-list of workers managed by the _worker_admin_ CLI tool |
