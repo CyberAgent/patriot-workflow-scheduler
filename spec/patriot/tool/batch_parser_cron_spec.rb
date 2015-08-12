@@ -49,7 +49,7 @@ describe "Patriot::Tool::BatchParser" do
     pbc_file = File.join(ROOT_PATH, 'spec', 'pbc', 'cron', 'weekly.pbc')
     1.upto(7).each do |w|
       @obj = Patriot::Tool::BatchParser.new(config_for_test)
-      date = DateTime.new(2015,4,w).strftime('%Y-%m-%d')
+      date = Time.new(2015,4,w).strftime('%Y-%m-%d')
       commands = @obj.parse(date, pbc_file)
       case w
       when 1

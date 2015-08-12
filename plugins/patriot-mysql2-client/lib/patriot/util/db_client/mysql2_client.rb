@@ -59,7 +59,7 @@ module Patriot
         # @see Patriot::Util::DBClient::Base#quote
         def quote(v)
           return 'NULL' if v.nil?
-          return "'#{v.to_s}'" if v.is_a?(DateTime)
+          return "'#{v.to_s}'" if v.is_a?(DateTime) || v.is_a?(Time)
           val =  (v.is_a?(String) ? "'#{Mysql2::Client.escape(v)}'" : v)
           return val
         end

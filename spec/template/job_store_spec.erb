@@ -144,9 +144,11 @@ describe <%= job_store_class %> do
       @job_store = <%= job_store_class %>.new("root", @config)
       @job       = TestEnvirionment.build_job({})
       @job_ticket = Patriot::JobStore::JobTicket.new(@job.job_id, @update_id)
+      @skip_on_fail_job        = TestEnvirionment.build_job({:post_processors => [Patriot::Command::PostProcessor::SkipOnFail.new]})
+      @skip_on_fail_job_ticket = Patriot::JobStore::JobTicket.new(@skip_on_fail_job.job_id, @update_id)
       @p_job     = TestEnvirionment.build_job({:job_id => 'with_node', :node => @node, :produce => ['p']})
       @c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
-      @job_store.register(@update_id, [@job, @p_job, @c_job])
+      @job_store.register(@update_id, [@job, @skip_on_fail_job,  @p_job, @c_job])
     end
 
     it "should reregister job" do
@@ -238,16 +240,21 @@ describe <%= job_store_class %> do
       expect(@job).to be_waited_in @job_store
     end
 
-    it "should skip a filed job with skip_on_fail " do
-      response = @job_store.offer_to_execute(@job_ticket)
-      expect(@job).to be_running_in @job_store
+    it "should skip a failed job with skip_on_fail " do
+      response = @job_store.offer_to_execute(@skip_on_fail_job_ticket)
+      expect(@skip_on_fail_job).to be_running_in @job_store
       command  = response[:command]
-      @job_ticket.exit_code    = Patriot::Command::ExitCode::FAILURE_SKIPPED
-      @job_ticket.execution_id = response[:execution_id]
-      @job_store.report_completion_status(@job_ticket)
-      expect(@job).to be_succeeded_in @job_store
-      history = @job_store.get_execution_history(@job.job_id, {:limit => 1})
-      expect(history[0][:exit_code]).to eq Patriot::Command::ExitCode::FAILURE_SKIPPED
+      expect(command.post_processors.size).to eq 1
+      expect(command.post_processors[0]).to be_a Patriot::Command::PostProcessor::SkipOnFail
+      @skip_on_fail_job_ticket.exit_code    = Patriot::Command::ExitCode::FAILED
+      @skip_on_fail_job_ticket.execution_id = response[:execution_id]
+      @job_store.report_completion_status(@skip_on_fail_job_ticket)
+      worker = double("")
+      allow(worker).to receive(:job_store).and_return(@job_store)
+      command.post_processors.each{|pp| pp.process(command, worker, @skip_on_fail_job_ticket)}
+      expect(@skip_on_fail_job).to be_succeeded_in @job_store
+      history = @job_store.get_execution_history(@skip_on_fail_job.job_id, {:limit => 1})
+      expect(history[0][:exit_code]).to eq Patriot::Command::ExitCode::FAILED
     end
 
     it "should fail with deserialization failure" do

@@ -13,10 +13,17 @@ module Patriot
         include Patriot::Command::CommandMacro
       end
 
-      attr_accessor :parser, :test_mode, :target_datetime
+      attr_accessor :config, :parser, :test_mode, :target_datetime, :post_processors
+      attr_writer   :start_datetime
 
       # comman attributes handled distinctively (only effective in top level commands)
-      volatile_attr :requisites, :products, :priority, :start_after, :exec_date, :exec_node, :exec_host, :skip_on_fail
+      volatile_attr :requisites,
+                    :products,
+                    :priority,
+                    :start_after,
+                    :exec_date,
+                    :exec_node,
+                    :exec_host
 
       # @param config [Patriot::Util::Config::Base] configuration for this command
       def initialize(config)
@@ -82,11 +89,6 @@ module Patriot
         param 'state' => Patriot::JobStore::JobState::SUSPEND
       end
 
-      # mark this job to skip in case of failures
-      def skip_on_fail?
-        return @skip_on_fail == 'true' || @skip_on_fail == true
-      end
-
       # @return [String] the target month in '%Y-%m'
       def _month_
         return @target_datetime.strftime("%Y-%m")
@@ -109,14 +111,14 @@ module Patriot
 
       # start datetime of this command.
       # This command should be executed after the return value of this method
-      # @return [DateTime]
+      # @return [Time]
       def start_date_time
         return nil if @exec_date.nil? && @start_after.nil?
         # set tomorrow as default
         date = (@exec_date || date_add(_date_, 1)).split("-").map(&:to_i)
         # set midnight as default
         time = (@start_after || "00:00:00").split(":").map(&:to_i)
-        return DateTime.new(date[0], date[1], date[2], time[0], time[1], time[2])
+        return Time.new(date[0], date[1], date[2], time[0], time[1], time[2])
       end
 
       # update parameters with a given hash.
@@ -185,6 +187,13 @@ module Patriot
       # @raise if sub command is not supported
       def add_subcommand
         raise "sub command is not supported"
+      end
+
+      # add a post processor
+      # @param [Patriot::Command::PostProcessor::Base] a post processor for this job
+      def add_post_processor(post_processor)
+        @post_processors ||= []
+        @post_processors << post_processor
       end
 
       # @return description of this command

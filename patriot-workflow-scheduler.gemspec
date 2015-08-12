@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-workflow-scheduler"
-  s.version     = "0.6.2"
+  s.version     = "0.7.0"
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
@@ -28,5 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rest-client', '~>1.6'
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-contrib', '~>1.4'
+  s.add_dependency 'mail', '~>2.6'
   s.add_dependency 'tilt', '~>1.4'
 end

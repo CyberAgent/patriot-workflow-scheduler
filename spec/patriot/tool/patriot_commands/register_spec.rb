@@ -30,7 +30,7 @@ describe Patriot::Tool::PatriotCommands::Register do
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
       expect(@job_store.get("sh_echo_2013-01-01")['priority']).to eq Patriot::JobStore::DEFAULT_PRIORITY
-      expect(@job_store.get("sh_echo_2013-01-01").update_id).to be_between(Time.now.to_i - 10, Time.now.to_i)
+      expect(@job_store.get("sh_echo_2013-01-01").update_id).to be_between(Time.now.to_i - 60, Time.now.to_i)
     end
 
     it "can debug pbc" do

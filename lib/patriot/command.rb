@@ -19,8 +19,8 @@ module Patriot
     EXEC_HOST_ATTR      = "exec_host"
     # attribute name for start time constraint
     START_DATETIME_ATTR = "start_datetime"
-    # attribute name for the skip on fail marker
-    SKIP_ON_FAIL_ATTR   = "skip_on_fail"
+    # attribute name for retry configration
+    POST_PROCESSORS_ATTR = "post_processors"
 
     # a list of comman attributes
     COMMON_ATTRIBUTES = [
@@ -31,7 +31,7 @@ module Patriot
       EXEC_NODE_ATTR,
       EXEC_HOST_ATTR,
       START_DATETIME_ATTR,
-      SKIP_ON_FAIL_ATTR
+      POST_PROCESSORS_ATTR
     ]
 
     # exit code of a command
@@ -40,8 +40,6 @@ module Patriot
       SUCCEEDED    = 0
       # failed
       FAILED       = 1
-      # failed but skipped (marked skip_on_fail)
-      FAILURE_SKIPPED = 2
       # skip (e.g., updated elsewhere)
       SKIPPED      = -1
 
@@ -50,19 +48,30 @@ module Patriot
       def name_of(exit_code)
         exit_code = exit_code.to_i
         return case exit_code
-          when 0  then "SUCCEEDED"
-          when 1  then "FAILED"
-          when 2  then "FAILURE_SKIPPED"
-          when 4  then "FAILED" # for backward compatibility
-          else raise "unknown exit_code #{exit_code}"
+          when SUCCEEDED  then "SUCCEEDED"
+          when FAILED     then "FAILED"
+          else exit_code.to_s # not nil for backward compatibility
         end
       end
       module_function :name_of
+
+      # @param code_name [Patriot::Command::ExitCode]
+      # @return [Fixnum] exit code of the code name
+      def value_of(code_name)
+        return code_name if code_name.is_a?(Fixnum)
+        return case code_name
+        when /SUCCEEDED/i then SUCCEEDED
+        when /FAILED/i    then FAILED
+        else raise "unknown exit code name: #{code_name}"
+        end
+      end
+      module_function :value_of
     end
 
     require 'patriot/command/parser'
     require 'patriot/command/command_macro'
     require 'patriot/command/base'
+    require 'patriot/command/post_processor'
     require 'patriot/command/command_group'
     require 'patriot/command/composite'
     require 'patriot/command/sh_command'

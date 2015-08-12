@@ -5,7 +5,7 @@ describe Patriot::Command::ShCommand do
   include Patriot::Command::Parser
   tmp_file="/tmp/pac3_shcommand_spec_msg"
   before :all do 
-    @target_datetime = DateTime.new(2011,12,12)
+    @target_datetime = Time.new(2011,12,12)
     @config = config_for_test
     @valid_cmd1 = new_command(Patriot::Command::ShCommand) do 
       produce ["product1"]  
@@ -21,7 +21,7 @@ describe Patriot::Command::ShCommand do
       param 'msg' => 'hello'
       start_after '12:00:00'
       name 'test_import'
-      commands 'cat #{$home}/tmp/no_file' # 存在しないファイルをcat
+      commands 'cat #{$home}/tmp/no_file' # the file is not exist
     end
     @invalid_cmd1 = @invalid_cmd1.build[0]
   end

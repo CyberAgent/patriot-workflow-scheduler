@@ -43,7 +43,7 @@ module Patriot
       def read_command(command)
         Patriot::Command::COMMON_ATTRIBUTES.each do |attr|
           value = command.instance_variable_get("@#{attr}".to_sym)
-          self[attr] = value unless value.nil?
+          self[attr] = _to_stdobj(value) unless value.nil?
         end
         _to_stdobj(command).each{|k,v| self[k] = v}
       end
@@ -58,6 +58,13 @@ module Patriot
           obj.class.serde_attrs.each do |attr|
             value = obj.instance_variable_get("@#{attr}".to_sym)
             hash[attr.to_s] = _to_stdobj(value) unless value.nil?
+          end
+          return hash
+        elsif obj.is_a?(Patriot::Command::PostProcessor::Base)
+          hash = {}
+          hash[Patriot::Command::PostProcessor::POST_PROCESSOR_CLASS_KEY] = obj.class.to_s.gsub(/::/, '.')
+          obj.props.each do |k,v|
+            hash[k.to_s] = _to_stdobj(v) unless v.nil?
           end
           return hash
         elsif obj.is_a?(Hash)
@@ -94,6 +101,10 @@ module Patriot
               cmd.instance_variable_set("@#{k}".to_sym, _from_stdobj(v, config))
             end
             return cmd
+          elsif obj.has_key?(Patriot::Command::PostProcessor::POST_PROCESSOR_CLASS_KEY)
+            cmd_cls = obj.delete(Patriot::Command::PostProcessor::POST_PROCESSOR_CLASS_KEY)
+            cmd_cls = cmd_cls.split('.').inject(Object){|c,name| c.const_get(name)}
+            return cmd_cls.new(obj)
           else
             hash = {}
             obj.each{|k,v| hash[k] = _from_stdobj(v, config)}

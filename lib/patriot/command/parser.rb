@@ -18,7 +18,7 @@ module Patriot
       end
 
       # parse DSL by processing the DSL description as block
-      # @param datetime [DateTime] the datetime for which the job works
+      # @param datetime [Time] the datetime for which the job works
       # @return a list of command defined in the DSL description
       def parse(datetime, blk)
         self.target_datetime = datetime
