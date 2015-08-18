@@ -299,6 +299,22 @@ EOJ
     end
   end
 
+  describe 'registration' do
+    before :each do
+      @job_store = <%= job_store_class %>.new("root", @config)
+    end
+
+    it "sholud not destroy input to be retriable" do
+      job = TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :node => 'node'})
+      job_id = job.job_id
+      expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
+      @job_store.register(Time.now.to_i, [job])
+      expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
+      job = @job_store.get(job_id, :include_dependency => true)
+      expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
+    end
+  end
+
   describe 'dependency management' do
     before :each do
       @job_store = <%= job_store_class %>.new("root", @config)
