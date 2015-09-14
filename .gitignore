@@ -14,6 +14,7 @@ plugins/*
 !plugins/patriot-mysql2-client
 !plugins/patriot-sqlite3-client
 !plugins/patriot-gcp
+!plugins/patriot-hadoop
 
 # YARD artifacts
 .yardoc
