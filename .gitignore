@@ -13,6 +13,7 @@ public
 plugins/*
 !plugins/patriot-mysql2-client
 !plugins/patriot-sqlite3-client
+!plugins/patriot-gcp
 
 # YARD artifacts
 .yardoc

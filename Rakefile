@@ -2,7 +2,8 @@
 load 'Rakefile.base'
 
 PLUGINS = {'mysql2'  => 'patriot-mysql2-client',
-           'sqlite3' => 'patriot-sqlite3-client'}
+           'sqlite3' => 'patriot-sqlite3-client',
+           'gcp'     => 'patriot-gcp'}
 TASKS   = ['build', 'install', 'spec', 'yard', 'clean', 'clobber']
 
 TASKS.each do |t|
