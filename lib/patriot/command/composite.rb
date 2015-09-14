@@ -9,7 +9,7 @@ module Patriot
 
       # @return [String] the identifier of this composite command
       # @see Patriot::Command::Base#job_id
-      def job_id  
+      def job_id
         return "#{command_name}_#{@name}_#{@name_suffix}"
       end
 

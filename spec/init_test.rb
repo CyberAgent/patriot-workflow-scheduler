@@ -44,4 +44,3 @@ unless ENV['TEST_DBMS'].nil?
   TestDBInitiator.new.truncate_database
 end
 
-
