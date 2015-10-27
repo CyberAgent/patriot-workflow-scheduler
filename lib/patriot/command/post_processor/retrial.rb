@@ -25,6 +25,9 @@ module Patriot
             cmd.start_datetime = Time.now + pp.props[INTERVAL_PROP_KEY]
           end
           job = cmd.to_job
+          current_config = worker.job_store.get_job(job.job_id)
+          job[Patriot::Command::PRODUCTS_ATTR] = current_config[Patriot::Command::PRODUCTS_ATTR]
+          job[Patriot::Command::REQUISITES_ATTR] = current_config[Patriot::Command::REQUISITES_ATTR]
           job[Patriot::Command::STATE_ATTR] = Patriot::JobStore::JobState::WAIT
           worker.job_store.register(Time.now.to_i, [job])
         end
