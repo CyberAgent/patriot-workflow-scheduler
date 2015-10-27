@@ -344,6 +344,22 @@ EOJ
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
       expect(job['consumers']).to include(@consumer2.job_id)
     end
+
+    it "sholud clear dependency " do
+      consumer1 = TestEnvirionment.build_job({:job_id => 'c1', :command => 'echo \'c1\''})
+      consumer1['requisites'] = []
+      jobs = [consumer1]
+      @job_store.register(Time.now.to_i, jobs)
+      job = @job_store.get(@producer1.job_id, :include_dependency => true)
+      expect(job['consumers']).not_to include(@consumer1.job_id)
+
+      consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\''})
+      consumer2['requisites'] = nil
+      jobs = [consumer2]
+      @job_store.register(Time.now.to_i, jobs)
+      job = @job_store.get(@producer2.job_id, :include_dependency => true)
+      expect(job['consumers']).not_to include(@consumer2.job_id)
+    end
   end
 end
 
