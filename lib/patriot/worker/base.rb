@@ -4,6 +4,27 @@ require 'patriot/command'
 module Patriot
   module Worker
 
+    def get_pid(config)
+      pid_file = get_pid_file(config)
+      return nil unless File.exists?(pid_file)
+      pid = nil
+      File.open(pid_file,'r'){|f| pid = f.read.strip.to_i }
+      begin
+        Process.getpgid(pid)
+      rescue Errno::ESRCH
+        @logger.warn("process #{pid} not exist but pid file remains") if @logger
+        return nil
+      end
+      return pid
+    end
+    module_function :get_pid
+
+    def get_pid_file(config)
+      worker_name = config.get('worker_name', Patriot::Worker::DEFAULT_WORKER_NAME)
+      return File.join($home, 'run', "patriot-worker_#{worker_name}.pid")
+    end
+    module_function :get_pid_file
+
     # @abstract
     # base class for worker implementations
     class Base
@@ -24,7 +45,6 @@ module Patriot
         @cycle       = config.get('fetch_cycle', Patriot::Worker::DEFAULT_FETCH_CYCLE).to_i
         @fetch_limit = config.get('fetch_limit', Patriot::Worker::DEFAULT_FETCH_LIMIT).to_i
         @worker_name = config.get('worker_name', Patriot::Worker::DEFAULT_WORKER_NAME)
-        @pid_file    = File.join($home, 'run', "patriot-worker_#{@worker_name}.pid")
         @info_server = Patriot::Worker::InfoServer.new(self,@config)
       end
 
@@ -79,16 +99,7 @@ module Patriot
 
       # @return [Integer] pid if the worker is running, otherwise nil
       def get_pid
-        return nil unless File.exists?(@pid_file)
-        pid = nil
-        File.open(@pid_file,'r'){|f| pid = f.read.strip.to_i }
-        begin
-          Process.getpgid(pid)
-        rescue Errno::ESRCH
-          @logger.warn("process #{pid} not exist but pid file remains")
-          return nil
-        end
-        return pid
+        return Patriot::Worker.get_pid(@config)
       end
 
       # send a request graceful shutdown to a running worker
@@ -106,9 +117,9 @@ module Patriot
       # main entry point of worker processing
       def start_worker
         return unless get_pid.nil?
-
         @logger.info "starting worker #{@node}@#{@host}"
-        File.open(@pid_file, 'w') {|f| f.write($$)} # save pid for shutdown
+        pid_file = Patriot::Worker.get_pid_file(@config)
+        File.open(pid_file, 'w') {|f| f.write($$)} # save pid for shutdown
         set_traps
         @info_server.start_server
         @logger.info "initiating worker #{@node}@#{@host}"

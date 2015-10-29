@@ -12,9 +12,9 @@ describe Patriot::Worker::Base do
     @job_store.register(@update_id, [@job1])
   end
 
-  describe "initialize" do
-    it "should set pid file" do
-      expect(@worker_base.instance_variable_get(:@pid_file)).to eq File.join(ROOT_PATH, "run","patriot-worker_default.pid" )
+  describe "module functions" do
+    it "should return pid file" do
+      expect(Patriot::Worker.get_pid_file(config_for_test)).to eq File.join(ROOT_PATH, "run","patriot-worker_default.pid" )
     end
   end
 
