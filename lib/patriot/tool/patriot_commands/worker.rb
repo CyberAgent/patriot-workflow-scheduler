@@ -15,6 +15,7 @@ module Patriot
             opts = symbolize_options(options)
             conf        = {:type => 'worker'}
             conf[:path] = opts[:config] if opts.has_key?(:config)
+            opts[:forground] = false unless sub_cmd == 'start'
             return if sub_cmd == 'start' && !bootable?(conf)
             Process.daemon unless opts[:foreground]
             config = load_config(conf)
@@ -42,7 +43,7 @@ module Patriot
             #         false if the worker has been already running,
             #         otherwize raise error
             def bootable?(conf)
-              conf = conf.merge(:ignore_plugin => false)
+              conf = conf.merge(:ignore_plugin => true)
               config = load_config(conf)
               pid = Patriot::Worker.get_pid(config)
               unless pid.nil?
