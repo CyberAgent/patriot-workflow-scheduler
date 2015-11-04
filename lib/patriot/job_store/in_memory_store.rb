@@ -39,8 +39,8 @@ module Patriot
               job[Patriot::Command::STATE_ATTR] ||= Patriot::JobStore::JobState::INIT
             end
             @jobs[job_id]      = job
-            @producers[job_id] = job[Patriot::Command::PRODUCTS_ATTR] unless job[Patriot::Command::PRODUCTS_ATTR].nil?
-            @consumers[job_id] = job[Patriot::Command::REQUISITES_ATTR] unless job[Patriot::Command::REQUISITES_ATTR].nil?
+            @producers[job_id] = job[Patriot::Command::PRODUCTS_ATTR] || []
+            @consumers[job_id] = job[Patriot::Command::REQUISITES_ATTR] || []
             if job[Patriot::Command::STATE_ATTR] == Patriot::JobStore::JobState::INIT
               _set_state(job_id, Patriot::JobStore::JobState::WAIT)
             else

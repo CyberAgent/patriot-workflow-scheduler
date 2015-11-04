@@ -21,7 +21,7 @@ module Patriot
       HISTORY_TABLE  = 'job_histories'
 
       # date format of execution history
-      HISTORY_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+      DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
       # attributes included in job_ticket
       TICKET_COLUMNS = ['job_id', 'update_id', 'node']
@@ -72,18 +72,20 @@ module Patriot
 
       def upsert_job(update_id, job, c)
         new_vals = {:job_id => job.job_id, :update_id => update_id, :priority => DEFAULT_PRIORITY}
+        job_attr = job.attributes.dup
         # extract and remove comman attributes
-        requisites = job.delete(Patriot::Command::REQUISITES_ATTR) || []
-        products   = job.delete(Patriot::Command::PRODUCTS_ATTR)   || []
+        requisites = job_attr.delete(Patriot::Command::REQUISITES_ATTR) || []
+        products   = job_attr.delete(Patriot::Command::PRODUCTS_ATTR)   || []
 
         prev_vals = c.select(JOB_TABLE, {:job_id => job.job_id})
         ATTR_TO_COLUMN.each do |a,c|
-          val = job.delete(a)
+          val = job_attr.delete(a)
           next if val.nil? && c == :state
+          val = val.strftime(DATE_FORMAT) if !val.nil? && a == Patriot::Command::START_DATETIME_ATTR
           new_vals[c] = val
         end
         # serialize remaining attributes
-        new_vals[:content] = JSON.generate(job.attributes)
+        new_vals[:content] = JSON.generate(job_attr)
 
         if prev_vals.empty?
           new_vals[:state] ||= Patriot::JobStore::JobState::INIT # set default state
@@ -184,7 +186,7 @@ END_OB_QUERY
                                   :node       => job_ticket.exec_node,
                                   :host       => job_ticket.exec_host,
                                   :thread     => job_ticket.exec_thread,
-                                  :begin_at   => Time.now.strftime(HISTORY_DATE_FORMAT)})
+                                  :begin_at   => Time.now.strftime(DATE_FORMAT)})
           record = c.select(JOB_TABLE, {:job_id => job_ticket.job_id})
           raise "duplicated entry found for #{job_ticket}" if record.size > 1
           raise "no entry found for #{job_ticket}" if record.empty?
@@ -205,7 +207,7 @@ END_OB_QUERY
         post_state = Patriot::JobStore::EXIT_CODE_TO_STATE[exit_code]
         raise "illegal exit_code #{exit_code}" if post_state.nil?
         connect(@db_config) do |c|
-          if c.update(HISTORY_TABLE, {:end_at => Time.now.strftime(HISTORY_DATE_FORMAT), :exit_code => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
+          if c.update(HISTORY_TABLE, {:end_at => Time.now.strftime(DATE_FORMAT), :exit_code => exit_code, :description => job_ticket.description}, {:id => job_ticket.execution_id}) != 1
             @logger.warn "illegal state of history for #{job_ticket.job_id}"
           end
           return _check_and_set_state(job_ticket, Patriot::JobStore::JobState::RUNNING, post_state, c)

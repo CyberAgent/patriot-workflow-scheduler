@@ -57,7 +57,7 @@ module Patriot
                 jobs << job
               end
               return if opts[:debug]
-              Patriot::Util::Retry.execute_with_retry{ job_store.register(opts[:update_id], jobs) }
+              job_store.register(opts[:update_id], jobs)
               if opts[:retry_dep]
                 job_store.process_subsequent(jobs.map(&:job_id)) do |job_store, jobs|
                   job_store.set_state(opts[:update_id], jobs.map(&:job_id), Patriot::JobStore::JobState::WAIT)

@@ -21,19 +21,21 @@ module Patriot
       include Patriot::Util::Config
       include Patriot::Util::Logger
 
+      attr_accessor :port
+
       # @param worker [Patriot::Worker::Base] worker managed through this server
       # @param config [Patriot::Util::Config::Bae]
       def initialize(worker, config)
         @logger = create_logger(config)
         @worker = worker
         @config = config
+        @port = @config.get(Patriot::Worker::InfoServer::PORT_KEY,
+                            Patriot::Worker::InfoServer::DEFAULT_PORT)
       end
 
       # start the server
       def start_server
-        port = @config.get(Patriot::Worker::InfoServer::PORT_KEY,
-                           Patriot::Worker::InfoServer::DEFAULT_PORT)
-        if port.nil?
+        if @port.nil?
           @logger.info("port is not set. starting info server is skipped")
           return
         end
@@ -42,7 +44,7 @@ module Patriot
             @handler = eval(@config.get(RACK_HANDLER_KEY, DEFAULT_RACK_HANDLER))
             app = Rack::URLMap.new(get_url_map)
             app = Rack::CommonLogger.new(app, build_access_logger)
-            @handler.run app, {:Port => port, :Host => '0.0.0.0'}
+            @handler.run app, {:Port => @port, :Host => '0.0.0.0'}
           rescue => e
             @logger.error e
           end
