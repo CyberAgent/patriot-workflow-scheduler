@@ -1,0 +1,4 @@
+sh {
+  name "weekly"
+  commands "echo #{_date_}"
+}

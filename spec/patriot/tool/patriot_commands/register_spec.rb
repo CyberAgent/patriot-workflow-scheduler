@@ -163,6 +163,19 @@ describe Patriot::Tool::PatriotCommands::Register do
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
       expect(@job_store.get("sh_echo_priority_2013-01-01")['priority']).to eq 99
     end
+
+    it "should include files under non-reserved directories" do
+      args = [
+          'register',
+          "--config=#{@config}",
+          '2013-01-01',
+          "#{ROOT_PATH}/spec/pbc/interval",
+        ]
+      expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
+      expect(@job_store.get("sh_non_reserved_dir_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_daily_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_monthly_2013-01-01")).to be nil
+    end
   end
 
 end

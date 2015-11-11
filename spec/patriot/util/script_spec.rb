@@ -6,53 +6,50 @@ describe Patriot::Util::Script do
   describe "get_batch_files" do
     context "all" do
       it "should be expected" do
-        path    = "#{ROOT_PATH}/spec/pbc/sh"
+        path    = "#{ROOT_PATH}/spec/pbc/interval"
         date    = '2013-01-01'
         options = {:all => true}
         files   = get_batch_files(path, date, options)
         expect(files).to be_a Array
-        expect(files.size).to eq 3
+        expect(files).to contain_exactly(
+          *['', 'daily', 'monthly', 'weekly/1'].map{|f| File.join(path, f, 'sh.pbc')}
+        )
       end
     end
 
     context "daily" do
-      it "should be expected" do
-        path    = "#{ROOT_PATH}/spec/pbc/sh/daily"
+      it "should not return weekly and monthly" do
+        path    = "#{ROOT_PATH}/spec/pbc/interval"
         date    = '2013-01-01'
-        options = {:all => true}
-        files   = get_batch_files(path, date, options)
+        files   = get_batch_files(path, date)
         expect(files).to be_a Array
-        expect(files.size).to eq 1
+        expect(files).to contain_exactly(
+          *['', 'daily'].map{|f| File.join(path, f, 'sh.pbc')}
+        )
       end
     end
 
     context "weekly" do
-      it "should be expected" do
-        path    = "#{ROOT_PATH}/spec/pbc/sh/weekly"
-        date    = '2013-01-01'
-        files   = get_batch_files(path, date)
-        expect(files).to be_a Array
-        expect(files.size).to eq 0
-
+      it "should include a weekly file" do
+        path    = "#{ROOT_PATH}/spec/pbc/interval"
         date    = '2013-01-07'
         files   = get_batch_files(path, date)
         expect(files).to be_a Array
-        expect(files.size).to eq 1
+        expect(files).to contain_exactly(
+          *['', 'daily', 'weekly/1'].map{|f| File.join(path, f, 'sh.pbc')}
+        )
       end
     end
 
     context "monthly" do
-      it "should be expected" do
-        path    = "#{ROOT_PATH}/spec/pbc/sh/monthly"
+      it "should include a monthly file" do
+        path    = "#{ROOT_PATH}/spec/pbc/interval"
         date    = '2013-12-31'
         files   = get_batch_files(path, date)
         expect(files).to be_a Array
-        expect(files.size).to eq 1
-
-        date    = '2013-01-01'
-        files   = get_batch_files(path, date)
-        expect(files).to be_a Array
-        expect(files.size).to eq 0
+        expect(files).to contain_exactly(
+          *['', 'daily', 'monthly'].map{|f| File.join(path, f, 'sh.pbc')}
+        )
       end
     end
   end

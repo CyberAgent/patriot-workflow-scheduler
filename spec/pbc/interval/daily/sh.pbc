@@ -1,0 +1,4 @@
+sh {
+  name "daily"
+  commands "echo #{_date_}"
+}

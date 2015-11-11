@@ -23,6 +23,10 @@ module Patriot
         end
 
         get '/' do
+          call env.merge('PATH_INFO' => '/status')
+        end
+
+        get '/status' do
           respond_with :worker, {:worker => @worker} do |f|
             # for monitoring
             f.on('*/*') { JSON.generate(@worker.host => @worker.status)}
@@ -30,6 +34,10 @@ module Patriot
         end
 
         put '/' do
+          call env.merge('PATH_INFO' => '/status')
+        end
+
+        put '/status' do
           new_status = params['status']
           if [Patriot::Worker::Status::ACTIVE, Patriot::Worker::Status::SLEEP ]
             @worker.status = new_status

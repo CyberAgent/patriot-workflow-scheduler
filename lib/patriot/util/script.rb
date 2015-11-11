@@ -38,11 +38,11 @@ module Patriot
 
       def target_file?(file, options)
         case
-        when options[:all]                            then true
-        when file =~ /\/daily\// && options[:day]     then true
-        when file =~ /\/monthly\// && options[:month] then true
-        when file =~ /\/weekly\/#{options[:week]}\//  then true
-        else false
+        when options[:all]               then true
+        when file =~ /\/daily\//         then options[:day]
+        when file =~ /\/monthly\//       then options[:month]
+        when file =~ /\/weekly\/([0-6])/ then options[:week].to_s == $~[1]
+        else true
         end
       end
       private :target_file?

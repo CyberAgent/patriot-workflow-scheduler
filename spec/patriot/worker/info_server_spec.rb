@@ -15,25 +15,38 @@ describe  Patriot::Worker::InfoServer do
       @job_store = @worker.instance_variable_get(:@job_store)
       @update_id = Time.now.to_i
       @job_store.register(@update_id, [@job1,@job2])
-      @worker.instance_variable_set(:@status, Patriot::Worker::Status::ACTIVE)
       @info_server = @worker.instance_variable_get(:@info_server)
       @info_server.start_server
       sleep 1
+    end
+
+    before :each do
+      @worker.instance_variable_set(:@status, Patriot::Worker::Status::ACTIVE)
     end
 
     after :all do
       @info_server.shutdown_server
     end
 
-    describe "status" do
-      it "should return status" do
+    describe "WorkerServlet" do
+      it "should controll status (to be modified)" do
+        expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::ACTIVE
         expect(RestClient.get("#{@url}/worker")).to match Patriot::Worker::Status::ACTIVE
-        @worker.instance_variable_set(:@status, Patriot::Worker::Status::SLEEP)
+        RestClient.put("#{@url}/worker", :status => Patriot::Worker::Status::SLEEP)
+        expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::SLEEP
         expect(RestClient.get("#{@url}/worker")).to match Patriot::Worker::Status::SLEEP
+      end
+
+      it "should controll worker status" do
+        expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::ACTIVE
+        expect(RestClient.get("#{@url}/worker/status")).to match Patriot::Worker::Status::ACTIVE
+        RestClient.put("#{@url}/worker/status", :status => Patriot::Worker::Status::SLEEP)
+        expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::SLEEP
+        expect(RestClient.get("#{@url}/worker/status")).to match Patriot::Worker::Status::SLEEP
       end
     end
 
-    describe "job" do
+    describe "JobServlet" do
       it "should return job status" do
         job_status = RestClient.get("#{@url}/jobs/#{@job1.job_id}", :accept => :json)
         json = JSON.parse(job_status)
