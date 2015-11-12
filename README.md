@@ -47,10 +47,10 @@ In processing the PBC files, a variable '\_date\_' will be replaced with the tar
 % cat batch/sample/daily/test.pbc
 sh{
   name "test"
-  commands "echo '{_date_}' > /tmp/test.out"
+  commands "echo '#{_date_}' > /tmp/test.out"
 }
 % ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
-% echo /tmp/test.out
+% cat /tmp/test.out
 2015-04-01
 
 ```
