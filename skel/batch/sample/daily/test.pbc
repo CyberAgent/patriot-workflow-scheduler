@@ -1,4 +1,4 @@
 sh{
   name "test"
-  commands 'echo \'#{_date_}\''
+  commands "echo '#{_date_}' > /tmp/test.out"
 }
