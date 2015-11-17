@@ -70,8 +70,8 @@ module PatriotGCP
           state = response["status"]["state"]
 
           if state == 'DONE'
-            if response["status"]["errorResult"]
-              raise BigQueryException, "upload failed: #{response['status']['errorResult']}"
+            if response["status"]["errors"]
+              raise BigQueryException, "upload failed: #{response['status']['errors']}"
             else
               return response["statistics"]
             end
@@ -101,10 +101,11 @@ module PatriotGCP
 
         begin
           job_id = JSON.parse(result.response.body)['jobReference']['jobId']
-          return _poll(bq_client, api_client, auth_client, project_id, job_id)
         rescue
-          raise BigQueryException, "upload failed: #{result.response.body}"
+          raise BigQueryException, "failed to register job: #{result.response.body}"
         end
+
+        return _poll(bq_client, api_client, auth_client, project_id, job_id)
       end
 
 
