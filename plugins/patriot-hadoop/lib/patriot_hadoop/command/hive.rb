@@ -12,6 +12,7 @@ module PatriotHadoop
         return job_id
       end
 
+
       def execute
         @logger.info "start hive"
 
@@ -19,30 +20,39 @@ module PatriotHadoop
         opt[:udf] = @udf unless @udf.nil?
         opt[:props] = @props unless @props.nil?
 
-        output_directory = File.dirname(@output_prefix)
+        output_prefix = @output_prefix.nil? ? File.join('/tmp', job_id()) : @output_prefix
+        output_directory = File.dirname(output_prefix)
         if not Dir.exist?(output_directory)
           FileUtils.mkdir_p(output_directory)
         end
 
-        tmpfile = @output_prefix + '.hql'
+        tmpfile = output_prefix + '.hql'
         _create_hivequery_tmpfile(@hive_ql, tmpfile, opt)
 
-        output_file = @output_prefix + '.tsv'
+        output_file = output_prefix + '.tsv'
         execute_hivequery(tmpfile, output_file, @exec_user)
 
-        unless File.size?(output_file)
-          @logger.warn "#{@hive_ql} manipulates empty result"
+        if File.zero?(output_file)
+          @logger.warn "#{@hive_ql} generated empty result"
           return
         end
 
         @logger.info "end hive"
       end
 
-      def _create_hivequery_tmpfile(hive_ql, tmpfile, opt = {})
+
+      def _create_hivequery_tmpfile(hive_ql, tmpfile, opt={})
         hive_ql = _add_udfs(hive_ql, opt[:udf]) if opt.has_key?(:udf)
         hive_ql = "#{_set_hive_property_prefix(opt[:props])}#{hive_ql}" if opt.has_key?(:props)
         File.write(tmpfile, hive_ql)
       end
+
+
+      def _set_hive_property_prefix(props={})
+        return "" if props.nil?
+        return props.map{|k,v| "set #{k}=#{v};"}.join
+      end
+
 
       def _add_udfs(hive_ql, udfs)
         return hive_ql if udfs.nil?

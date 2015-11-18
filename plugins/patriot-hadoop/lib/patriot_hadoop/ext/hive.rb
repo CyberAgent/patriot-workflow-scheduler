@@ -14,7 +14,8 @@ module PatriotHadoop
 
       class HiveException < Exception; end
 
-      def execute_hivequery(hql_file, output_file, user = nil)
+
+      def execute_hivequery(hql_file, output_file=nil, user=nil)
         command = "hive -f \"#{hql_file}\""
         unless user.nil?
           if user !~ /^[a-z_][a-z0-9_]{0,30}$/
@@ -24,6 +25,7 @@ module PatriotHadoop
         end
         return _execute_hivequery_internal(command, output_file)
       end
+
 
       def _execute_hivequery_internal(command, output_file)
         so = execute_command(command) do |status, so, se|
@@ -39,12 +41,7 @@ module PatriotHadoop
           end
           raise HiveException, "#{command}\n#{err_msg}"
         end
-        File.rename(so, output_file)
-      end
-
-      def _set_hive_property_prefix(props={})
-        return "" if props.nil?
-        return props.map{|k,v| "set #{k}=#{v};"}.join
+        File.rename(so, output_file) unless output_file.nil?
       end
 
     end

@@ -30,6 +30,28 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
+  it "sholud execute hive query without output_prefix" do
+    query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
+    cmd = new_command(PatriotHadoop::Command::HiveCommand) do
+      hive_ql query
+      name_suffix 'test'
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    allow(Dir).to receive(:exist?).and_return(true)
+    allow(File).to receive(:write)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)
+    expect_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)\
+                                                    .once\
+                                                    .with("/tmp/hive_test.hql",
+                                                          "/tmp/hive_test.tsv",
+                                                          nil)
+    expect(File).to receive(:write).with("/tmp/hive_test.hql", query)
+    cmd.execute
+  end
+
   it "sholud execute hive query with exec_user" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     exec_user = 'user1'
