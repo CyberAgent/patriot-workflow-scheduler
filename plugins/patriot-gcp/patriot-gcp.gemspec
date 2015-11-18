@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
   s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler"
   s.summary     = %q{GCP plugin for Patriot Workflow Scheduler}
-  s.description     = %q{GCP plugin for Patriot Workflow Scheduler}
+  s.description = %q{plugins for Patriot Worlflow Scheduler, which deal with GCP such as BigQuery.}
   s.platform = Gem::Platform::RUBY
 
   s.rubyforge_project = VERSION::PROJECT_NAME
