@@ -55,9 +55,14 @@ module PatriotGCP
       end
 
 
-      def _poll(bq_client, api_client, auth_client, project_id, job_id)
+      def _poll(bq_client,
+                api_client,
+                auth_client,
+                project_id,
+                job_id,
+                polling_interval)
 
-        60.times{
+        polling_interval.times{
           response = JSON.parse(api_client.execute(
                                 :api_method => bq_client.jobs.get,
                                 :parameters => {
@@ -79,10 +84,20 @@ module PatriotGCP
 
           sleep 60
         }
+
+        raise BigQueryException,"registered job didn't finish within: #{polling_interval} mins. please check if it will finish later on. jobId: #{job_id}"
       end
 
 
-      def _bq_load(filename, project_id, dataset_id, table_id, auth_client, api_client, schema, options)
+      def _bq_load(filename,
+                   project_id,
+                   dataset_id,
+                   table_id,
+                   auth_client,
+                   api_client,
+                   schema,
+                   options,
+                   polling_interval)
 
         bq_client = api_client.discovered_api('bigquery', 'v2')
         body = _make_body(project_id, dataset_id, table_id, schema, options)
@@ -105,14 +120,41 @@ module PatriotGCP
           raise BigQueryException, "failed to register job: #{result.response.body}"
         end
 
-        return _poll(bq_client, api_client, auth_client, project_id, job_id)
+        return _poll(bq_client,
+                     api_client,
+                     auth_client,
+                     project_id,
+                     job_id,
+                     polling_interval)
       end
 
 
-      def bq_load(filename, p12_key, key_pass, email, project_id, dataset_id, table_id, schema, options={})
+      def bq_load(filename,
+                  p12_key,
+                  key_pass,
+                  email,
+                  project_id,
+                  dataset_id,
+                  table_id,
+                  schema,
+                  options=nil,
+                  polling_interval=nil)
+
+        options ||= {}
+        polling_interval ||= 60
+
         api_client  = _get_api_client()
         auth_client = _get_auth_client(p12_key, key_pass, email)
-        return _bq_load(filename, project_id, dataset_id, table_id, auth_client, api_client, schema, options)
+
+        return _bq_load(filename,
+                        project_id,
+                        dataset_id,
+                        table_id,
+                        auth_client,
+                        api_client,
+                        schema,
+                        options,
+                        polling_interval)
       end
 
     end

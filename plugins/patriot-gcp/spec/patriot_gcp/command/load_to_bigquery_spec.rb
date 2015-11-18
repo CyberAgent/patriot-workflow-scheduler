@@ -19,12 +19,28 @@ describe PatriotGCP::Command::LoadToBigQueryCommand do
       options 'fieldDelimiter' => '\t',
               'writeDisposition' => 'WRITE_APPEND',
               'allowLargeResults' => true
+      polling_interval 30
     end 
     cmd = cmd.build[0]
     cmd = cmd.to_job.to_command(@config)
 
     cmd.execute
   end 
+
+  it "sholud work without arbitrary parameters" do
+    allow_any_instance_of(PatriotGCP::Ext::BigQuery).to receive(:bq_load)
+    cmd = new_command(PatriotGCP::Command::LoadToBigQueryCommand) do
+      inifile path_to_test_config('test-bigquery.ini')
+      dataset 'test-dataset'
+      table 'test-table'
+      schema 'field1'
+      input_file File.join(SAMPLE_DIR, "hive_result.txt")
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    cmd.execute
+  end
 
   it "sholud work with an empty file" do
     allow_any_instance_of(PatriotGCP::Ext::BigQuery).to receive(:bq_load)

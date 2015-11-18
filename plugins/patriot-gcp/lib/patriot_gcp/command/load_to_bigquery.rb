@@ -4,7 +4,7 @@ module PatriotGCP
       declare_command_name :load_to_bigquery
       include PatriotGCP::Ext::BigQuery
 
-      command_attr :inifile, :dataset, :table, :schema, :options, :input_file, :name_suffix
+      command_attr :inifile, :dataset, :table, :schema, :options, :input_file, :name_suffix, :polling_interval
 
       class BigQueryException < Exception; end
       class GoogleCloudPlatformException < Exception; end
@@ -53,7 +53,8 @@ module PatriotGCP
                             @dataset,
                             @table,
                             @schema,
-                            @options)
+                            @options,
+                            @polling_interval)
 
         @logger.info "upload succeeded: #{stat_info}"
         @logger.info "end load_to_bigquery"

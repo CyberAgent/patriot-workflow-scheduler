@@ -57,6 +57,44 @@ describe PatriotGCP::Ext::BigQuery do
   end
 
 
+  it "raises BigQueryException when not finishing in time" do
+    api_client_mock = double('api-client-mock')
+    allow(api_client_mock).to receive(:discovered_api).with('bigquery', 'v2'){
+        double(nil,
+               {:jobs => double(nil,
+                                {:get => "GET",
+                                 :insert => "INSERT"})})
+    }
+    allow(api_client_mock).to receive(:execute).with(hash_including(:api_method => 'INSERT',
+                                                                    :parameters => {
+                                                                        'projectId' => 'test-project',
+                                                                        'uploadType' => 'multipart'
+                                                                    })){
+        double(nil,
+               {:response => double(nil,
+                                    {:body => '{"jobReference": {"jobId": "job_id01"}}'})})
+    }
+
+    allow(Google::APIClient).to receive(:new).and_return(api_client_mock)
+    expect(api_client_mock).to receive(:execute).with(hash_including(:api_method => "INSERT")).once
+    expect {
+        bq_load(File.join(SAMPLE_DIR, "hive_result.txt"),
+                '/path/to/keyfile',
+                'key_pass',
+                'test-account@developer.gserviceaccount.com',
+                'test-project',
+                'test-dataset',
+                'test-table',
+                'field1',
+                options={'fieldDelimiter' => '\t',
+                         'writeDisposition' => 'WRITE_APPEND',
+                         'allowLargeResults' => true},
+                polling_interval=0)
+    }.to raise_error(BigQueryException)
+
+  end
+
+
   it "raises BigQueryException when getting error from api" do
     api_client_mock = double('api-client-mock')
     allow(api_client_mock).to receive(:discovered_api).with(
