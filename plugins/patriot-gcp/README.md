@@ -4,7 +4,7 @@ patriot-gcp plugin
 This plugin adds some commands for Patriot Workflow Scheduler to collaborate with Google Cloud Platform (GCP).
 
 
-Impremented Commands
+Implemented Commands
 -------------
 
 ### load_to_bigquery
