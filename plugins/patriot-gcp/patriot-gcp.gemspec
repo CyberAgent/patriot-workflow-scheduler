@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
-  s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler"
+  s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler/tree/master/plugins/patriot-gcp"
   s.summary     = %q{GCP plugin for Patriot Workflow Scheduler}
   s.description = %q{plugins for Patriot Worlflow Scheduler, which deal with GCP such as BigQuery.}
   s.platform = Gem::Platform::RUBY
