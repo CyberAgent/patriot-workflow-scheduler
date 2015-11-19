@@ -4,13 +4,13 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-hadoop"
-  s.version     = "0.1.0"
+  s.version     = "0.1.1"
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
   s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler"
   s.summary     = %q{Hadoop plugin for Patriot Workflow Scheduler}
-  s.description     = %q{Hadoop plugin for Patriot Workflow Scheduler}
+  s.description     = %q{a plugin for Patriot Workflow Scheduler, which deal with Hadoop-related softwares.}
   s.platform = Gem::Platform::RUBY
 
   s.rubyforge_project = "patriot-hadoop"
