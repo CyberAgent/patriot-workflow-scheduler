@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
-  s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler"
+  s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler/tree/master/plugins/patriot-hadoop"
   s.summary     = %q{Hadoop plugin for Patriot Workflow Scheduler}
   s.description     = %q{a plugin for Patriot Workflow Scheduler, which deal with Hadoop-related softwares.}
   s.platform = Gem::Platform::RUBY
