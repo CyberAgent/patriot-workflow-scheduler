@@ -81,6 +81,21 @@ sh{
 # execute echo 'this is a consumer'
 ```
 
+Generate documents
+-------
+
+You can easily generate API documents using yard.
+
+### setup yard and start yard server
+
+```
+% gem install yard
+% yard doc lib plugins
+% yard server
+```
+
+Now you can see docs at [http://localhost:8808/docs/frames/index](http://localhost:8808/docs/frames/index).
+
 ### For more information
 
 For understanding how to manage dependencies in a complicated workflow, the architecture of the scheduler, other command line tools, etc, 
