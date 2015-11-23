@@ -73,7 +73,7 @@ module Patriot
       def upsert_job(update_id, job, c)
         new_vals = {:job_id => job.job_id, :update_id => update_id, :priority => DEFAULT_PRIORITY}
         job_attr = job.attributes.dup
-        # extract and remove comman attributes
+        # extract and remove command attributes
         requisites = job_attr.delete(Patriot::Command::REQUISITES_ATTR) || []
         products   = job_attr.delete(Patriot::Command::PRODUCTS_ATTR)   || []
 

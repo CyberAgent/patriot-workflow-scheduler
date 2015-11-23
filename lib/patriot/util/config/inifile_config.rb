@@ -5,7 +5,7 @@ module Patriot
       # a configuration implementation definied by the ini-file format
       class IniFileConfig < Patriot::Util::Config::Base
 
-        # comman section name
+        # common section name
         COMMON_SECTION = 'common'
 
         # @param path [String] path to a configuration file

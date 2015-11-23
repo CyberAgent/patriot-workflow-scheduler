@@ -31,7 +31,7 @@ module Patriot
       # execute block for each target hosts
       # @param options [Hash]
       # @option options :host  a target host
-      # @option options :hosts a comman separated value of target hosts
+      # @option options :hosts a comma separated value of target hosts
       # @option options :all   set true to target all hosts in the configuration 
       # @return [Hash] a hash from host name to the result of the block
       def request_to_target_hosts(options = {}, &blk)

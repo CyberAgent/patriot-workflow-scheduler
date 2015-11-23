@@ -22,7 +22,7 @@ module Patriot
     # attribute name for retry configration
     POST_PROCESSORS_ATTR = "post_processors"
 
-    # a list of comman attributes
+    # a list of command attributes
     COMMON_ATTRIBUTES = [
       REQUISITES_ATTR,
       PRODUCTS_ATTR,
