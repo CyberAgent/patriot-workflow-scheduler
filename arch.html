@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Architecture &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
+    <link rel="next" title="Job Configuration DSL (PBC)" href="pbc.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pbc.html" title="Job Configuration DSL (PBC)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="architecture">
+<h1>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
+<img alt="_images/arch.png" src="_images/arch.png" />
+<p>How jobs are executed with the patriot-workflow-scheduler is described
+in the above figure.  The jobs are defined with Patriot Batch Config
+(PBC) files in original DSL.  PBC files are parsed by the patriot
+script and registered to JobStore.  The JobStore has a role of
+determining which jobs are executable by managing dependency.  The
+executable jobs are fetched by workers and executed by the workers.</p>
+<div class="section" id="model-of-jobs-and-dependency">
+<h2>Model of jobs and dependency<a class="headerlink" href="#model-of-jobs-and-dependency" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/depmodel.png" src="_images/depmodel.png" />
+<p>The job dependency model is shown in the above figure.  The model is
+designed on the basis of data flow.  The rounded rectangles and the
+rectangles represent jobs and products, respectively.  The products
+can be produced and/or required by one or more jobs.  The figure has
+two kind of data (data1, data2) which are modeled as products.  The
+product data1 and date2 are produced (required) by the job import1
+(process1) and import2 (process2), respectively.  In addition, the
+figure has a virtual product (&#8216;all data&#8217;) which is produced by the
+import1 and the import2 and required by the processAll.  A job is
+judged as executable when all products the job requires are available.
+A product becomes available when all jobs which produce the product
+are successfully finished.</p>
+<p>For instance, the process1 becomes executable when the import1 is
+finished because the process1 only requires the data1 and it is
+produced only by the import1.  On the other hand, both the import1 and
+the import2 have to be finished for the processAll.  The processAll
+only requires the &#8216;data all&#8217; but it has two producers (import1 and
+import2).</p>
+<p>The data flow based dependency model can improve modularity of
+dependency configuration.  Consider a situation that new data (data3)
+which should be processed as all data is added which should be
+processed as all data for instance.  The below figure shows this kind
+of extension can be achieved by only producer-side modification due to
+the existence of the virtual product (&#8216;all data&#8217;).  By setting the
+&#8216;all data&#8217; as a product of the import3, the processAll requires
+completion of the import3 to become executable.  The patriot workflow
+scheduler provides an original Patriot Batch Config DSL (<a class="reference internal" href="pbc.html"><em>PBC</em></a>) to describe the data-flow based dependency model.</p>
+<img alt="_images/depmodel2.png" src="_images/depmodel2.png" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Architecture</a><ul>
+<li><a class="reference internal" href="#model-of-jobs-and-dependency">Model of jobs and dependency</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="getting_started.html"
+                        title="previous chapter">Getting Started</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pbc.html"
+                        title="next chapter">Job Configuration DSL (PBC)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/arch.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pbc.html" title="Job Configuration DSL (PBC)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Cyberagent, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

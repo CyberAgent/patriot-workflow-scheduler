@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
+    <link rel="next" title="Architecture" href="arch.html" />
+    <link rel="prev" title="Patriot Workflow Scheduler" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="arch.html" title="Architecture"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Patriot Workflow Scheduler"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Ruby ( &gt;= 1.9 )</li>
+<li>MySQL ( recommended for production use )</li>
+</ul>
+</div>
+<div class="section" id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>% sudo gem install patriot-workflow-scheduler
+% patriot-init ${INSTALL_DIR}
+</pre></div>
+</div>
+</div>
+<div class="section" id="job-execution">
+<h2>Job Execution<a class="headerlink" href="#job-execution" title="Permalink to this headline">¶</a></h2>
+<p>Command line tools are available for processing jobs defined in <a class="reference internal" href="pbc.html"><em>PBC</em></a>.
+The tool can be triggered by <a class="reference internal" href="cli.html"><em>the patriot script</em></a>.
+The script takes three arguments: a tool name (&#8216;execute&#8217; for job execution), a target date of the jobs (in yyyy-MM-dd) and a path to the PBC file. In processing the PBC files, a variable &#8216;_date_&#8217; will be replaced with the target date.</p>
+<div class="highlight-python"><div class="highlight"><pre>% cd ${INSTALL_DIR}
+% ./bin/patriot execute 2015-04-01 batch/sample/daily/test.pbc
+</pre></div>
+</div>
+<p>The initial target of this scheduler is daily batch jobs and the
+script takes a date (or range of dates) as an argument.</p>
+</div>
+<div class="section" id="dependency-configuration">
+<h2>Dependency Configuration<a class="headerlink" href="#dependency-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Dependencies between jobs are defined through <em>products</em>.
+The products produced/required by jobs are configured by <em>produce</em> and <em>require</em>, respectively.
+A job becomes ready to be executed when all products required by the job are available.
+The products become available when all jobs which produce the product are finished.</p>
+<p>To run jobs according to dependencies, the <em>strict</em> option should be passed to the execution tool.
+(or use JobStore explained later)</p>
+<div class="highlight-python"><div class="highlight"><pre>% cat flow_sample.pbc
+sh{
+  require [&#39;product1&#39;] # run after &#39;product1&#39; is created
+  name &quot;consumer&quot;
+  commands &quot;echo &#39;this is a consumer&#39;&quot;
+}
+sh{
+  produce [&#39;product1&#39;] # this job creates &#39;product1&#39;
+  name &quot;producer&quot;
+  commands &quot;echo &#39;this is a producer&#39;&quot;
+}
+% ./bin/patriot execute --strict 2015-04-01 flow_sample.pbc
+# execute echo &#39;this is a producer&#39;
+# execute echo &#39;this is a consumer&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-workers-with-jobstore">
+<h2>Running workers with JobStore<a class="headerlink" href="#running-workers-with-jobstore" title="Permalink to this headline">¶</a></h2>
+<p>The JobStore has a role of managing dependency among jobs.
+By using the JobStore, multiple jobs can be executed by workers in parallel and distributively (see <a class="reference internal" href="arch.html"><em>architecture</em></a>).</p>
+<ol class="arabic">
+<li><p class="first">Configure database.</p>
+<blockquote>
+<div><p>The recommended implementation of JobStore uses MySQL to manage the dependency. So MySQL database and tables should be configured.
+The DDL file is included in this repository (in the <a class="reference external" href="https://github.com/CyberAgent/patriot-workflow-scheduler/tree/develop/misc">misc</a> directory).</p>
+<p>The below four variables have to be set by users.</p>
+<ul class="simple">
+<li>PATRIOT_DB : database which stores workflow information</li>
+<li>PATRIOT_DBHOST : host where database is located</li>
+<li>PATRIOT_USER : user for accessing the database</li>
+<li>PATRIOT_PASSWORD : password for accessing the database</li>
+</ul>
+<p>To configure the database, login to the PATRIOT_DBHOST, then</p>
+<div class="highlight-python"><div class="highlight"><pre>% mysql -u root -p
+&gt; create database ${PATRIOT_DB};
+&gt; grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER}@&#39;%&#39; identified by &#39;${PATRIOT_PASSWORD}&#39;;
+( &gt; grant all on ${PATRIOT_DB}.* to ${PATRIOT_USER}@&#39;localhost&#39; identified by &#39;${PATRIOT_PASSWORD}&#39;; # if case of localhost)
+&gt; exit;
+% mysql -u ${PATRIOT_USER} -h ${PATRIOT_DBHOST} --password=${PATRIOT_PASSWORD} ${PATRIOT_DB} &lt;  misc/mysql.sql
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Install the DB adapter</p>
+<blockquote>
+<div><p>The DB adapter is included in the this repository and is implemented as a plugin.</p>
+<div class="highlight-python"><div class="highlight"><pre>% cd ${CLONE_DIR}/plugins/patriot-mysql2-client
+% gem build patriot-mysql2-client.gemspec
+% sudo gem install patriot-mysql2-client-${VERSION}.gem
+</pre></div>
+</div>
+<p>then</p>
+<div class="highlight-python"><div class="highlight"><pre>% cd ${INSTALL_DIR}
+% ./bin/patriot plugin install ${CLONE_DIR}/plugins/patriot-mysql2-client/patriot-mysql-client-${VERSION}.gem
+</pre></div>
+</div>
+<p>For more detail on the plugin tool, please refer to <a class="reference internal" href="cli.html#cli-plugin"><span>the CLI page</span></a>.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Configure JobStore and workers.</p>
+<blockquote>
+<div><p>An example configuration is as below.
+See <a class="reference internal" href="config.html"><em>system configuration</em></a> for more detail.</p>
+<div class="highlight-python"><div class="highlight"><pre>% cat ${INSTALL_DIR}/config/patriot.ini
+[common]
+plugins=patriot-mysql2-client
+jobstore.root.class=Patriot::JobStore::RDBJobStore
+jobstore.root.adapter=mysql2
+jobstore.root.database=${PATRIOT_DB}
+jobstore.root.host=${PATRIOT_DBHOST}
+jobstore.root.username=${PATRIOT_USER}
+jobstore.root.password=${PATRIOT_PASSWORD}
+
+log_factory = Patriot::Util::Logger::Log4rFactory
+log_level   = INFO
+log_format  = &quot;[%l] %d %C (%h) : %m&quot;
+log_outputters = stdout
+log_outputter.stdout.class = Log4r::StdoutOutputter
+
+[worker]
+nodes=test
+node.test.type=any
+node.test.threads=1
+log_outputters = file
+log_outputter.file.class = Log4r::DateFileOutputter
+log_outputter.file.dir =  ${LOG_DIR}
+log_outputter.file.file = patriot-worker.log
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Start a worker</p>
+<blockquote>
+<div><p>A worker process for executing jobs stored in the JobStore can be started by <a class="reference internal" href="cli.html#cli-worker"><span>the worker tool</span></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>% mkdir ${LOG_DIR} # if necessary
+% sudo ./bin/patriot worker start
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Register jobs</p>
+<blockquote>
+<div><p>Jobs defined in PBC files can be registered to the JobStore by <a class="reference internal" href="cli.html#cli-register"><span>the register tool</span></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>% ${INSTALL_DIR}/bin/patriot register YYYY-mm-DD ${batch config file}
+</pre></div>
+</div>
+<p>The jobs defined in the batch config file will be executed by the worker.
+See <a class="reference internal" href="pbc.html"><em>batch config</em></a> for more detail on batch config files.</p>
+<p>In addition, a job management web console is available at &#8216;<a class="reference external" href="http:/">http:/</a>/${HOST}:36104/jobs/&#8217;</p>
+</div></blockquote>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#job-execution">Job Execution</a></li>
+<li><a class="reference internal" href="#dependency-configuration">Dependency Configuration</a></li>
+<li><a class="reference internal" href="#running-workers-with-jobstore">Running workers with JobStore</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Patriot Workflow Scheduler</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="arch.html"
+                        title="next chapter">Architecture</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="arch.html" title="Architecture"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Patriot Workflow Scheduler"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Cyberagent, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

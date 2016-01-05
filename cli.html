@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CLI tools &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
+    <link rel="next" title="Web Console" href="web.html" />
+    <link rel="prev" title="Job Configuration DSL (PBC)" href="pbc.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="web.html" title="Web Console"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pbc.html" title="Job Configuration DSL (PBC)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cli-tools">
+<h1>CLI tools<a class="headerlink" href="#cli-tools" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot
+Commands:
+  patriot execute [options] &lt;yyyy-mm-dd[,yyyy-mm-dd]&gt; &lt;files/paths&gt;+       # execute patriot jobs directly
+  patriot help [COMMAND]                                                   # Describe available commands or one specific command
+  patriot job [delete|show_dependency] job_id [job_id ..]                  # manage job(s) in job store
+  patriot plugin [options] install &lt;path to plugin&gt;                        # manage plugins
+  patriot register [OPTIONS] yyyy-mm-dd[,yyyy-mm-dd] path [path file ...]  # register jobs
+  patriot validate [OPTIONS] path [path file ...]                          # validate pbc files
+  patriot worker [options] [start|stop]                                    # controll worker
+  patriot worker_admin [options] [start|stop|restart|sleep|wake|status]    # controll remote workers
+
+Options:
+  -c, [--config=CONFIG]  # path to configuration file
+</pre></div>
+</div>
+<div class="section" id="register">
+<span id="cli-register"></span><h2>Register<a class="headerlink" href="#register" title="Permalink to this headline">¶</a></h2>
+<p>By using this tool, jobs described in given PBC files can be
+registered to JobStore so that workers can execute the jobs according to their dependency.</p>
+<p>This tool requires two arguments, date (or date range) and files (or a directory) to be parsed.
+The date should be formatted in yyyy-MM-dd (e.g., 2014-12-31) and be comma-separated in case of range (e.g., 2015-01-01,2015-01-31).</p>
+<div class="section" id="specifying-execution-interval">
+<h3>Specifying Execution Interval<a class="headerlink" href="#specifying-execution-interval" title="Permalink to this headline">¶</a></h3>
+<p>Jobs may have different execution intervals (e.g., daily and monthly).
+The interval can be specified by using pre processor at the top of each PBC file.
+For instance,</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1">#interval 0 0 1 * *</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">name</span> <span class="s1">&#39;monthly&#39;</span>
+  <span class="n">commands</span> <span class="s1">&#39;echo monthly&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>the above job would be executed for the 1st day of every month.
+The default interval is set to daily (i.e., &#8216;0 0 * * *&#8217;), and therefore, you can ignore the pro processor for daily jobs.</p>
+<p>In addition, the interval can accept key works (&#8216;end_of_every_month&#8217;) for jobs which should be executed for the end of every month.
+The below is an example of such job.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1">#interval end_of_every_month</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">name</span> <span class="s1">&#39;end_of_month&#39;</span>
+  <span class="n">commands</span> <span class="s1">&#39;echo end of month&#39;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="specifying-execution-interval-by-directories-deprecated">
+<h3>Specifying Execution Interval by Directories (deprecated)<a class="headerlink" href="#specifying-execution-interval-by-directories-deprecated" title="Permalink to this headline">¶</a></h3>
+<p>The interval can be also determined by directory names.
+If the pass to a PBC file contains a directory named <em>&#8216;daily&#8217;</em>, the jobs in the PBC files are treated as daily jobs.
+PBC files located in a sub directory of <em>&#8216;monthly&#8217;</em> directory, the PBC files are regarded as ones of monthly jobs and processed on only the end of each month.
+For weekly jobs, PBC files should be stored in the directory <em>&#8216;weekly/${wday}&#8217;</em> where the <em>wday</em> is a number for the day of week (0 is Sunday).</p>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot help register
+Usage:
+  patriot register [OPTIONS] yyyy-mm-dd[,yyyy-mm-dd] path [path file ...]
+
+Options:
+  -f, [--filter=FILTER]                  # regular expression for Ruby
+  -d, [--debug], [--no-debug]            # debug mode flag
+  -p, [--priority=N]                     # job priority
+                                         # Default: 1
+  -s, [--state=N]                        # register as specified state
+      [--keep-state], [--no-keep-state]  # don&#39;t change current state of jobs (only change definition)
+      [--retry-dep], [--no-retry-dep]    # set states of dependent jobs to WAIT
+      [--update-id=UPDATE_ID]            # default value is current unixtime
+                                         # Default: Time.now.to_i
+  -c, [--config=CONFIG]                  # path to configuration file
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="execute">
+<span id="cli-execute"></span><h2>Execute<a class="headerlink" href="#execute" title="Permalink to this headline">¶</a></h2>
+<p>This tool executes jobs defined in given PBC files directory.</p>
+<p>This tool is developed for testing before registering the jobs to JobStore.
+Two additional modes can be defined for this tool, <em>debug</em> and <em>test</em>.
+In the debug mode, this tool only outputs description for the jobs without executing the jobs.
+The test mode is for implementing command-specific behavior for inspecting problems.</p>
+<p>This tool also handle the interval in the same way as the register tool.</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/patriot help execute
+Usage:
+  patriot execute [options] &lt;yyyy-mm-dd[,yyyy-mm-dd]&gt; &lt;files/paths&gt;+
+
+Options:
+  -f, [--filter=FILTER]          # regular expression for job_id
+  -d, [--debug], [--no-debug]    # run in debug mode
+  -t, [--test], [--no-test]      # run in test mode
+      [--strict], [--no-strict]  # run in strict mode (according to dependency)
+  -c, [--config=CONFIG]          # path to configuration file
+</pre></div>
+</div>
+</div>
+<div class="section" id="validate">
+<span id="cli-validate"></span><h2>Validate<a class="headerlink" href="#validate" title="Permalink to this headline">¶</a></h2>
+<p>This tool just validate PBC files so that</p>
+<ul class="simple">
+<li>they do not include grammatical errors.</li>
+<li>their identifiers are not duplicated.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot help validate
+Usage:
+  patriot validate [OPTIONS] path [path file ...]
+
+Options:
+  -s, [--stop-on-detection], [--no-stop-on-detection]  # stop immediately when invalid config detected
+      [--date=DATE]                                    # date passed to parser
+  -c, [--config=CONFIG]                                # path to configuration file
+</pre></div>
+</div>
+</div>
+<div class="section" id="worker">
+<span id="cli-worker"></span><h2>Worker<a class="headerlink" href="#worker" title="Permalink to this headline">¶</a></h2>
+<p>This tool just starts or stops a worker.
+In stopping the worker, this tool sends a SIGNAL to the worker to terminate after the completion of the jobs currently executed by the worker.
+Therefore, the worker would not stop immediately.</p>
+<div class="highlight-python"><div class="highlight"><pre>Usage:
+  patriot worker [options] [start|stop]
+
+Options:
+      [--foreground], [--no-foreground]  # run as a foreground job
+  -c, [--config=CONFIG]                  # path to configuration file
+
+controll worker
+</pre></div>
+</div>
+</div>
+<div class="section" id="worker-admin">
+<span id="cli-worker-admin"></span><h2>Worker_Admin<a class="headerlink" href="#worker-admin" title="Permalink to this headline">¶</a></h2>
+<p>This tool administrates one or all of remote workers.
+The remote worker should be configured in the _worker_hosts_ in the configuration file.
+The tool supoorts below operations.</p>
+<ul class="simple">
+<li>start/stop/restart workers</li>
+<li>sleep/wake up workers (in the sleep state, workers do not execute any jobs)</li>
+<li>monitor status of workers</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>Usage:
+  patriot worker_admin [options] [start|stop|restart|sleep|wake|status]
+
+Options:
+  -a, [--all], [--no-all]  # target all worker hosts
+  -h, [--host=HOST]        # target host
+  -c, [--config=CONFIG]    # path to configuration file
+</pre></div>
+</div>
+</div>
+<div class="section" id="job">
+<span id="cli-job"></span><h2>Job<a class="headerlink" href="#job" title="Permalink to this headline">¶</a></h2>
+<p>This tool manage jobs in JobStore.</p>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot help job
+Usage:
+  patriot job [delete|show_dependency] job_id [job_id ..]
+
+Options:
+  -c, [--config=CONFIG]  # path to configuration file
+</pre></div>
+</div>
+</div>
+<div class="section" id="plugin">
+<span id="cli-plugin"></span><h2>Plugin<a class="headerlink" href="#plugin" title="Permalink to this headline">¶</a></h2>
+<p>This tool is used for installing plugins build as gem packages.</p>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot help plugin
+Usage:
+  patriot plugin [options] install &lt;path to plugin&gt;
+
+Options:
+  -f, [--force]                  # force operation
+      [--unpack], [--no-unpack]  # unpack gem into plugin dir
+  -c, [--config=CONFIG]          # path to configuration file
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CLI tools</a><ul>
+<li><a class="reference internal" href="#register">Register</a><ul>
+<li><a class="reference internal" href="#specifying-execution-interval">Specifying Execution Interval</a></li>
+<li><a class="reference internal" href="#specifying-execution-interval-by-directories-deprecated">Specifying Execution Interval by Directories (deprecated)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#execute">Execute</a></li>
+<li><a class="reference internal" href="#validate">Validate</a></li>
+<li><a class="reference internal" href="#worker">Worker</a></li>
+<li><a class="reference internal" href="#worker-admin">Worker_Admin</a></li>
+<li><a class="reference internal" href="#job">Job</a></li>
+<li><a class="reference internal" href="#plugin">Plugin</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pbc.html"
+                        title="previous chapter">Job Configuration DSL (PBC)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="web.html"
+                        title="next chapter">Web Console</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cli.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="web.html" title="Web Console"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pbc.html" title="Job Configuration DSL (PBC)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Cyberagent, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

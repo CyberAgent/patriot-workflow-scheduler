@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Web Console &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
+    <link rel="next" title="System Configuration" href="config.html" />
+    <link rel="prev" title="CLI tools" href="cli.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="config.html" title="System Configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="CLI tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="web-console">
+<h1>Web Console<a class="headerlink" href="#web-console" title="Permalink to this headline">¶</a></h1>
+<p>Web console for managing jobs in JobStore is provided by worker processes at a port set by <a class="reference internal" href="config.html"><em>&#8216;info_server_port&#8217;</em></a> (default 36104).
+The web console looks like below, and users can check and change states of jobs.</p>
+<img alt="_images/web.png" src="_images/web.png" />
+<p>The number of jobs for each state can be shown at the left side pane and the main pane shows the list of jobs in a selected state.</p>
+<p>Each job can be in one of following states.</p>
+<ul class="simple">
+<li><strong>Succeeded</strong> : successfully finished (the number of jobs in this state is not counted since it tends to be large).</li>
+<li><strong>Initiating</strong> : under registration process</li>
+<li><strong>Waiting</strong> : waiting to be executed</li>
+<li><strong>Running</strong> : some worker is executing</li>
+<li><strong>Suspended</strong> : execution is suspended. jobs in this state are not fetched by workers.</li>
+<li><strong>Failed</strong> : unsuccessfully finished</li>
+<li><strong>Discarded</strong> : to be discarded. jobs in this state can be completely deleted with the web console.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><p class="first">JobId Filter</p>
+<blockquote>
+<div><p>The web console has a capability for filtering jobs by job_id.
+The filter searches jobs by complete match.
+If you want to search jobs with job_ids prefixed with &#8216;prefix&#8217;, the filter should be set as &#8216;prefix%&#8217;.</p>
+</div></blockquote>
+</li>
+<li><p class="first">Discarded State</p>
+<blockquote>
+<div><p>The _discarded_ state is just a marker to confirm unnecessary jobs before complete deletion.
+If there exists jobs dependeing on discarded jobs, the jobs would not be executed.
+Jobs in the _discarded_ state should be deleted if the jobs are really unnecessary.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cli.html"
+                        title="previous chapter">CLI tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="config.html"
+                        title="next chapter">System Configuration</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/web.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="config.html" title="System Configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="CLI tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Cyberagent, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>

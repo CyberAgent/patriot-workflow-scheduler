@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Job Configuration DSL (PBC) &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
+    <link rel="next" title="CLI tools" href="cli.html" />
+    <link rel="prev" title="Architecture" href="arch.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cli.html" title="CLI tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="arch.html" title="Architecture"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="job-configuration-dsl-pbc">
+<h1>Job Configuration DSL (PBC)<a class="headerlink" href="#job-configuration-dsl-pbc" title="Permalink to this headline">¶</a></h1>
+<p>PBC is a ruby-based DSL to describe batch jobs with dependency.
+Jobs in this workflow scheduler can be defined in a set of key value
+pairs with a job type (called command).
+PBC enables us to write common key values in one space and simplifies
+batch configurations.
+In addition, the DSL are designed to be extensible, so that new commands can be incorporated.</p>
+<p>The below is a &#8216;Hello World&#8217; example.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="sx">% cat </span><span class="nb">test</span><span class="o">.</span><span class="n">pbc</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">name</span> <span class="s1">&#39;test&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;hello world&#39; &gt; /tmp/out.txt&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>% ./bin/patriot execute 2015-04-01 test.pbc
+% cat /tmp/out.txt
+hello world
+</pre></div>
+</div>
+<p>The initial target of this scheduler is daily batch jobs and the script takes a date (or range of dates) as an argument.
+The date given as the argument can be used via the variable &#8216;_date_&#8217;.
+For instance,</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="sx">% cat </span><span class="nb">test</span><span class="o">.</span><span class="n">pbc</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">name</span> <span class="s1">&#39;test&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;hello world (</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">)&#39; &gt; /tmp/out.txt&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+<span class="sx">% ./bin/patriot </span><span class="n">execute</span> <span class="mi">2015</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">01</span> <span class="nb">test</span><span class="o">.</span><span class="n">pbc</span>
+<span class="sx">% cat </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">out</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">hello</span> <span class="n">world</span> <span class="p">(</span><span class="mi">2015</span><span class="o">-</span><span class="mo">04</span><span class="o">-</span><span class="mo">01</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="configuring-dependency">
+<h2>Configuring Dependency<a class="headerlink" href="#configuring-dependency" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/pbc_example.png" src="_images/pbc_example.png" />
+<p>Consider above workflow as an example, in which the SELECT statement
+should be executed after two LOAD statements.</p>
+<p>This workflow can be defined in PBC as follows.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">produce</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;load1_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;LOAD DATA INPATH </span><span class="se">\&#39;</span><span class="s2">path_to_source1</span><span class="se">\&#39;</span><span class="s2"> INTO TABLE table PARTITION (dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">, type = </span><span class="se">\&#39;</span><span class="s2">1</span><span class="se">\&#39;</span><span class="s2">)&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+
+<span class="n">sh</span><span class="p">{</span>
+  <span class="n">produce</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;load2_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;LOAD DATA INPATH </span><span class="se">\&#39;</span><span class="s2">path_to_source2</span><span class="se">\&#39;</span><span class="s2"> INTO TABLE table PARTITION (dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">, type = </span><span class="se">\&#39;</span><span class="s2">2</span><span class="se">\&#39;</span><span class="s2">)&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">require</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;select_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;SELECT count(1) FROM table WHERE dt = &#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&#39; &gt; result_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="simplifying-configurations-using-job-groups">
+<h2>Simplifying Configurations Using Job Groups<a class="headerlink" href="#simplifying-configurations-using-job-groups" title="Permalink to this headline">¶</a></h2>
+<p>In the above example, the two LOAD jobs have same product.
+This can be consolidated by using job_group as follows.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">job_group</span><span class="p">{</span>
+  <span class="n">produce</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="n">sh</span><span class="p">{</span>
+    <span class="nb">name</span> <span class="s2">&quot;load1_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;LOAD DATA INPATH </span><span class="se">\&#39;</span><span class="s2">path_to_source1</span><span class="se">\&#39;</span><span class="s2"> INTO TABLE table PARTITION (dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">, type = </span><span class="se">\&#39;</span><span class="s2">1</span><span class="se">\&#39;</span><span class="s2">)&quot;</span><span class="o">]</span>
+  <span class="p">}</span>
+  <span class="n">sh</span><span class="p">{</span>
+    <span class="nb">name</span> <span class="s2">&quot;load2_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;LOAD DATA INPATH </span><span class="se">\&#39;</span><span class="s2">path_to_source2</span><span class="se">\&#39;</span><span class="s2"> INTO TABLE table PARTITION (dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">, type = </span><span class="se">\&#39;</span><span class="s2">2</span><span class="se">\&#39;</span><span class="s2">)&quot;</span><span class="o">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">require</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;select_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;SELECT count(1) FROM table WHERE dt = &#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&#39; &gt; result_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Since PBC is an Ruby-internal DSL, this example can be written more concisely.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">job_group</span><span class="p">{</span>
+  <span class="n">produce</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="o">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+    <span class="n">sh</span><span class="p">{</span>
+      <span class="nb">name</span> <span class="s2">&quot;load</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;LOAD DATA INPATH </span><span class="se">\&#39;</span><span class="s2">path_to_source</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2"> INTO TABLE table PARTITION (dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">, type = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">)&quot;</span><span class="o">]</span>
+    <span class="p">}</span>
+  <span class="k">end</span>
+<span class="p">}</span>
+
+<span class="n">sh</span><span class="p">{</span>
+  <span class="nb">require</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;select_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;hive -e &#39;SELECT count(1) FROM table WHERE dt = </span><span class="se">\&#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="se">\&#39;</span><span class="s2">&#39; &gt; result_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="implementing-and-using-custom-commands">
+<h2>Implementing and Using Custom Commands<a class="headerlink" href="#implementing-and-using-custom-commands" title="Permalink to this headline">¶</a></h2>
+<p>Until now, the every batch configurations need &#8216;hive -e&#8217; and have
+cumbersome quotes and escapes.
+These issues can be removed by using custom command.</p>
+<p>A custom command can be developed by implementing only 3 methods in a sub class of <strong>Patriot::Command::Base</strong> together with setting command name and its attributes.
+The three methods are</p>
+<ul class="simple">
+<li><strong>job_id</strong> which returns an identifier of the job in String.</li>
+<li><strong>description</strong> which builds a string expressing what this job does.</li>
+<li><strong>execute</strong> in which the process of the job is implemented</li>
+</ul>
+<p>The command name is an expression used in the PBC and the attributes are used for implementing the above methods. The command name and the attributes can be set by using class macros, <strong>declare_command_name</strong> and <strong>command_attr</strong>, respectively.</p>
+<p>Below is a custom command example which executes a Hive LOAD statement.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># writtern in hive_load_command.rb</span>
+<span class="k">class</span> <span class="nc">HiveLoadCommand</span> <span class="o">&lt;</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Command</span><span class="o">::</span><span class="no">Base</span>
+  <span class="c1"># define command name</span>
+  <span class="n">declare_command_name</span> <span class="ss">:hive_load</span>
+  <span class="c1"># set attributes of this command</span>
+  <span class="c1"># the attributes can be available as instance variables</span>
+  <span class="n">command_attr</span> <span class="ss">:table</span><span class="p">,</span> <span class="ss">:partition</span><span class="p">,</span> <span class="ss">:source</span>
+
+  <span class="kp">include</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Util</span><span class="o">::</span><span class="no">System</span> <span class="c1"># utility for executes external scripts</span>
+
+  <span class="c1"># create job_id of this job</span>
+  <span class="k">def</span> <span class="nf">job_id</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">command_name</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@table</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># commond_name is defined in the super clas</span>
+    <span class="k">return</span> <span class="n">job_id</span> <span class="k">if</span> <span class="vi">@partitions</span><span class="o">.</span><span class="n">nil?</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="n">partitions</span><span class="o">.</span><span class="n">map</span><span class="si">{</span><span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="k">end</span>
+
+  <span class="c1"># return what this job do</span>
+  <span class="k">def</span> <span class="nf">description</span>
+    <span class="k">return</span> <span class="n">build_load_statement</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">execute</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;hive -e </span><span class="se">\&quot;</span><span class="si">#{</span><span class="n">build_load_statement</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+    <span class="n">execute_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+  <span class="k">end</span>
+
+
+  <span class="k">def</span> <span class="nf">build_load_statement</span>
+    <span class="n">hql</span> <span class="s2">&quot;LOAD DATA INPATH &#39;</span><span class="si">#{</span><span class="vi">@source</span><span class="si">}</span><span class="s2">&#39; INTO TABLE </span><span class="si">#{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">hql</span> <span class="k">if</span> <span class="vi">@partitions</span><span class="o">.</span><span class="n">nil?</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">hql</span><span class="si">}</span><span class="s2"> PARTITION (</span><span class="si">#{</span><span class="vi">@partitions</span><span class="o">.</span><span class="n">map</span><span class="si">{</span><span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="s2"> = &#39;</span><span class="si">#{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="si">}</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+  <span class="k">end</span>
+
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>Assuming the results of the SELECT statement needs to be stored other database (e.g. relational database or key-value store), a command for the such jobs could be like below.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># writtern in hive2db_command.rb</span>
+<span class="k">class</span> <span class="nc">Hive2DBCommand</span> <span class="o">&lt;</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Command</span><span class="o">::</span><span class="no">Base</span>
+  <span class="c1"># define command name</span>
+  <span class="n">declare_command_name</span> <span class="ss">:hive2db</span>
+  <span class="c1"># set attributes of this command</span>
+  <span class="c1"># the attributes can be available as instance variables</span>
+  <span class="n">command_attr</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:db</span><span class="p">,</span> <span class="ss">:table</span><span class="p">,</span> <span class="ss">:query</span>
+
+  <span class="kp">include</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Util</span><span class="o">::</span><span class="no">System</span> <span class="c1"># utility for executes external scripts</span>
+
+  <span class="c1"># create job_id of this job</span>
+  <span class="k">def</span> <span class="nf">job_id</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">command_name</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@name</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@db</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@table</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="k">end</span>
+
+  <span class="c1"># return what this job do</span>
+  <span class="k">def</span> <span class="nf">description</span>
+    <span class="k">return</span> <span class="vi">@query</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">execute</span>
+    <span class="c1"># execute_command return path to a file</span>
+    <span class="c1"># in which the content of stdout is stored.</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">execute_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">so</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">results</span><span class="o">|</span>
+      <span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">result</span><span class="o">|</span>
+        <span class="c1"># insert result to @db.@table</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>These command can be integrated by putting file in the plugins directory and set init.rb and patriot.ini to load the commands.</p>
+<div class="highlight-python"><div class="highlight"><pre>mkdir -p ${INSTALL_DIR}/plugins/my_custom_commands/lib
+cp hive_load_command.rb ${INSTALL_DIR}/plugins/my_custom_commands/lib
+cp hive2db_command.rb ${INSTALL_DIR}/plugins/my_custom_commands/lib
+vi ${INSTALL_DIR}/plugins/my_custom_commands/init.rb
+cat ${INSTALL_DIR}/plugins/my_custom_commands/init.rb
+require &#39;patriot&#39;
+require &#39;hive_load_command&#39;
+require &#39;hive2db_command&#39;
+
+vi ${INSTALL_DIR}/config/patriot.ini
+...
+plugins=my_custom_commands,patriot-mysql2-client
+...
+</pre></div>
+</div>
+<p>By using the custom commands, the configurations can be written as below.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">job_group</span><span class="p">{</span>
+  <span class="n">produce</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="o">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+    <span class="n">hive_load</span><span class="p">{</span>
+      <span class="n">table</span> <span class="s1">&#39;table&#39;</span>
+      <span class="n">partition</span> <span class="s1">&#39;dt&#39;</span> <span class="o">=&gt;</span> <span class="n">_date_</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="n">i</span>
+      <span class="n">source</span> <span class="s2">&quot;path_to_source</span><span class="si">#{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">}</span>
+  <span class="k">end</span>
+<span class="p">}</span>
+
+<span class="n">hive2db</span><span class="p">{</span>
+  <span class="nb">require</span> <span class="o">[</span><span class="s2">&quot;table_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">]</span>
+  <span class="nb">name</span> <span class="s2">&quot;select_</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">db</span> <span class="s1">&#39;dbname&#39;</span>
+  <span class="n">table</span> <span class="s1">&#39;tablename&#39;</span>
+  <span class="n">query</span> <span class="s2">&quot;SELECT count(1) FROM table WHERE dt = &#39;</span><span class="si">#{</span><span class="n">_date_</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Job Configuration DSL (PBC)</a><ul>
+<li><a class="reference internal" href="#configuring-dependency">Configuring Dependency</a></li>
+<li><a class="reference internal" href="#simplifying-configurations-using-job-groups">Simplifying Configurations Using Job Groups</a></li>
+<li><a class="reference internal" href="#implementing-and-using-custom-commands">Implementing and Using Custom Commands</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="arch.html"
+                        title="previous chapter">Architecture</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cli.html"
+                        title="next chapter">CLI tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pbc.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cli.html" title="CLI tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="arch.html" title="Architecture"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Cyberagent, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
+    </div>
+  </body>
+</html>
