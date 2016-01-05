@@ -19,12 +19,6 @@ The List of Configuration Properties
     - port number used by the management web console
   * - info_server.admin.username
     - admin user name of the web console
-  * - info_server.admin.username
-    - admin user name of the web console
-  * - info_server.admin.username
-    - admin user name of the web console
-  * - info_server.admin.username
-    - admin user name of the web console
   * - info_server.admin.password
     - admin user password of the web console
   * - worker_hosts
@@ -58,7 +52,7 @@ The List of Configuration Properties
   * - log_outputters
     - a comma-separated-list of log outputters
   * - log_outputter.$outputer.class
-    - an implementation of each outputter ($outputter should be replaced with one of the outputter specified in _log_outputters_.
+    - an implementation of each outputter ($outputter should be replaced with one of the outputter specified in *log_outputters*.
   * - fetch_cycle
     - an interval in which the worker fetches executable jobs from JobStore
   * - fetch_limit
@@ -66,8 +60,8 @@ The List of Configuration Properties
   * - nodes
     - a comma-separated-list of nodes hosted on the worker
   * - node.$node.type
-    - type of node (_any_ or _own_). $node should be replaces one of the nodes specified in the _nodes_. With type any, the node executes jobs without nodes or jobs with the same node. With type own, the node only executes jobs with the same node.
+    - type of node (*any* or *own*). $node should be replaces one of the nodes specified in the *nodes*. With type any, the node executes jobs without nodes or jobs with the same node. With type own, the node only executes jobs with the same node.
   * - node.$node.threads
-    - the number of threads for the node ($node should be replaced with one of the _nodes_).
+    - the number of threads for the node ($node should be replaced with one of the *nodes*).
 
 
