@@ -28,10 +28,7 @@ Getting Started
 ### Install
 
 ```
-% git clone https://github.com/CyberAgent/patriot-workflow-scheduler.git
-% cd patriot-workflow-scheduler
-% gem build patriot-workflow-scheduler.gemspec
-% gem install patriot-workflow-scheduler-${VERSION}.gem
+% gem install patriot-workflow-scheduler
 % patriot-init ${install_dir}
 ```
 
@@ -57,7 +54,7 @@ sh{
 
 ### Dependency Configuration
 
-Dependencies between jobs are defined through *products*. 
+Dependencies between jobs are defined through *products*.
 The products produced/required by jobs are configured by _produce_ and _require_, respectively.
 A job becomes ready to be executed when all products required by the job are available.
 The products become available when all jobs which produce the product are finished.
@@ -84,9 +81,21 @@ sh{
 Generate documents
 -------
 
-You can easily generate API documents using yard.
+- Github pages
 
-### setup yard and start yard server
+The gh-pages branch should be managed as workdir at docs/build/html.
+The document can be generatd by Sphinx.
+
+```
+% git-new-workdir . docs/build/html gh-pages
+% cd docs
+% make html
+```
+
+
+- API documents
+
+You can easily generate API documents using yard.
 
 ```
 % gem install yard
@@ -98,9 +107,9 @@ Now you can see docs at [http://localhost:8808/docs/frames/index](http://localho
 
 ### For more information
 
-For understanding how to manage dependencies in a complicated workflow, the architecture of the scheduler, other command line tools, etc, 
+For understanding how to manage dependencies in a complicated workflow, the architecture of the scheduler, other command line tools, etc,
 please see the [Github pages](https://CyberAgent.github.io/patriot-workflow-scheduler).
-   
+
 Requirements
 -------
 * Ruby ( >= 1.9 )
@@ -111,5 +120,5 @@ License
 
 Copyright © CyberAgent, Inc. All Rights Reserved.
 
-This package is released under Apache License Ver. 2.0.  
+This package is released under Apache License Ver. 2.0.
 http://www.apache.org/licenses/LICENSE-2.0.txt
