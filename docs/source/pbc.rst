@@ -28,7 +28,7 @@ The below is a 'Hello World' example.
 
 The initial target of this scheduler is daily batch jobs and the script takes a date (or range of dates) as an argument.
 The date given as the argument can be used via the variable '_date_'.
-For instance, 
+For instance,
 
 .. code-block:: ruby
 
@@ -137,7 +137,7 @@ Below is a custom command example which executes a Hive LOAD statement.
 
 .. code-block:: ruby
 
-  # writtern in hive_load_command.rb
+  # written in hive_load_command.rb
   class HiveLoadCommand < Patriot::Command::Base
     # define command name
     declare_command_name :hive_load
@@ -149,7 +149,7 @@ Below is a custom command example which executes a Hive LOAD statement.
 
     # create job_id of this job
     def job_id
-      job_id = "#{command_name}_#{@table}" # commond_name is defined in the super clas
+      job_id = "#{command_name}_#{@table}" # command_name is defined in the super class
       return job_id if @partitions.nil?
       return "#{job_id}_#{partitions.map{|k,v| "#{k}_#{v}"}.join(",")}"
     end
@@ -177,7 +177,7 @@ Assuming the results of the SELECT statement needs to be stored other database (
 
 .. code-block:: ruby
 
-  # writtern in hive2db_command.rb
+  # written in hive2db_command.rb
   class Hive2DBCommand < Patriot::Command::Base
     # define command name
     declare_command_name :hive2db
@@ -252,5 +252,107 @@ By using the custom commands, the configurations can be written as below.
     query "SELECT count(1) FROM table WHERE dt = '#{_date_}'"
   }
 
+Other Configuration Options
+===========================
 
+Priority
+---------
 
+Priority can be set by using *priority* in each job or job group.
+Jobs in JobStore are sorted by the priority in ascending order.
+Therefore, jobs with lower priority value are preferentially fetched.
+
+.. code-block:: ruby
+
+  sh{
+    priority 0
+    name 'high'
+    commands ["echo 'higher priority'"]
+  }
+  sh{
+    priority 10
+    name 'low'
+    commands ["echo 'lower priority'"]
+  }
+
+::
+
+Skip / Suspend
+----------------
+
+Jobs can be skipped or suspended when they should not be executed automatically.
+Each state can be set by putting *skip* or *suspend*, respectively
+
+.. code-block:: ruby
+
+  sh{
+    skip
+    name 'skip'
+    commands ["echo 'skipped'"]
+  }
+  sh{
+    suspend
+    name 'suspend'
+    commands ["echo 'suspended'"]
+  }
+
+::
+
+Limiting Node/Host
+----------------------
+
+When a job should be run on a certain host, this can be achieved by setting *exec_host* or *exec_node*.
+The *exec_host* limits the host where the job is executed (limited by hostname).
+Jobs with *exec_node* are only executed by threads labeled with the configured labels (see :doc:`system configuration <config>`).
+
+.. code-block:: ruby
+
+  sh{
+    exec_host 'hosts1'
+    name 'host'
+    commands ["echo 'executed on host1'"]
+  }
+  sh{
+    exec_node 'node1'
+    name 'node'
+    commands ["echo 'execute by a thread labeled with node1'"]
+  }
+
+::
+
+Retry
+----------------------
+
+Jobs can be configured to be retried in case of a failure.
+In the retry configuration, retry interval and the number of retries can be configured.
+
+.. code-block:: ruby
+
+  sh{
+    retrial 'count' => 3, 'interval' => 3600
+    name 'retry'
+    commands ["echo 'retry 3 time at intervals of 1 hour'"]
+  }
+
+::
+
+Mail Notification
+----------------------
+
+To send a mail when a job finished, *mail_notification* should be set to the job.
+For using this functionality, SMTP should be configured on the host where the worker process is running.
+
+.. code-block:: ruby
+
+  sh{
+    mail_notification 'to' => test@test.com, 'on' => 'failed'
+    name 'mail'
+    commands ["echo 'notify failure'"]
+  }
+  sh{
+    mail_notification 'to' => test@test.com, 'on' => 'succeeded'
+    name 'mail'
+    commands ["echo 'notify success'"]
+  }
+
+::
