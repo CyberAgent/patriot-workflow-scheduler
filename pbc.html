@@ -165,7 +165,7 @@ The three methods are</p>
 </ul>
 <p>The command name is an expression used in the PBC and the attributes are used for implementing the above methods. The command name and the attributes can be set by using class macros, <strong>declare_command_name</strong> and <strong>command_attr</strong>, respectively.</p>
 <p>Below is a custom command example which executes a Hive LOAD statement.</p>
-<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># writtern in hive_load_command.rb</span>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># written in hive_load_command.rb</span>
 <span class="k">class</span> <span class="nc">HiveLoadCommand</span> <span class="o">&lt;</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Command</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># define command name</span>
   <span class="n">declare_command_name</span> <span class="ss">:hive_load</span>
@@ -177,7 +177,7 @@ The three methods are</p>
 
   <span class="c1"># create job_id of this job</span>
   <span class="k">def</span> <span class="nf">job_id</span>
-    <span class="n">job_id</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">command_name</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@table</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># commond_name is defined in the super clas</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">command_name</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="vi">@table</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># command_name is defined in the super class</span>
     <span class="k">return</span> <span class="n">job_id</span> <span class="k">if</span> <span class="vi">@partitions</span><span class="o">.</span><span class="n">nil?</span>
     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="n">partitions</span><span class="o">.</span><span class="n">map</span><span class="si">{</span><span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">k</span><span class="si">}</span><span class="s2">_</span><span class="si">#{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
   <span class="k">end</span>
@@ -203,7 +203,7 @@ The three methods are</p>
 </pre></div>
 </div>
 <p>Assuming the results of the SELECT statement needs to be stored other database (e.g. relational database or key-value store), a command for the such jobs could be like below.</p>
-<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># writtern in hive2db_command.rb</span>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="c1"># written in hive2db_command.rb</span>
 <span class="k">class</span> <span class="nc">Hive2DBCommand</span> <span class="o">&lt;</span> <span class="no">Patriot</span><span class="o">::</span><span class="no">Command</span><span class="o">::</span><span class="no">Base</span>
   <span class="c1"># define command name</span>
   <span class="n">declare_command_name</span> <span class="ss">:hive2db</span>
@@ -275,6 +275,91 @@ plugins=my_custom_commands,patriot-mysql2-client
 </pre></div>
 </div>
 </div>
+<div class="section" id="other-configuration-options">
+<h2>Other Configuration Options<a class="headerlink" href="#other-configuration-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="priority">
+<h3>Priority<a class="headerlink" href="#priority" title="Permalink to this headline">¶</a></h3>
+<p>Priority can be set by using <em>priority</em> in each job or job group.
+Jobs in JobStore are sorted by the priority in ascending order.
+Therefore, jobs with lower priority value are preferentially fetched.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">priority</span> <span class="mi">0</span>
+  <span class="nb">name</span> <span class="s1">&#39;high&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;higher priority&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="n">priority</span> <span class="mi">10</span>
+  <span class="nb">name</span> <span class="s1">&#39;low&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;lower priority&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="skip-suspend">
+<h3>Skip / Suspend<a class="headerlink" href="#skip-suspend" title="Permalink to this headline">¶</a></h3>
+<p>Jobs can be skipped or suspended when they should not be executed automatically.
+Each state can be set by putting <em>skip</em> or <em>suspend</em>, respectively</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">skip</span>
+  <span class="nb">name</span> <span class="s1">&#39;skip&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;skipped&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="n">suspend</span>
+  <span class="nb">name</span> <span class="s1">&#39;suspend&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;suspended&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="limiting-node-host">
+<h3>Limiting Node/Host<a class="headerlink" href="#limiting-node-host" title="Permalink to this headline">¶</a></h3>
+<p>When a job should be run on a certain host, this can be achieved by setting <em>exec_host</em> or <em>exec_node</em>.
+The <em>exec_host</em> limits the host where the job is executed (limited by hostname).
+Jobs with <em>exec_node</em> are only executed by threads labeled with the configured labels (see <a class="reference internal" href="config.html"><em>system configuration</em></a>).</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">exec_host</span> <span class="s1">&#39;hosts1&#39;</span>
+  <span class="nb">name</span> <span class="s1">&#39;host&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;executed on host1&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="n">exec_node</span> <span class="s1">&#39;node1&#39;</span>
+  <span class="nb">name</span> <span class="s1">&#39;node&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;execute by a thread labeled with node1&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="retry">
+<h3>Retry<a class="headerlink" href="#retry" title="Permalink to this headline">¶</a></h3>
+<p>Jobs can be configured to be retried in case of a failure.
+In the retry configuration, retry interval and the number of retries can be configured.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">retrial</span> <span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;interval&#39;</span> <span class="o">=&gt;</span> <span class="mi">3600</span>
+  <span class="nb">name</span> <span class="s1">&#39;retry&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;retry 3 time at intervals of 1 hour&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mail-notification">
+<h3>Mail Notification<a class="headerlink" href="#mail-notification" title="Permalink to this headline">¶</a></h3>
+<p>To send a mail when a job finished, <em>mail_notification</em> should be set to the job.
+For using this functionality, SMTP should be configured on the host where the worker process is running.</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">sh</span><span class="p">{</span>
+  <span class="n">mail_notification</span> <span class="s1">&#39;to&#39;</span> <span class="o">=&gt;</span> <span class="nb">test</span><span class="vi">@test</span><span class="o">.</span><span class="n">com</span><span class="p">,</span> <span class="s1">&#39;on&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;failed&#39;</span>
+  <span class="nb">name</span> <span class="s1">&#39;mail&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;notify failure&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+<span class="n">sh</span><span class="p">{</span>
+  <span class="n">mail_notification</span> <span class="s1">&#39;to&#39;</span> <span class="o">=&gt;</span> <span class="nb">test</span><span class="vi">@test</span><span class="o">.</span><span class="n">com</span><span class="p">,</span> <span class="s1">&#39;on&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;succeeded&#39;</span>
+  <span class="nb">name</span> <span class="s1">&#39;mail&#39;</span>
+  <span class="n">commands</span> <span class="o">[</span><span class="s2">&quot;echo &#39;notify success&#39;&quot;</span><span class="o">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -289,6 +374,14 @@ plugins=my_custom_commands,patriot-mysql2-client
 <li><a class="reference internal" href="#configuring-dependency">Configuring Dependency</a></li>
 <li><a class="reference internal" href="#simplifying-configurations-using-job-groups">Simplifying Configurations Using Job Groups</a></li>
 <li><a class="reference internal" href="#implementing-and-using-custom-commands">Implementing and Using Custom Commands</a></li>
+<li><a class="reference internal" href="#other-configuration-options">Other Configuration Options</a><ul>
+<li><a class="reference internal" href="#priority">Priority</a></li>
+<li><a class="reference internal" href="#skip-suspend">Skip / Suspend</a></li>
+<li><a class="reference internal" href="#limiting-node-host">Limiting Node/Host</a></li>
+<li><a class="reference internal" href="#retry">Retry</a></li>
+<li><a class="reference internal" href="#mail-notification">Mail Notification</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
