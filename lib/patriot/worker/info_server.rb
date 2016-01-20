@@ -61,7 +61,8 @@ module Patriot
       def get_url_map
         urls = @config.get(URLS_KEY, nil)
         if urls.nil?
-          urlmap = {"/jobs"   => Patriot::Worker::Servlet::JobServlet,
+          urlmap = {"/"       => Patriot::Worker::Servlet::IndexServlet,
+                    "/jobs"   => Patriot::Worker::Servlet::JobServlet,
                     "/api/v1/jobs" => Patriot::Worker::Servlet::JobAPIServlet,
                     "/worker" => Patriot::Worker::Servlet::WorkerStatusServlet}
         else

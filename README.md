@@ -78,6 +78,21 @@ sh{
 # execute echo 'this is a consumer'
 ```
 
+Build from Source
+-------
+
+- Compiling JSX
+
+The Web console implemented in JSX (React.js) and compiled with Grunt.
+To compile the JSXs, install Nodejs and set up grunt.
+
+```
+% # install node (e.g., brew install node)
+% npm install -g grunt-cli
+% npm install
+% grunt
+```
+
 Generate documents
 -------
 
