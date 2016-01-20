@@ -276,7 +276,7 @@ END_OB_QUERY
             end
           end
         end
-        return result
+        return result.uniq
       end
       private :_get_jobs_for_products
 

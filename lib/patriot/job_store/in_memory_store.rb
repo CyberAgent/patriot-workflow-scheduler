@@ -158,7 +158,7 @@ module Patriot
             end
           }
         }
-        return producers
+        return producers.uniq
       end
 
       # @see Patriot::JobStore::Base#get_consumers
@@ -175,7 +175,7 @@ module Patriot
             end
           }
         }
-        return consumers
+        return consumers.uniq
       end
 
       # @see Patriot::JobStore::Base#find_jobs_by_state
