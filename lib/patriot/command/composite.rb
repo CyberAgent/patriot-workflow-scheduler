@@ -5,7 +5,7 @@ module Patriot
       declare_command_name :composite_command 
       declare_command_name :composite_job 
       private_command_attr :contained_commands => []
-      volatile_attr :name, :name_suffix
+      command_attr :name, :name_suffix
 
       # @return [String] the identifier of this composite command
       # @see Patriot::Command::Base#job_id
@@ -28,6 +28,7 @@ module Patriot
         # don't do flatten to handle nested composite commands
         @subcommands.map do |cmd|
            cmd.build(@param).each do |cmd|
+            _validate_command(cmd)
             require cmd['requisites']
             produce cmd['products']
             @contained_commands << cmd
@@ -43,6 +44,18 @@ module Patriot
           c.execute
         end
       end 
+
+      # @private
+      # validate command
+      # @param [Patriot::Command::Base] cmd
+      def _validate_command(cmd)
+        if !cmd['post_processors'].nil?
+          raise 'you cannot set "post_processor" at subcommand of composite_job\'s ' \
+            + "\n" + 'name: ' + cmd['name'] \
+            + "\n" + 'command: ' + cmd['commands'].to_s
+        end
+      end
+      private :_validate_command
 
     end
   end
