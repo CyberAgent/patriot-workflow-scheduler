@@ -9,8 +9,8 @@ describe  Patriot::Worker::MultiNodeWorker do
   describe "init_worker" do
     before :each do
       @worker = Patriot::Worker::MultiNodeWorker.new(@config)
-      @job1 = TestEnvirionment.build_job()
-      @job2 = TestEnvirionment.build_job()
+      @job1 = TestEnvironment.build_job()
+      @job2 = TestEnvironment.build_job()
       @update_id = Time.now.to_i
       @job_store = @worker.instance_variable_get(:@job_store)
       @job_store.register(@update_id, [@job1,@job2])
@@ -53,8 +53,8 @@ describe  Patriot::Worker::MultiNodeWorker do
         @worker = Patriot::Worker::MultiNodeWorker.new(@config)
         @worker.init_worker
         @cycle = @worker.instance_variable_get(:@cycle)
-        @job1 = TestEnvirionment.build_job()
-        @job2 = TestEnvirionment.build_job()
+        @job1 = TestEnvironment.build_job()
+        @job2 = TestEnvironment.build_job()
         @job_store = @worker.instance_variable_get(:@job_store)
         @job_store.register(@update_id, [@job1,@job2])
       end
@@ -90,8 +90,8 @@ describe  Patriot::Worker::MultiNodeWorker do
       @worker = Patriot::Worker::MultiNodeWorker.new(@config)
       @worker.init_worker
       @cycle = @worker.instance_variable_get(:@cycle)
-      @job1 = TestEnvirionment.build_job()
-      @job2 = TestEnvirionment.build_job()
+      @job1 = TestEnvironment.build_job()
+      @job2 = TestEnvironment.build_job()
       @job_store = @worker.instance_variable_get(:@job_store)
       @job_store.register(@update_id, [@job1,@job2])
     end
@@ -138,8 +138,8 @@ describe  Patriot::Worker::MultiNodeWorker do
     end
 
     it "should be success" do
-      job1 = TestEnvirionment.build_job()
-      job2 = TestEnvirionment.build_job()
+      job1 = TestEnvironment.build_job()
+      job2 = TestEnvironment.build_job()
       job_ticket1 = Patriot::JobStore::JobTicket.new(job1.job_id, job1.update_id)
       job_ticket2 = Patriot::JobStore::JobTicket.new(job2.job_id, job2.update_id,'own')
       queue = Queue.new
@@ -163,7 +163,7 @@ describe  Patriot::Worker::MultiNodeWorker do
           puts "incomplete"
         end
       end.new(@config)
-      job1 = TestEnvirionment.build_job()
+      job1 = TestEnvironment.build_job()
       job_ticket1 = Patriot::JobStore::JobTicket.new(job1.job_id, job1.update_id)
       queue = Queue.new
       worker = Patriot::Worker::MultiNodeWorker.new(@config)

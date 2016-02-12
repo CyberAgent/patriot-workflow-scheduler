@@ -10,8 +10,8 @@ describe  Patriot::Worker::InfoServer do
                          Patriot::Worker::InfoServer::DEFAULT_PORT)
       @url = "http://127.0.0.1:#{port}"
       @worker = Patriot::Worker::MultiNodeWorker.new(@config)
-      @job1 = TestEnvirionment.build_job()
-      @job2 = TestEnvirionment.build_job()
+      @job1 = TestEnvironment.build_job()
+      @job2 = TestEnvironment.build_job()
       @job_store = @worker.instance_variable_get(:@job_store)
       @update_id = Time.now.to_i
       @job_store.register(@update_id, [@job1,@job2])
@@ -63,8 +63,8 @@ describe  Patriot::Worker::InfoServer do
       port = @config.get(Patriot::Worker::InfoServer::PORT_KEY)
       @url = "http://127.0.0.1:#{port}"
       @worker = Patriot::Worker::MultiNodeWorker.new(@config)
-      @job1 = TestEnvirionment.build_job()
-      @job2 = TestEnvirionment.build_job()
+      @job1 = TestEnvironment.build_job()
+      @job2 = TestEnvironment.build_job()
       @job_store = @worker.instance_variable_get(:@job_store)
       @update_id = Time.now.to_i
       @job_store.register(@update_id, [@job1,@job2])

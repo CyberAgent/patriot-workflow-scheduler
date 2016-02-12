@@ -1,4 +1,4 @@
-module  TestEnvirionment
+module  TestEnvironment
   include Patriot::Util::Config
 
   TEST_TARGET_DATE = Time.new(2015, 4, 1)
