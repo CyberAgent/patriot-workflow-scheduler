@@ -13,7 +13,7 @@ describe Patriot::Command::Base do
     @target_datetime = Time.new(YEAR, MONTH, DAY)
   end
 
-  it "sholud extract start after" do
+  it "should extract start after" do
     cmd = new_command(Patriot::Command::ShCommand) do
       produce ["product1_#{@hour}"]  
       require ["product2_#{@hour}"]  
@@ -28,7 +28,7 @@ describe Patriot::Command::Base do
     expect(cmds[0].start_date_time).to eq Time.new(YEAR,MONTH,DAY,0,0,0)
   end
 
-  it "sholud not have reserved word" do
+  it "should not have reserved word" do
     cmd = new_command(Patriot::Command::ShCommand) do
       produce ["product1_#{@hour}"]  
       require ["product2_#{@hour}"]  
@@ -39,7 +39,7 @@ describe Patriot::Command::Base do
     expect{cmd.build}.to raise_error
   end
 
-  it "sholud handle double quote" do
+  it "should handle double quote" do
     cmd = new_command(Patriot::Command::ShCommand) do
       name 'test_"import'
       commands "echo \"#{YEAR}\""
@@ -50,7 +50,7 @@ describe Patriot::Command::Base do
     expect(cmd.instance_variable_get(:@commands)[0]).to eq "echo \"#{YEAR}\""
   end
 
-  it "sholud be suspended" do
+  it "should be suspended" do
     cmd = new_command(Patriot::Command::ShCommand) do
       suspend
       name 'test_"import'
@@ -60,7 +60,7 @@ describe Patriot::Command::Base do
     expect(cmd.instance_variable_get(:@state)).to eq Patriot::JobStore::JobState::SUSPEND
   end
 
-  it "sholud be skipped" do
+  it "should be skipped" do
     cmd = new_command(Patriot::Command::ShCommand) do
       skip
       name 'test_"import'

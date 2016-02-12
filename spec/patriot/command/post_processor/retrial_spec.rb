@@ -37,7 +37,7 @@ EOJ
     @job_store.register(@update_id, @jobs)
   end
 
-  it "sholud retry failed job" do
+  it "should retry failed job" do
     retry_job_id = 'sh_test_2015-08-01'
     0.upto(2) do |i|
       job_ticket = @job_store.get_job_tickets("", [])[0]

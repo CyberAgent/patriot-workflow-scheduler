@@ -6,7 +6,7 @@ require 'patriot/worker/base'
 describe Patriot::Worker::Base do
   before :each do
     @worker_base = Patriot::Worker::Base.new(config_for_test)
-    @job1 = TestEnvirionment.build_job
+    @job1 = TestEnvironment.build_job
     @update_id = Time.now.to_i
     @job_store = @worker_base.instance_variable_get(:@job_store)
     @job_store.register(@update_id, [@job1])

@@ -47,9 +47,11 @@ module Patriot
           query = {:limit  => params['limit']  || DEFAULT_JOB_LIMIT,
                    :offset => params['offset'] || DEFAULT_JOB_OFFSET}
           query[:filter_exp] = params['filter_exp'] if params.has_key?('filter_exp') && params['filter_exp'] != ""
-          jobs = @@job_store.find_jobs_by_state(state.to_i, query)
-          jobs ||= []
-          respond_with :jobs, {:jobs => jobs, :state => state, :filter_exp => query[:filter_exp]}.merge(query)
+          job_ids = @@job_store.find_jobs_by_state(state.to_i, query)
+          job_ids ||= []
+          respond_with :jobs, {:jobs => job_ids.map{|job_id| {:job_id => job_id, :state => state}},
+                               :state => state,
+                               :filter_exp => query[:filter_exp]}.merge(query)
         end
 
         post '/' do
@@ -72,7 +74,7 @@ module Patriot
           raise JobNotFoundException, job_id if job.nil?
           update_job_size(job[Patriot::Command::STATE_ATTR])
           histories = @@job_store.get_execution_history(job_id, {:limit => history_size})
-          # respond_with :job, {:job => job, :histories => histories} 
+          # respond_with :job, {:job => job, :histories => histories}
           respond_to do |f|
             f.on('text/html'){ erb :job, :locals => {:job => job, :histories => histories} }
             # for monitoring

@@ -49,7 +49,7 @@ EOJ
     @job_store.register(@update_id, @jobs)
   end
 
-  it "sholud notify on success with both setting" do
+  it "should notify on success with both setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_both_success_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to@test", "#{job_ticket.job_id} has been successfully finished", anything)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::SUCCEEDED
@@ -57,7 +57,7 @@ EOJ
     expect(job).to be_succeeded_in @job_store
   end
 
-  it "sholud notify on failure with both setting" do
+  it "should notify on failure with both setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_both_fail_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to@test", "#{job_ticket.job_id} has been failed", anything)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
@@ -65,7 +65,7 @@ EOJ
     expect(job).to be_failed_in @job_store
   end
 
-  it "sholud notify on success with success enabled setting" do
+  it "should notify on success with success enabled setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_success_success_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to@test", "#{job_ticket.job_id} has been successfully finished", anything)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::SUCCEEDED
@@ -73,7 +73,7 @@ EOJ
     expect(job).to be_succeeded_in @job_store
   end
 
-  it "sholud not notify on failure with success enabled setting" do
+  it "should not notify on failure with success enabled setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_success_fail_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).not_to receive(:deliver)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
@@ -81,7 +81,7 @@ EOJ
     expect(job).to be_failed_in @job_store
   end
 
-  it "sholud not notify on success with failure enabled setting" do
+  it "should not notify on success with failure enabled setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_fail_success_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).not_to receive(:deliver)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::SUCCEEDED
@@ -89,7 +89,7 @@ EOJ
     expect(job).to be_succeeded_in @job_store
   end
 
-  it "sholud notify on failure with failure enabled setting" do
+  it "should notify on failure with failure enabled setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_fail_fail_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to@test", "#{job_ticket.job_id} has been failed", anything)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED

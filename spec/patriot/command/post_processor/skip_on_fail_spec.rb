@@ -6,7 +6,7 @@ describe Patriot::Command::PostProcessor::SkipOnFail do
 
   before :each do 
     @worker = Patriot::Worker::Base.new(config_for_test)
-    @job    = TestEnvirionment.build_job({
+    @job    = TestEnvironment.build_job({
         :post_processors => [Patriot::Command::PostProcessor::SkipOnFail.new],
         :commands        => 'no_such_a_command'
       })
@@ -15,7 +15,7 @@ describe Patriot::Command::PostProcessor::SkipOnFail do
     @job_store.register(@update_id, [@job])
   end
 
-  it "sholud execute a job" do
+  it "should execute a job" do
     job_entry = Patriot::JobStore::JobTicket.new(@job.job_id, @update_id)
     expect(@worker.execute_job(job_entry)).to eq Patriot::Command::ExitCode::FAILED
     expect(@job).to be_succeeded_in @job_store

@@ -6,7 +6,7 @@ describe Patriot::Util::Config::IniFileConfig do
   end
 
   describe "worker config" do
-    it "sholud return variables" do
+    it "should return variables" do
       expect(@config.get('info_server_port')).to eq '36104'
       expect(@config.get('none')).to be nil
     end

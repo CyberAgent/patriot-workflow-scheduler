@@ -26,10 +26,10 @@ describe Patriot::Tool::PatriotCommands::Job do
   describe "show valid dependency" do
     before :each do
       @update_id = Time.now.to_i
-      @p_job = TestEnvirionment.build_job({:produce => ['p1']})
-      @m_job = TestEnvirionment.build_job({:require => ['p1'], :produce => ['p2']})
-      @c_job = TestEnvirionment.build_job({:require => ['p2']})
-      @illegal_job = TestEnvirionment.build_job({:require => ['illegal']})
+      @p_job = TestEnvironment.build_job({:produce => ['p1']})
+      @m_job = TestEnvironment.build_job({:require => ['p1'], :produce => ['p2']})
+      @c_job = TestEnvironment.build_job({:require => ['p2']})
+      @illegal_job = TestEnvironment.build_job({:require => ['illegal']})
       @job_store.register(@update_id, [@p_job, @m_job, @c_job, @illegal_job])
     end
 
@@ -56,10 +56,10 @@ EOS
   describe "show incorrect dependency" do
     before :each do
       @update_id = Time.now.to_i
-      @p_job = TestEnvirionment.build_job({:produce => ['p1']})
-      @m_job = TestEnvirionment.build_job({:require => ['p1'], :produce => ['p2']})
-      @c_job = TestEnvirionment.build_job({:require => ['p2']})
-      @illegal_job = TestEnvirionment.build_job({:require => ['illegal']})
+      @p_job = TestEnvironment.build_job({:produce => ['p1']})
+      @m_job = TestEnvironment.build_job({:require => ['p1'], :produce => ['p2']})
+      @c_job = TestEnvironment.build_job({:require => ['p2']})
+      @illegal_job = TestEnvironment.build_job({:require => ['illegal']})
       @job_store.register(@update_id, [@p_job, @m_job, @c_job, @illegal_job])
       allow(@job_store).to receive(:get).and_call_original
       allow(@job_store).to receive(:get).with(anything, {:include_dependency => true}).and_return({'consumers' => {}, 'producers' => {}})
