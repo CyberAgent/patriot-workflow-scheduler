@@ -148,23 +148,31 @@ module Patriot
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         opts = {:include_attrs => []}.merge(opts)
         products = [products] unless products.is_a?(Array)
-        producers = {}
-        products.each{|product| 
-          @producers.map{|pid, prods| 
-            producers[pid.to_s] = @jobs[pid].filter_attributes(opts[:include_attrs]) if prods.include?(product)
+        producers = []
+        products.each{|product|
+          @producers.map{|pid, prods|
+            if prods.include?(product)
+              job = @jobs[pid].filter_attributes(opts[:include_attrs])
+              job["job_id"] = pid.to_s
+              producers.push(job)
+            end
           }
         }
         return producers
       end
-  
+
       # @see Patriot::JobStore::Base#get_consumers
       def get_consumers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         opts = {:include_attrs => []}.merge(opts)
         products = [products] unless products.is_a?(Array)
-        consumers = {}
+        consumers = []
         products.each{|product|
-          @consumers.map{|pid, prods| 
-            consumers[pid.to_s] = @jobs[pid].filter_attributes(opts[:include_attrs]) if prods.include?(product)
+          @consumers.map{|pid, prods|
+            if prods.include?(product)
+              job = @jobs[pid].filter_attributes(opts[:include_attrs])
+              job["job_id"] = pid.to_s
+              consumers.push(job)
+            end
           }
         }
         return consumers
@@ -208,7 +216,7 @@ module Patriot
       # @see Patriot::JobStore::Base#delete_job
       def delete_job(job_id)
         job_id = job_id.to_sym
-        @mutex.synchronize do 
+        @mutex.synchronize do
           @job_states.each{|s,js| js.delete(job_id)}
           @jobs.delete(job_id)
           @producers.delete(job_id)

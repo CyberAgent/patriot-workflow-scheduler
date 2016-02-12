@@ -32,7 +32,7 @@ describe Patriot::Command::CompositeCommand do
     FileUtils.rm_r(tmp_file) if File.exist?(tmp_file) 
   end
 
-  it "sholud execute a multiple command sequentially" do
+  it "should execute a multiple command sequentially" do
     @valid_cmd1.execute
     File.open(tmp_file) do |f|
       output = f.readlines
@@ -40,7 +40,7 @@ describe Patriot::Command::CompositeCommand do
     end
   end
 
-  it "sholud handle dependency of contained commands" do
+  it "should handle dependency of contained commands" do
     expect(@valid_cmd1['requisites']).to contain_exactly('a')
     expect(@valid_cmd1['products']).to contain_exactly('b')
   end

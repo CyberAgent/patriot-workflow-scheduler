@@ -12,7 +12,7 @@ describe PatriotGCP::Ext::BigQuery do
   end
 
 
-  it "sholud load data to bigquery" do
+  it "should load data to bigquery" do
     api_client_mock = double('api-client-mock')
     allow(api_client_mock).to receive(:discovered_api).with('bigquery', 'v2'){
         double(nil,

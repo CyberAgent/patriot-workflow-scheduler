@@ -108,12 +108,10 @@
 <h3> Dependency Info. </h3>
 <% if !producers.nil? && !producers.empty? %>
 <h5> Before </h5>
-<% p_job_state = {}; producers.each{|jid, attr| p_job_state[jid] = Patriot::JobStore::JobState.name_of(attr[:state].to_i)} %>
-<%= erb :_jobs, :locals => {:jobs => producers.keys, :job_state => p_job_state, :prefix => "p_"}, :layout => false %>
+<%= erb :_jobs, :locals => {:jobs => producers, :prefix => "p_"}, :layout => false %>
 <% end %>
 <% if !consumers.nil? && !consumers.empty? %>
 <h5> After </h5>
-<% c_job_state = {}; consumers.each{|jid, attr| c_job_state[jid] = Patriot::JobStore::JobState.name_of(attr[:state].to_i)} %>
-<%= erb :_jobs, :locals => {:jobs => consumers.keys, :job_state => c_job_state, :prefix => "c_"}, :layout => false %>
+<%= erb :_jobs, :locals => {:jobs => consumers, :prefix => "c_"}, :layout => false %>
 <% end %>
 

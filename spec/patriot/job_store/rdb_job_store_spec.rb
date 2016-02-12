@@ -19,8 +19,8 @@ unless ENV['TEST_DBMS'].nil?
     end
 
     it "should use strict datetime format" do
-      target_datetime = TestEnvirionment::TEST_TARGET_DATE.strftime("%Y-%m-%d")
-      job  = TestEnvirionment.build_job({:job_id => 'startafter_test'})
+      target_datetime = TestEnvironment::TEST_TARGET_DATE.strftime("%Y-%m-%d")
+      job  = TestEnvironment.build_job({:job_id => 'startafter_test'})
       job[Patriot::Command::START_DATETIME_ATTR] = Time.new(2010,1,31)
       expect_any_instance_of(Patriot::Util::DBClient::MySQL2Client).to receive(:do_insert).once.with(
         "INSERT INTO jobs (job_id,update_id,priority,state,start_after,node,host,content) VALUES ('sh_job_startafter_test_#{target_datetime}',#{@update_id},1,1,'2010-01-31 00:00:00',NULL,NULL,'{\\\"COMMAND_CLASS\\\":\\\"Patriot.Command.ShCommand\\\",\\\"connector\\\":\\\"&&\\\",\\\"commands\\\":[\\\"echo 1\\\"],\\\"name\\\":\\\"job_startafter_test\\\",\\\"name_suffix\\\":\\\"#{target_datetime}\\\"}')"

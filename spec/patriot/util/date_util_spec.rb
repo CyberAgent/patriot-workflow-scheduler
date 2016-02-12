@@ -19,7 +19,7 @@ describe Patriot::Util::DateUtil do
       val = date_format "2012-11-30", "23:12:34" , "%Y-%m-%d %H:%M:%S", {:day =>1}
       expect(val).to eq "2012-12-01 23:12:34"
     end
-    it "sholud add hour by date_format" do
+    it "should add hour by date_format" do
       val = date_format "2012-02-01", "23:12:34" , "%Y-%m-%d %H:%M:%S", {:hour =>1}
       expect(val).to eq "2012-02-02 00:12:34"
       val = date_format "2012-02-28", "23:12:34" , "%Y-%m-%d %H:%M:%S", {:hour =>1}
@@ -34,7 +34,7 @@ describe Patriot::Util::DateUtil do
       expect(val).to eq "2012-12-01 00:12:34"
     end
 
-    it "sholud subtract hour by date_format" do
+    it "should subtract hour by date_format" do
       val = date_format "2012-03-01", "00:12:34" , "%Y-%m-%d %H:%M:%S", {:hour =>-1}
       expect(val).to eq "2012-02-29 23:12:34"
       val = date_format "2013-03-01", "00:12:34" , "%Y-%m-%d %H:%M:%S", {:hour =>-1}
@@ -43,7 +43,7 @@ describe Patriot::Util::DateUtil do
       expect(val).to eq "2011-12-31 23:12:34"
     end
 
-    it "sholud add month and hourby date_format" do
+    it "should add month and hourby date_format" do
       val = date_format "2012-02-28", "23:12:34" , "%Y-%m-%d %H:%M:%S", {:month =>1, :hour =>1}
       expect(val).to eq "2012-03-29 00:12:34"
     end

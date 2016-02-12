@@ -6,7 +6,7 @@ describe Patriot::Util::Param do
   end
 
   describe ".eval_string_attr" do
-    it "sholud eval string with vertical bar" do
+    it "should eval string with vertical bar" do
       expect(@obj.eval_string_attr '#{"abc|def"}').to eq "abc|def"
     end
 

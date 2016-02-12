@@ -16,6 +16,7 @@ module Patriot
       PASSWORD_KEY = 'info_server.admin.password'
 
       require 'patriot/worker/servlet/job_servlet.rb'
+      require 'patriot/worker/servlet/job_api_servlet.rb'
       require 'patriot/worker/servlet/worker_status_servlet.rb'
 
     end

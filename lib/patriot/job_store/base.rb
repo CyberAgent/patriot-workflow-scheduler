@@ -72,8 +72,8 @@ module Patriot
         job = get_job(job_id)
         return if job.nil?
         if opts[:include_dependency] == true
-          job['consumers'] = get_consumers(job[Patriot::Command::PRODUCTS_ATTR]) || {}
-          job['producers'] = get_producers(job[Patriot::Command::REQUISITES_ATTR]) ||{}
+          job['consumers'] = get_consumers(job[Patriot::Command::PRODUCTS_ATTR]) || []
+          job['producers'] = get_producers(job[Patriot::Command::REQUISITES_ATTR]) || []
         end
         return job
       end
@@ -93,7 +93,7 @@ module Patriot
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         raise NotImplementedError
       end
-  
+
       # get consumers of products
       # @param [Array] products a list of product name
       # @param [Hash] opts
@@ -124,7 +124,7 @@ module Patriot
 
       # @param [Hash] opts
       # @option [Array<Patriot::JobStore::JobState>] :ignore_states
-      # @return [Hash<Patriot::JobStore::JobState, Integer>] a hash from job state to the number of jobs in the state 
+      # @return [Hash<Patriot::JobStore::JobState, Integer>] a hash from job state to the number of jobs in the state
       def get_job_size(opts = {})
         raise NotImplementedError
       end
@@ -147,7 +147,7 @@ module Patriot
         }.compact.flatten
         consumers = get_consumers(products)
         while !consumers.empty?
-          jobs = consumers.keys.map{|jid| get_job(jid)}.compact
+          jobs = consumers.map{|job| get_job(job["job_id"])}.compact
           yield self, jobs
           products = jobs.map{|j| j[Patriot::Command::PRODUCTS_ATTR]}.compact.flatten
           consumers = get_consumers(products)
