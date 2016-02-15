@@ -1,49 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>System Configuration &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
-    
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.7.2',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html" />
-    <link rel="prev" title="Web Console" href="web.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="web.html" title="Web Console"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>System Configuration &mdash; patriot-workflow-scheduler 0.7.2 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="patriot-workflow-scheduler 0.7.2 documentation" href="index.html"/>
+        <link rel="prev" title="Web Console" href="web.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> patriot-workflow-scheduler
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arch.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbc.html">Job Configuration DSL (PBC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web.html">Web Console</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">System Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-list-of-configuration-properties">The List of Configuration Properties</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">patriot-workflow-scheduler</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>System Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/config.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="system-configuration">
 <h1>System Configuration<a class="headerlink" href="#system-configuration" title="Permalink to this headline">¶</a></h1>
@@ -52,150 +141,199 @@ By using sections, the configuration can be switched by the tool of the command 
 The default configuration defined in the &#8216;common&#8217; section will be overwritten by the section of the CLI command.</p>
 <div class="section" id="the-list-of-configuration-properties">
 <h2>The List of Configuration Properties<a class="headerlink" href="#the-list-of-configuration-properties" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="docutils">
-<colgroup>
-<col width="30%" />
-<col width="70%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">property name</th>
-<th class="head">description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>info_server.port</td>
-<td>port number used by the management web console</td>
-</tr>
-<tr class="row-odd"><td>info_server.admin.username</td>
-<td>admin user name of the web console</td>
-</tr>
-<tr class="row-even"><td>info_server.admin.password</td>
-<td>admin user password of the web console</td>
-</tr>
-<tr class="row-odd"><td>worker_hosts</td>
-<td>a comma-separated-list of workers managed by the _worker_admin_ CLI tool</td>
-</tr>
-<tr class="row-even"><td>admin_user</td>
-<td>user name used in the _worker_admin tool.  The tool accesses remote servers as this user name by ssh, each of worker server should be accessible without password in case of this user.</td>
-</tr>
-<tr class="row-odd"><td>plugins</td>
-<td>a comma-separated-list of plugins</td>
-</tr>
-<tr class="row-even"><td>jobstore.root.class</td>
-<td>JobStore implementation class name. The default is Patriot::JobStore::InMemoryStore. Set to Patriot::JobStore::RDBJobStore to use RDB as the JobStore</td>
-</tr>
-<tr class="row-odd"><td>jobstore.root.adapter</td>
-<td>a DB adapter name for RDBJobStore. (mysql2 or sqlite3)</td>
-</tr>
-<tr class="row-even"><td>jobstore.root.database</td>
-<td>the database name of RDBJobStore</td>
-</tr>
-<tr class="row-odd"><td>jobstore.root.username</td>
-<td>the user name to access the DB for the JobStore</td>
-</tr>
-<tr class="row-even"><td>jobstore.root.password</td>
-<td>the password to access the DB for the JobStore</td>
-</tr>
-<tr class="row-odd"><td>jobstore.root.host</td>
-<td>the location of the DBMS where JobStore is hosted</td>
-</tr>
-<tr class="row-even"><td>jobstore.root.port</td>
-<td>the port number used by the DBMS where JobStore is hosted</td>
-</tr>
-<tr class="row-odd"><td>jobstore.root.encoding</td>
-<td>the encoding used in communicating the DBMS</td>
-</tr>
-<tr class="row-even"><td>log_factory</td>
-<td>an implementation of Patriot::Util::Logger::Factory</td>
-</tr>
-<tr class="row-odd"><td>log_level</td>
-<td>Log level (e.g., DEBUG, INFO)</td>
-</tr>
-<tr class="row-even"><td>log_format</td>
-<td>Log format</td>
-</tr>
-<tr class="row-odd"><td>log_outputters</td>
-<td>a comma-separated-list of log outputters</td>
-</tr>
-<tr class="row-even"><td>log_outputter.$outputer.class</td>
-<td>an implementation of each outputter ($outputter should be replaced with one of the outputter specified in <em>log_outputters</em>.</td>
-</tr>
-<tr class="row-odd"><td>fetch_cycle</td>
-<td>an interval in which the worker fetches executable jobs from JobStore</td>
-</tr>
-<tr class="row-even"><td>fetch_limit</td>
-<td>the max number of jobs fetched at once</td>
-</tr>
-<tr class="row-odd"><td>nodes</td>
-<td>a comma-separated-list of nodes hosted on the worker</td>
-</tr>
-<tr class="row-even"><td>node.$node.type</td>
-<td>type of node (<em>any</em> or <em>own</em>). $node should be replaces one of the nodes specified in the <em>nodes</em>. With type any, the node executes jobs without nodes or jobs with the same node. With type own, the node only executes jobs with the same node.</td>
-</tr>
-<tr class="row-odd"><td>node.$node.threads</td>
-<td>the number of threads for the node ($node should be replaced with one of the <em>nodes</em>).</td>
-</tr>
-</tbody>
-</table>
+<dl class="docutils">
+<dt>info_server.port</dt>
+<dd><div class="first last line-block">
+<div class="line">A port number used by the management web console</div>
+</div>
+</dd>
+<dt>info_server.admin.username</dt>
+<dd><div class="first last line-block">
+<div class="line">An admin user name of the web console</div>
+</div>
+</dd>
+<dt>info_server.admin.password</dt>
+<dd><div class="first last line-block">
+<div class="line">An admin user password of the web console</div>
+</div>
+</dd>
+<dt>worker_hosts</dt>
+<dd><div class="first last line-block">
+<div class="line">A comma-separated list of workers managed by the _worker_admin_ CLI tool</div>
+</div>
+</dd>
+<dt>admin_user</dt>
+<dd><div class="first last line-block">
+<div class="line">A user name used in the _worker_admin tool.</div>
+<div class="line">Since it accesses remote servers with this user name by SSH, Every workers should be accessible without password for this user.</div>
+</div>
+</dd>
+<dt>plugins</dt>
+<dd><div class="first last line-block">
+<div class="line">A comma-separated list of plugins</div>
+</div>
+</dd>
+<dt>jobstore.root.class</dt>
+<dd><div class="first last line-block">
+<div class="line">JobStore implementation class name (default is Patriot::JobStore::InMemoryStore).</div>
+<div class="line">Set it to Patriot::JobStore::RDBJobStore to use RDB as JobStore</div>
+</div>
+</dd>
+<dt>jobstore.root.adapter</dt>
+<dd><div class="first last line-block">
+<div class="line">The DB adapter name for RDBJobStore. (mysql2 or sqlite3)</div>
+</div>
+</dd>
+<dt>jobstore.root.database</dt>
+<dd><div class="first last line-block">
+<div class="line">The DB name of RDBJobStore</div>
+</div>
+</dd>
+<dt>jobstore.root.username</dt>
+<dd><div class="first last line-block">
+<div class="line">The user name to access the DB for JobStore</div>
+</div>
+</dd>
+<dt>jobstore.root.password</dt>
+<dd><div class="first last line-block">
+<div class="line">The password to access the DB for JobStore</div>
+</div>
+</dd>
+<dt>jobstore.root.host</dt>
+<dd><div class="first last line-block">
+<div class="line">The location of the DB where JobStore is hosted</div>
+</div>
+</dd>
+<dt>jobstore.root.port</dt>
+<dd><div class="first last line-block">
+<div class="line">The port number used by the DB where JobStore is hosted</div>
+</div>
+</dd>
+<dt>jobstore.root.encoding</dt>
+<dd><div class="first last line-block">
+<div class="line">The encoding used in communicating the DB</div>
+</div>
+</dd>
+<dt>log_factory</dt>
+<dd><div class="first last line-block">
+<div class="line">Implementation of Patriot::Util::Logger::Factory</div>
+</div>
+</dd>
+<dt>log_level</dt>
+<dd><div class="first last line-block">
+<div class="line">Log level (e.g., DEBUG, INFO)</div>
+</div>
+</dd>
+<dt>log_format</dt>
+<dd><div class="first last line-block">
+<div class="line">Log format</div>
+</div>
+</dd>
+<dt>log_outputters</dt>
+<dd><div class="first last line-block">
+<div class="line">A comma-separated-list of log outputters</div>
+</div>
+</dd>
+<dt>log_outputter.$outputer.class</dt>
+<dd><div class="first last line-block">
+<div class="line">Implementation of each outputter ($outputter should be replaced with one of the outputters specified in <em>log_outputters</em>).</div>
+</div>
+</dd>
+<dt>fetch_cycle</dt>
+<dd><div class="first last line-block">
+<div class="line">Interval in which the worker fetches executable jobs from JobStore</div>
+</div>
+</dd>
+<dt>fetch_limit</dt>
+<dd><div class="first last line-block">
+<div class="line">The max number of jobs fetched at once</div>
+</div>
+</dd>
+<dt>nodes</dt>
+<dd><div class="first last line-block">
+<div class="line">A comma-separated-list of nodes hosted on the worker</div>
+</div>
+</dd>
+<dt>node.$node.type</dt>
+<dd><div class="first last line-block">
+<div class="line">Type of node (<em>any</em> or <em>own</em>). $node should be replaced one of the nodes specified in the <em>nodes</em>.</div>
+<div class="line">With type any, the node executes jobs without nodes or jobs with the same node.</div>
+<div class="line">With type own, the node only executes jobs with the same node.</div>
+</div>
+</dd>
+<dt>node.$node.threads</dt>
+<dd><div class="first last line-block">
+<div class="line">A number of threads for the node ($node should be replaced with one of the <em>nodes</em>).</div>
+</div>
+</dd>
+</dl>
 </div>
 </div>
 
 
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">System Configuration</a><ul>
-<li><a class="reference internal" href="#the-list-of-configuration-properties">The List of Configuration Properties</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="web.html" class="btn btn-neutral" title="Web Console" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="web.html"
-                        title="previous chapter">Web Console</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/config.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Cyberagent, Inc..
+
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="web.html" title="Web Console"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">patriot-workflow-scheduler 0.7.2 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Cyberagent, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
