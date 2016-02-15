@@ -13,55 +13,56 @@ The List of Configuration Properties
   :header-rows: 1
   :widths: 3,7
 
-  * - property name
-    - description
-  * - info_server.port
-    - port number used by the management web console
-  * - info_server.admin.username
-    - admin user name of the web console
-  * - info_server.admin.password
-    - admin user password of the web console
-  * - worker_hosts
-    - a comma-separated-list of workers managed by the _worker_admin_ CLI tool
-  * - admin_user
-    - user name used in the _worker_admin tool.  The tool accesses remote servers as this user name by ssh, each of worker server should be accessible without password in case of this user.
-  * - plugins
-    - a comma-separated-list of plugins
-  * - jobstore.root.class
-    - JobStore implementation class name. The default is Patriot::JobStore::InMemoryStore. Set to Patriot::JobStore::RDBJobStore to use RDB as the JobStore
-  * - jobstore.root.adapter
-    - a DB adapter name for RDBJobStore. (mysql2 or sqlite3)
-  * - jobstore.root.database
-    - the database name of RDBJobStore
-  * - jobstore.root.username
-    - the user name to access the DB for the JobStore
-  * - jobstore.root.password
-    - the password to access the DB for the JobStore
-  * - jobstore.root.host
-    - the location of the DBMS where JobStore is hosted
-  * - jobstore.root.port
-    - the port number used by the DBMS where JobStore is hosted
-  * - jobstore.root.encoding
-    - the encoding used in communicating the DBMS
-  * - log_factory
-    - an implementation of Patriot::Util::Logger::Factory
-  * - log_level
-    - Log level (e.g., DEBUG, INFO)
-  * - log_format
-    - Log format
-  * - log_outputters
-    - a comma-separated-list of log outputters
-  * - log_outputter.$outputer.class
-    - an implementation of each outputter ($outputter should be replaced with one of the outputter specified in *log_outputters*.
-  * - fetch_cycle
-    - an interval in which the worker fetches executable jobs from JobStore
-  * - fetch_limit
-    -  the max number of jobs fetched at once
-  * - nodes
-    - a comma-separated-list of nodes hosted on the worker
-  * - node.$node.type
-    - type of node (*any* or *own*). $node should be replaces one of the nodes specified in the *nodes*. With type any, the node executes jobs without nodes or jobs with the same node. With type own, the node only executes jobs with the same node.
-  * - node.$node.threads
-    - the number of threads for the node ($node should be replaced with one of the *nodes*).
-
+info_server.port
+  | A port number used by the management web console
+info_server.admin.username
+  | An admin user name of the web console
+info_server.admin.password
+  | An admin user password of the web console
+worker_hosts
+  | A comma-separated list of workers managed by the _worker_admin_ CLI tool
+admin_user
+  | A user name used in the _worker_admin tool.
+  | Since it accesses remote servers with this user name by SSH, Every workers should be accessible without password for this user.
+plugins
+  | A comma-separated list of plugins
+jobstore.root.class
+  | JobStore implementation class name (default is Patriot::JobStore::InMemoryStore).
+  | Set it to Patriot::JobStore::RDBJobStore to use RDB as JobStore
+jobstore.root.adapter
+  | The DB adapter name for RDBJobStore. (mysql2 or sqlite3)
+jobstore.root.database
+  | The DB name of RDBJobStore
+jobstore.root.username
+  | The user name to access the DB for JobStore
+jobstore.root.password
+  | The password to access the DB for JobStore
+jobstore.root.host
+  | The location of the DB where JobStore is hosted
+jobstore.root.port
+  | The port number used by the DB where JobStore is hosted
+jobstore.root.encoding
+  | The encoding used in communicating the DB
+log_factory
+  | Implementation of Patriot::Util::Logger::Factory
+log_level
+  | Log level (e.g., DEBUG, INFO)
+log_format
+  | Log format
+log_outputters
+  | A comma-separated-list of log outputters
+log_outputter.$outputer.class
+  | Implementation of each outputter ($outputter should be replaced with one of the outputters specified in *log_outputters*).
+fetch_cycle
+  | Interval in which the worker fetches executable jobs from JobStore
+fetch_limit
+  | The max number of jobs fetched at once
+nodes
+  | A comma-separated-list of nodes hosted on the worker
+node.$node.type
+  | Type of node (*any* or *own*). $node should be replaced one of the nodes specified in the *nodes*.
+  | With type any, the node executes jobs without nodes or jobs with the same node.
+  | With type own, the node only executes jobs with the same node.
+node.$node.threads
+  | A number of threads for the node ($node should be replaced with one of the *nodes*).
 
