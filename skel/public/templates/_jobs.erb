@@ -1,4 +1,3 @@
-<% job_state = Hash.new(Patriot::JobStore::JobState.name_of(state)) if job_state.nil? && !state.nil? %>
 <% prefix = "" if prefix.nil? %>
 <form id="state_update_form" method="POST" action="/jobs/">
   <input type="hidden" name="_method" value="put">
@@ -7,11 +6,11 @@
       <th><input type="checkbox" id="selectAllJob" onclick="$('input:checkbox[name=\'job_ids[]\']').prop('checked', $(this).prop('checked'));"></input></th>
       <th>job_id</th>
       <th>State</th>
-      <% jobs.each do |job_id| %>
+      <% jobs.each do |job| %>
         </tr><tr>
-        <td><input type="checkbox" data-job-id="<%= job_id %>" data-job-state="<%= job_state[job_id] %>" name="job_ids[]" value="<%= job_id %>"></td>
-          <td><%= to_job_link(job_id) %></td>
-          <td> <%= job_state[job_id] %></td>
+        <td><input type="checkbox" data-job-id="<%= job[:job_id] %>" data-job-state="<%= Patriot::JobStore::JobState.name_of(job[:state].to_i) %>" name="job_ids[]" value="<%= job[:job_id] %>"></td>
+          <td><%= to_job_link(job[:job_id]) %></td>
+          <td><%= Patriot::JobStore::JobState.name_of(job[:state].to_i) %></td>
       <% end %>
     </tr>
   </table>

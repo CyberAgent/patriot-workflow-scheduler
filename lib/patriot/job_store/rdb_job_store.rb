@@ -62,7 +62,7 @@ module Patriot
         @logger.info "start to register jobs"
         connect(@db_config) do |c|
           jobs.each{|job| upsert_job(update_id, job, c)}
-          c.update(JOB_TABLE, 
+          c.update(JOB_TABLE,
                    {:state => Patriot::JobStore::JobState::WAIT},
                    {:state => Patriot::JobStore::JobState::INIT, :update_id => update_id}
                   )
@@ -98,7 +98,7 @@ module Patriot
         raise "failed to upsert a job #{j}" if serial_id.nil?
 
         update_dependency(serial_id, requisites, CONSUMER_TABLE, c)
-        update_dependency(serial_id, products,   PRODUCER_TABLE, c) 
+        update_dependency(serial_id, products,   PRODUCER_TABLE, c)
         # set dependency for initiator jobs
         c.insert(FLOW_TABLE, {:producer_id => @initiator_id, :consumer_id => serial_id}, {:ignore => true}) if requisites.empty?
       end
@@ -158,15 +158,15 @@ module Patriot
         node_condition = (nodes.map{|n| "c.node = '#{n}'" } | ["c.node IS NULL"]).join(" OR ")
         query          = <<"END_OB_QUERY"
           SELECT c.#{TICKET_COLUMNS[0]}, c.#{TICKET_COLUMNS[1]}, c.#{TICKET_COLUMNS[2]}
-          FROM flows f 
-          JOIN jobs c on c.id = f.consumer_id 
-          JOIN jobs p on f.producer_id = p.id 
+          FROM flows f
+          JOIN jobs c on c.id = f.consumer_id
+          JOIN jobs p on f.producer_id = p.id
           WHERE c.state=#{Patriot::JobStore::JobState::WAIT}
               AND (#{node_condition})
               AND (c.host = '#{host}' OR c.host IS NULL)
               AND c.content IS NOT NULL
               AND (c.start_after IS NULL  OR c.start_after < current_timestamp)
-          GROUP BY f.consumer_id HAVING Min(p.state=#{Patriot::JobStore::JobState::SUCCEEDED})=1 
+          GROUP BY f.consumer_id HAVING Min(p.state=#{Patriot::JobStore::JobState::SUCCEEDED})=1
           ORDER BY c.priority
 END_OB_QUERY
         query = "#{query} LIMIT #{options[:fetch_limit]} " if options.has_key?(:fetch_limit)
@@ -191,7 +191,7 @@ END_OB_QUERY
           raise "duplicated entry found for #{job_ticket}" if record.size > 1
           raise "no entry found for #{job_ticket}" if record.empty?
           job = record_to_job(record[0])
-          begin 
+          begin
             return {:execution_id => execution_id, :command => job.to_command(@config)}
           rescue Exception => e
             marked = _check_and_set_state(job_ticket, Patriot::JobStore::JobState::RUNNING, Patriot::JobStore::JobState::FAILED, c)
@@ -222,7 +222,7 @@ END_OB_QUERY
           @logger.info("definition or state of job: #{job_ticket.job_id} is changed and its state is not changed")
           return false
         elsif num_updated != 1
-          raise "illegal state: #{job_ticket.job_id} has more than #{num_updated} records" 
+          raise "illegal state: #{job_ticket.job_id} has more than #{num_updated} records"
         end
         return true
       end
@@ -254,15 +254,15 @@ END_OB_QUERY
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         return _get_jobs_for_products(PRODUCER_TABLE, products, opts)
       end
-  
+
       # @see Patriot::JobStore::Base#get_producers
       def get_consumers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
         return _get_jobs_for_products(CONSUMER_TABLE, products, opts)
       end
 
       def _get_jobs_for_products(table, products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
-        result = {}
-        return result if products.nil?
+        result = []
+        return result if products.blank?
         products = [products] unless products.is_a? Array
         included_cols = (opts[:include_attrs] || []).map{|a| ATTR_TO_COLUMN[a]}
         connect(@db_config) do |c|
@@ -270,10 +270,9 @@ END_OB_QUERY
             jids = c.select(table, {:product => product}).map{|r| r.job_id}
             next if jids.empty?
             included_cols = (['job_id'] | (included_cols || [])).uniq
-            query = "SELECT job_id, #{included_cols.join(', ')} FROM jobs WHERE #{jids.map{|jid| "id = #{jid}" }.join(' OR ')}"
+            query = "SELECT #{included_cols.join(', ')} FROM jobs WHERE #{jids.map{|jid| "id = #{jid}" }.join(' OR ')}"
             c.execute_statement(query, :select).each do |r|
-              hashval = r.to_hash
-              result[hashval.delete(:job_id)] = hashval
+              result.push(r.to_hash)
             end
           end
         end

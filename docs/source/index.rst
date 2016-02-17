@@ -18,6 +18,7 @@ Contents:
    pbc
    cli
    web
+   rest
    config
 
 Indices and tables

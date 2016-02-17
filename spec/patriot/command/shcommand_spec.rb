@@ -30,7 +30,7 @@ describe Patriot::Command::ShCommand do
     FileUtils.rm_r(tmp_file) if File.exist?(tmp_file) 
   end
 
-  it "sholud execute a command" do
+  it "should execute a command" do
     parser = Patriot::Tool::BatchParser.new(config_for_test)
     @valid_cmd1.execute
     File.open(tmp_file) do |f|
@@ -39,21 +39,21 @@ describe Patriot::Command::ShCommand do
     end   
   end
 
-  it "sholud raise an error" do
+  it "should raise an error" do
     parser = Patriot::Tool::BatchParser.new(config_for_test)
     expect{
       @invalid_cmd1.execute
     }.to raise_error(Patriot::Util::System::ExternalCommandException)
   end
 
-  it "sholud have a name" do
+  it "should have a name" do
     noname = new_command(Patriot::Command::ShCommand) do 
       commands 'echo /tmp/no_name' 
     end
     expect{noname.build}.to raise_error
   end
 
-  it "sholud has default connector name" do
+  it "should has default connector name" do
     cmd = new_command(Patriot::Command::ShCommand) do 
       name 'default_connector'
       commands 'echo /tmp/no_name' 

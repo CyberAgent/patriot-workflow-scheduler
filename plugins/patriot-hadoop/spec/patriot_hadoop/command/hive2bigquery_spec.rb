@@ -8,7 +8,7 @@ describe PatriotHadoop::Command::HiveCommand do
     @config = config_for_test
   end
 
-  it "sholud execute hive query" do
+  it "should execute hive query" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     cmd = new_command(PatriotHadoop::Command::HiveCommand) do
       hive_ql query
@@ -30,7 +30,7 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
-  it "sholud execute hive query without output_prefix" do
+  it "should execute hive query without output_prefix" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     cmd = new_command(PatriotHadoop::Command::HiveCommand) do
       hive_ql query
@@ -52,7 +52,7 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
-  it "sholud execute hive query with exec_user" do
+  it "should execute hive query with exec_user" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     exec_user = 'user1'
     cmd = new_command(PatriotHadoop::Command::HiveCommand) do
@@ -76,7 +76,7 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
-  it "sholud execute hive query with properties" do
+  it "should execute hive query with properties" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     cmd = new_command(PatriotHadoop::Command::HiveCommand) do
       hive_ql query
@@ -101,7 +101,7 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
-  it "sholud execute hive query and the result is empty" do
+  it "should execute hive query and the result is empty" do
     query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
     cmd = new_command(PatriotHadoop::Command::HiveCommand) do
       hive_ql query
