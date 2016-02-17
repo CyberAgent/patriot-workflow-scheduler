@@ -88,6 +88,15 @@ module Patriot
         end
 
 
+        put '/' do
+          protected!
+          body = JSON.parse(request.body.read)
+          job_ids = body["job_ids"]
+          state = body['state']
+          set_state_of_jobs(job_ids, state)
+          return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id, "state" => state} })
+        end
+
         put '/:job_id' do
           protected!
           job_id = params['job_id']

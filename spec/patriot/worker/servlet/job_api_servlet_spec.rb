@@ -169,6 +169,37 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       )).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
     end
 
+    it "should change the status of a set of jobs" do
+      expect(JSON.parse(@client['/sh_job_wait1_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
+      expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
+
+      expect(JSON.parse(@client_auth['/'].put(
+        JSON.generate({:job_ids => ["sh_job_wait1_2015-04-01", "sh_job_wait2_2015-04-01"],
+                       :state => Patriot::JobStore::JobState::SUSPEND}),
+        {:content_type => :json}
+      ))).to eq([{"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND},
+                 {"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND}])
+
+      expect(JSON.parse(@client['/sh_job_wait1_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
+      expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
+
+      expect(JSON.parse(@client_auth['/'].put(
+        JSON.generate({:job_ids => ["sh_job_wait1_2015-04-01", "sh_job_wait2_2015-04-01"],
+                       :state => Patriot::JobStore::JobState::WAIT}),
+        {:content_type => :json}
+      ))).to eq([{"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT},
+                 {"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT}])
+
+      expect(JSON.parse(@client['/sh_job_wait1_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
+      expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
+            ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
+    end
+
 
     it "should delete a job" do
       expect(JSON.parse(@client.get(
