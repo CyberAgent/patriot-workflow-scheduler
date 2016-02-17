@@ -6,7 +6,7 @@ describe Patriot::Command::PostProcessor::SkipOnFail do
 
   before :each do 
     @worker = Patriot::Worker::Base.new(config_for_test)
-    @job    = TestEnvirionment.build_job({
+    @job    = TestEnvironment.build_job({
         :post_processors => [Patriot::Command::PostProcessor::SkipOnFail.new],
         :commands        => 'no_such_a_command'
       })

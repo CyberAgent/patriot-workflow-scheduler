@@ -39,7 +39,7 @@ module Patriot
           @logger.info("port is not set. starting info server is skipped")
           return
         end
-        @server_thread = Thread.new do 
+        @server_thread = Thread.new do
           begin
             @handler = eval(@config.get(RACK_HANDLER_KEY, DEFAULT_RACK_HANDLER))
             app = Rack::URLMap.new(get_url_map)
@@ -58,6 +58,7 @@ module Patriot
         urls = @config.get(URLS_KEY, nil)
         if urls.nil?
           urlmap = {"/jobs"   => Patriot::Worker::Servlet::JobServlet,
+                    "/api/v1/jobs" => Patriot::Worker::Servlet::JobAPIServlet,
                     "/worker" => Patriot::Worker::Servlet::WorkerStatusServlet}
         else
           urlmap = {}

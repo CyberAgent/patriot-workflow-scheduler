@@ -41,10 +41,12 @@ module Patriot
               job[Patriot::Command::REQUISITES_ATTR].each do |product|
                 products = job_store.get_producers(product)
                 values << "#{'  '*indent}<= #{product} = WARN: no producer exists" if products.empty?
-                products.each do |jid, attrs|
-                  dep_status = "#{jid}, #{attrs[Patriot::Command::STATE_ATTR]}"
+                products.each do |p|
+                  jid = p['job_id']
+                  state = p[Patriot::Command::STATE_ATTR]
+                  dep_status = "#{jid}, #{state}"
                   producer_job = job_store.get(jid, :include_dependency => true)
-                  unless producer_job['consumers'].keys.include?(job_id)
+                  unless producer_job['consumers'].map{|c| c['job_id']}.include?(job_id)
                     dep_status = "WARN: currupted dependency #{dep_status}"
                   end
                   values << "#{'  '*indent}<= #{product} = #{dep_status}"

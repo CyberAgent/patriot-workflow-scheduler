@@ -15,12 +15,12 @@ describe <%= job_store_class %> do
       @host = 'dummy_host1'
       @update_id = Time.now.to_i
       @job_store = <%= job_store_class %>.new("root", @config)
-      @anyjob  = TestEnvirionment.build_job({})
-      @nodejob = TestEnvirionment.build_job({:node => @node})
-      @hostjob = TestEnvirionment.build_job({:host => @host})
-      @bothjob = TestEnvirionment.build_job({:node => @node, :host => @host})
-      @p_job   = TestEnvirionment.build_job({:node => @node, :produce => ['p']})
-      @c_job   = TestEnvirionment.build_job({:node => @node, :require => ['p']})
+      @anyjob  = TestEnvironment.build_job({})
+      @nodejob = TestEnvironment.build_job({:node => @node})
+      @hostjob = TestEnvironment.build_job({:host => @host})
+      @bothjob = TestEnvironment.build_job({:node => @node, :host => @host})
+      @p_job   = TestEnvironment.build_job({:node => @node, :produce => ['p']})
+      @c_job   = TestEnvironment.build_job({:node => @node, :require => ['p']})
       @job_store.register(@update_id, [@anyjob, @nodejob, @hostjob, @bothjob, @p_job,@c_job])
     end
 
@@ -55,9 +55,9 @@ describe <%= job_store_class %> do
     it "should include dependency" do 
       job = @job_store.get(@c_job.job_id, :include_dependency=>true)
       expect(job['consumers']).to be_empty
-      expect(job['producers'].keys).to contain_exactly(@p_job.job_id)
+      expect(job['producers']).to contain_exactly({"job_id" => @p_job.job_id, "state" => 1})
       job = @job_store.get(@p_job.job_id, :include_dependency=>true)
-      expect(job['consumers'].keys).to contain_exactly(@c_job.job_id)
+      expect(job['consumers']).to contain_exactly({"job_id" => @c_job.job_id, "state" => 1})
       expect(job['producers']).to be_empty
     end
 
@@ -74,7 +74,7 @@ describe <%= job_store_class %> do
       it "should return producers" do
         producers = @job_store.get_producers("p")
         expect(producers.size).to eq 1
-        expect(producers.has_key?(@p_job.job_id)).to eq true
+        expect(producers.map{|p| p["job_id"]}).to contain_exactly(@p_job.job_id)
       end
     end
 
@@ -82,7 +82,7 @@ describe <%= job_store_class %> do
       it "should return consumers" do
         consumers = @job_store.get_consumers("p")
         expect(consumers.size).to eq 1
-        expect(consumers.has_key?(@c_job.job_id)).to be true
+        expect(consumers.map{|c| c["job_id"]}).to contain_exactly(@c_job.job_id)
       end
     end
   end
@@ -92,11 +92,11 @@ describe <%= job_store_class %> do
       @update_id = Time.now.to_i
       @job_store = <%= job_store_class %>.new("root", @config)
       # set state to suspend to avoid effects of other tests
-      @job1 = TestEnvirionment.build_job({:job_id => 'j1', :state => Patriot::JobStore::JobState::SUSPEND})
-      @job2 = TestEnvirionment.build_job({:job_id => 'j2', :state => Patriot::JobStore::JobState::FAILED})
-      @job3 = TestEnvirionment.build_job({:job_id => 'j3', :state => Patriot::JobStore::JobState::FAILED})
-      @job4 = TestEnvirionment.build_job({:job_id => 'j4', :state => Patriot::JobStore::JobState::SUSPEND, :produce => ['p']})
-      @job5 = TestEnvirionment.build_job({:job_id => 'j5', :state => Patriot::JobStore::JobState::SUSPEND, :require => ['p']})
+      @job1 = TestEnvironment.build_job({:job_id => 'j1', :state => Patriot::JobStore::JobState::SUSPEND})
+      @job2 = TestEnvironment.build_job({:job_id => 'j2', :state => Patriot::JobStore::JobState::FAILED})
+      @job3 = TestEnvironment.build_job({:job_id => 'j3', :state => Patriot::JobStore::JobState::FAILED})
+      @job4 = TestEnvironment.build_job({:job_id => 'j4', :state => Patriot::JobStore::JobState::SUSPEND, :produce => ['p']})
+      @job5 = TestEnvironment.build_job({:job_id => 'j5', :state => Patriot::JobStore::JobState::SUSPEND, :require => ['p']})
       @job_store.register(@update_id, [@job1, @job2, @job3, @job4, @job5])
     end
 
@@ -142,12 +142,12 @@ describe <%= job_store_class %> do
       @node      = 'dummy_node'
       @host      = 'dummy_host'
       @job_store = <%= job_store_class %>.new("root", @config)
-      @job       = TestEnvirionment.build_job({})
+      @job       = TestEnvironment.build_job({})
       @job_ticket = Patriot::JobStore::JobTicket.new(@job.job_id, @update_id)
-      @skip_on_fail_job        = TestEnvirionment.build_job({:post_processors => [Patriot::Command::PostProcessor::SkipOnFail.new]})
+      @skip_on_fail_job        = TestEnvironment.build_job({:post_processors => [Patriot::Command::PostProcessor::SkipOnFail.new]})
       @skip_on_fail_job_ticket = Patriot::JobStore::JobTicket.new(@skip_on_fail_job.job_id, @update_id)
-      @p_job     = TestEnvirionment.build_job({:job_id => 'with_node', :node => @node, :produce => ['p']})
-      @c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      @p_job     = TestEnvironment.build_job({:job_id => 'with_node', :node => @node, :produce => ['p']})
+      @c_job     = TestEnvironment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
       @job_store.register(@update_id, [@job, @skip_on_fail_job,  @p_job, @c_job])
     end
 
@@ -160,12 +160,12 @@ describe <%= job_store_class %> do
 
     it "should reregister job with keeping state" do
       update_id = Time.now.to_i
-      c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      c_job     = TestEnvironment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
       c_job[Patriot::Command::STATE_ATTR] = Patriot::JobStore::JobState::SUSPEND
       @job_store.register(update_id, [c_job])
       c_job = @job_store.get(@c_job.job_id)
       expect(c_job[Patriot::Command::STATE_ATTR]).to eq Patriot::JobStore::JobState::SUSPEND
-      c_job     = TestEnvirionment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
+      c_job     = TestEnvironment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
       c_job.delete(Patriot::Command::STATE_ATTR)
       @job_store.register(update_id, [c_job])
       c_job = @job_store.get(@c_job.job_id)
@@ -177,7 +177,7 @@ describe <%= job_store_class %> do
       job = @job_store.get(@p_job.job_id)
       expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq @node
       expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
-      job = TestEnvirionment.build_job({:job_id => 'with_node', :produce => ['p']})
+      job = TestEnvironment.build_job({:job_id => 'with_node', :produce => ['p']})
       @job_store.register(update_id, [job])
       job = @job_store.get(@p_job.job_id)
       expect(job[Patriot::Command::EXEC_NODE_ATTR]).to be nil
@@ -187,7 +187,7 @@ describe <%= job_store_class %> do
       job = @job_store.get(@c_job.job_id)
       expect(job[Patriot::Command::EXEC_HOST_ATTR]).to eq @host
       expect(job[Patriot::Command::PRIORITY_ATTR]).to eq Patriot::JobStore::DEFAULT_PRIORITY
-      job = TestEnvirionment.build_job({:job_id => 'with_host', :require => ['c']})
+      job = TestEnvironment.build_job({:job_id => 'with_host', :require => ['c']})
       @job_store.register(update_id, [job])
       job = @job_store.get(@c_job.job_id)
       expect(job[Patriot::Command::EXEC_HOST_ATTR]).to be nil
@@ -265,17 +265,17 @@ describe <%= job_store_class %> do
 
     it "should delete a consumer job from db" do
       job_id = @c_job.job_id
-      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].keys).to include(job_id)
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].map{|c| c["job_id"]}).to include(job_id)
       @job_store.delete_job(job_id)
-      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].keys).not_to include(job_id)
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].map{|c| c["job_id"]}).not_to include(job_id)
       expect(@job_store.get(job_id)).to be nil
     end
 
     it "should delete a producer job from db" do
       job_id = @p_job.job_id
-      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].keys).to include(job_id)
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].map{|p| p["job_id"]}).to include(job_id)
       @job_store.delete_job(job_id)
-      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].keys).not_to include(job_id)
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].map{|p| p["job_id"]}).not_to include(job_id)
       expect(@job_store.get(job_id)).to be nil
     end
 
@@ -305,7 +305,7 @@ EOJ
     end
 
     it "sholud not destroy input to be retriable" do
-      job = TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :node => 'node'})
+      job = TestEnvironment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :node => 'node'})
       job_id = job.job_id
       expect(job[Patriot::Command::EXEC_NODE_ATTR]).to eq 'node'
       @job_store.register(Time.now.to_i, [job])
@@ -318,42 +318,42 @@ EOJ
   describe 'dependency management' do
     before :each do
       @job_store = <%= job_store_class %>.new("root", @config)
-      @producer1 = TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})
-      @consumer1 = TestEnvirionment.build_job({:job_id => 'c1', :command => 'echo \'c1\'', :require => ['1']})
-      @producer2 = TestEnvirionment.build_job({:job_id => 'p2', :command => 'echo \'p2\'', :produce => ['2']})
-      @consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
+      @producer1 = TestEnvironment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})
+      @consumer1 = TestEnvironment.build_job({:job_id => 'c1', :command => 'echo \'c1\'', :require => ['1']})
+      @producer2 = TestEnvironment.build_job({:job_id => 'p2', :command => 'echo \'p2\'', :produce => ['2']})
+      @consumer2 = TestEnvironment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
       jobs = [@producer1,@producer2,@consumer1,@consumer2]
       @job_store.register(Time.now.to_i, jobs)
     end
 
     it "sholud not destroy dependency when producers are reregistered" do
-      jobs = [TestEnvirionment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})]
+      jobs = [TestEnvironment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
-      expect(job['consumers'].keys).to include(@consumer1.job_id)
+      expect(job['consumers'].map{|c| c["job_id"]}).to include(@consumer1.job_id)
     end
 
     it "sholud remove the deprecated dependency " do
-      consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
+      consumer2 = TestEnvironment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
       consumer2['requisites'] << "1"
       consumer2['requisites'].delete("2")
       jobs = [consumer2]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer2.job_id, :include_dependency => true)
-      expect(job['consumers']).not_to include(@consumer2.job_id)
+      expect(job['consumers'].map{|c| c["job_id"]}).not_to include(@consumer2.job_id)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
-      expect(job['consumers']).to include(@consumer2.job_id)
+      expect(job['consumers'].map{|c| c["job_id"]}).to include(@consumer2.job_id)
     end
 
     it "sholud clear dependency " do
-      consumer1 = TestEnvirionment.build_job({:job_id => 'c1', :command => 'echo \'c1\''})
+      consumer1 = TestEnvironment.build_job({:job_id => 'c1', :command => 'echo \'c1\''})
       consumer1['requisites'] = []
       jobs = [consumer1]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
       expect(job['consumers']).not_to include(@consumer1.job_id)
 
-      consumer2 = TestEnvirionment.build_job({:job_id => 'c2', :command => 'echo \'c2\''})
+      consumer2 = TestEnvironment.build_job({:job_id => 'c2', :command => 'echo \'c2\''})
       consumer2['requisites'] = nil
       jobs = [consumer2]
       @job_store.register(Time.now.to_i, jobs)
