@@ -7,7 +7,8 @@ pkg
 batch
 run
 script
-public
+/public
+/skel/public/js/patriot-workflow-scheduler-*.js
 
 # ignore plugins
 plugins/*
