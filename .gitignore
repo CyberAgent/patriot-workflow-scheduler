@@ -7,7 +7,8 @@ pkg
 batch
 run
 script
-public
+/public
+/skel/public/js/patriot-workflow-scheduler-*.js
 
 # ignore plugins
 plugins/*
@@ -15,6 +16,9 @@ plugins/*
 !plugins/patriot-sqlite3-client
 !plugins/patriot-gcp
 !plugins/patriot-hadoop
+
+# NPM modules
+node_modules
 
 # YARD artifacts
 .yardoc

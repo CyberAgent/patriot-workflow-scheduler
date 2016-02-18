@@ -147,7 +147,7 @@ module Patriot
         }.compact.flatten
         consumers = get_consumers(products)
         while !consumers.empty?
-          jobs = consumers.map{|job| get_job(job["job_id"])}.compact
+          jobs = consumers.map{|job| get_job(job[:job_id])}.compact
           yield self, jobs
           products = jobs.map{|j| j[Patriot::Command::PRODUCTS_ATTR]}.compact.flatten
           consumers = get_consumers(products)
