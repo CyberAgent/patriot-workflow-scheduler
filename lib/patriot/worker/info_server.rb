@@ -1,3 +1,5 @@
+require 'thin'
+
 module Patriot
   module Worker
     # info server (web management console and for monitoring)
@@ -16,7 +18,8 @@ module Patriot
       # configuration key for rack handler used to start this server
       RACK_HANDLER_KEY   = 'info_server.rack.handler'
       # default rack handler
-      DEFAULT_RACK_HANDLER = 'Rack::Handler::WEBrick'
+      # DEFAULT_RACK_HANDLER = 'Rack::Handler::WEBrick'
+      DEFAULT_RACK_HANDLER = 'Rack::Handler::Thin'
 
       include Patriot::Util::Config
       include Patriot::Util::Logger
@@ -47,9 +50,10 @@ module Patriot
             @handler.run app, {:Port => @port, :Host => '0.0.0.0'}
           rescue => e
             @logger.error e
+            raise e
           end
         end
-        @logger.info "info server has started"
+        @logger.info "info server has started with #{@handler.class}"
         return true
       end
 

@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "patriot-workflow-scheduler"
 
-  s.files         = Dir.glob("{lib,skel,bin}/**/*") 
+  s.files         = Dir.glob("{lib,skel,bin}/**/*")
   # s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = ["patriot-init"]
   s.require_paths = ["lib"]
@@ -30,4 +30,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'sinatra-contrib', '~>1.4'
   s.add_dependency 'mail', '~>2.6'
   s.add_dependency 'tilt', '~>1.4'
+  s.add_dependency 'thin', '~>1.6'
 end
