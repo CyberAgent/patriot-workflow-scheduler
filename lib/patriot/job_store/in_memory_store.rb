@@ -29,26 +29,28 @@ module Patriot
       def register(update_id, jobs)
         jobs.each{|job| raise "#{job.job_id} is not acceptable" unless acceptable?(job) }
         @mutex.synchronize do
-          jobs.each do |job|
-            job_id        = job.job_id.to_sym
-            job.update_id = update_id
-            if @jobs.has_key?(job_id) # update
-              job[Patriot::Command::STATE_ATTR] ||= @jobs[job_id][Patriot::Command::STATE_ATTR]
-            else # insert
-              # set default state
-              job[Patriot::Command::STATE_ATTR] ||= Patriot::JobStore::JobState::INIT
-            end
-            @jobs[job_id]      = job
-            @producers[job_id] = job[Patriot::Command::PRODUCTS_ATTR] || []
-            @consumers[job_id] = job[Patriot::Command::REQUISITES_ATTR] || []
-            if job[Patriot::Command::STATE_ATTR] == Patriot::JobStore::JobState::INIT
-              _set_state(job_id, Patriot::JobStore::JobState::WAIT)
-            else
-              _set_state(job_id, job[Patriot::Command::STATE_ATTR])
-            end
-          end
+          jobs.each {|job| _upsert(update_id, job) }
         end
       end
+
+      def _upsert(update_id, job)
+        job_id        = job.job_id.to_sym
+        job.update_id = update_id
+        if @jobs.has_key?(job_id) # update
+          job[Patriot::Command::STATE_ATTR] ||= @jobs[job_id][Patriot::Command::STATE_ATTR]
+        else # insert
+          job[Patriot::Command::STATE_ATTR] ||= Patriot::JobStore::JobState::INIT
+        end
+        @jobs[job_id]      = job
+        @producers[job_id] = job[Patriot::Command::PRODUCTS_ATTR] || []
+        @consumers[job_id] = job[Patriot::Command::REQUISITES_ATTR] || []
+        if job[Patriot::Command::STATE_ATTR] == Patriot::JobStore::JobState::INIT
+          _set_state(job_id, Patriot::JobStore::JobState::WAIT)
+        else
+          _set_state(job_id, job[Patriot::Command::STATE_ATTR])
+        end
+      end
+      private :_upsert
 
       # @see Patriot::JobStore::Base#acceptable?
       def acceptable?(job)

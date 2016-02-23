@@ -58,10 +58,11 @@ module Patriot
 
       # @see Patriot::JobStore::Base#register
       def register(update_id, jobs)
+        jobs = [jobs] unless jobs.is_a? Array
         jobs.each{|job| raise "#{job.job_id} is not acceptable" unless acceptable?(job) }
         @logger.info "start to register jobs"
         connect(@db_config) do |c|
-          jobs.each{|job| upsert_job(update_id, job, c)}
+          jobs.each{|job| _upsert_job(update_id, job, c)}
           c.update(JOB_TABLE,
                    {:state => Patriot::JobStore::JobState::WAIT},
                    {:state => Patriot::JobStore::JobState::INIT, :update_id => update_id}
@@ -70,7 +71,7 @@ module Patriot
         @logger.info "job registration finished"
       end
 
-      def upsert_job(update_id, job, c)
+      def _upsert_job(update_id, job, c)
         new_vals = {:job_id => job.job_id, :update_id => update_id, :priority => DEFAULT_PRIORITY}
         job_attr = job.attributes.dup
         # extract and remove command attributes
@@ -97,14 +98,14 @@ module Patriot
 
         raise "failed to upsert a job #{j}" if serial_id.nil?
 
-        update_dependency(serial_id, requisites, CONSUMER_TABLE, c)
-        update_dependency(serial_id, products,   PRODUCER_TABLE, c)
+        _update_dependency(serial_id, requisites, CONSUMER_TABLE, c)
+        _update_dependency(serial_id, products,   PRODUCER_TABLE, c)
         # set dependency for initiator jobs
         c.insert(FLOW_TABLE, {:producer_id => @initiator_id, :consumer_id => serial_id}, {:ignore => true}) if requisites.empty?
       end
-      private :upsert_job
+      private :_upsert_job
 
-      def update_dependency(serial_id, updated_products, updated_table, conn)
+      def _update_dependency(serial_id, updated_products, updated_table, conn)
         raise "unknown dependency table #{updated_table}" unless [CONSUMER_TABLE, PRODUCER_TABLE].include?(updated_table)
         updated_col    = updated_table == CONSUMER_TABLE ? :consumer_id : :producer_id
         opposite_table = updated_table == CONSUMER_TABLE ? PRODUCER_TABLE  : CONSUMER_TABLE
@@ -126,7 +127,7 @@ module Patriot
           end
         end
       end
-      private :update_dependency
+      private :_update_dependency
 
       # @see Patriot::JobStore::Base#acceptable?
       def acceptable?(job)
@@ -143,7 +144,7 @@ module Patriot
       def get_job_tickets(host, nodes, options = {})
         nodes = [nodes] unless nodes.is_a?(Array)
         begin
-          query = generate_fetching_job_sql(host, nodes,options)
+          query = _generate_fetching_job_sql(host, nodes,options)
           @logger.debug "fetchings job by #{query}"
           connect(@db_config) do |c|
             return c.execute_statement(query).map{|r| Patriot::JobStore::JobTicket.new(r.job_id, r.update_id, r.node) }
@@ -154,7 +155,7 @@ module Patriot
         end
       end
 
-      def generate_fetching_job_sql(host, nodes, options)
+      def _generate_fetching_job_sql(host, nodes, options)
         node_condition = (nodes.map{|n| "c.node = '#{n}'" } | ["c.node IS NULL"]).join(" OR ")
         query          = <<"END_OB_QUERY"
           SELECT c.#{TICKET_COLUMNS[0]}, c.#{TICKET_COLUMNS[1]}, c.#{TICKET_COLUMNS[2]}
@@ -172,7 +173,7 @@ END_OB_QUERY
         query = "#{query} LIMIT #{options[:fetch_limit]} " if options.has_key?(:fetch_limit)
         return query.gsub(/(\r|\n|\s+)/, ' ')
       end
-      private :generate_fetching_job_sql
+      private :_generate_fetching_job_sql
 
       # @see Patriot::JobStore::Base#offer_to_execute
       def offer_to_execute(job_ticket)
@@ -190,7 +191,7 @@ END_OB_QUERY
           record = c.select(JOB_TABLE, {:job_id => job_ticket.job_id})
           raise "duplicated entry found for #{job_ticket}" if record.size > 1
           raise "no entry found for #{job_ticket}" if record.empty?
-          job = record_to_job(record[0])
+          job = _record_to_job(record[0])
           begin
             return {:execution_id => execution_id, :command => job.to_command(@config)}
           rescue Exception => e
@@ -243,7 +244,7 @@ END_OB_QUERY
           raise "duplicate job_ticket for #{job_id}" unless records.size == 1
           record = records[0]
           serial_id = record.to_hash[:id]
-          job = record_to_job(record)
+          job = _record_to_job(record)
           job[Patriot::Command::PRODUCTS_ATTR] = c.select(PRODUCER_TABLE, {:job_id => serial_id}).map{|r| r.product}
           job[Patriot::Command::REQUISITES_ATTR] = c.select(CONSUMER_TABLE, {:job_id => serial_id}).map{|r| r.product}
           return job
@@ -338,7 +339,7 @@ END_OB_QUERY
         end
       end
 
-      def record_to_job(record)
+      def _record_to_job(record)
         job = Patriot::JobStore::Job.new(record.job_id)
         job.update_id = record.update_id
         ATTR_TO_COLUMN.each{|attr, col| job[attr] = record.send(col) }
@@ -348,7 +349,7 @@ END_OB_QUERY
         end
         return job
       end
-      private :record_to_job
+      private :_record_to_job
     end
   end
 end
