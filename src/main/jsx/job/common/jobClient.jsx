@@ -78,7 +78,6 @@ module.exports = {
         if (res.statusCode == 200) callback(data);
       });
     }).on("error", function(e) {
-      console.log("Got error: " + e.message);
       alert(e.message);
     });
   }
