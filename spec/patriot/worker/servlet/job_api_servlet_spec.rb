@@ -216,14 +216,14 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait1_2015-04-01'].get()
       )).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
 
-      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].patch(
+      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::SUSPEND}), {:content_type => :json}
       ))).to contain_exactly({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
 
       expect(JSON.parse(@client['/sh_job_wait1_2015-04-01'].get()
       )).to include({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
 
-      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].patch(
+      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::WAIT}), {:content_type => :json}
       ))).to contain_exactly({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
 
@@ -237,7 +237,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
             ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
 
-      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].patch(
+      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::SUSPEND, :option => { :with_subsequent => true }}),
         {:content_type => :json}
       ))).to contain_exactly({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND},
@@ -248,7 +248,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
             ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
 
-      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].patch(
+      expect(JSON.parse(@client_auth['/sh_job_wait1_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::WAIT, :option => { :with_subsequent => false }}),
         {:content_type => :json}
       ))).to contain_exactly({"job_id" => "sh_job_wait1_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
@@ -258,7 +258,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
             ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
 
-      expect(JSON.parse(@client_auth['/sh_job_wait2_2015-04-01'].patch(
+      expect(JSON.parse(@client_auth['/sh_job_wait2_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::WAIT, :option => { :with_subsequent => false }}),
         {:content_type => :json}
       ))).to eq([{"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT}])
@@ -276,7 +276,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
             ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::WAIT})
 
-      expect(JSON.parse(@client_auth['/'].patch(
+      expect(JSON.parse(@client_auth['/'].put(
         JSON.generate({:job_ids => ["sh_job_wait1_2015-04-01", "sh_job_wait2_2015-04-01"],
                        :state => Patriot::JobStore::JobState::SUSPEND}),
         {:content_type => :json}
@@ -288,7 +288,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       expect(JSON.parse(@client['/sh_job_wait2_2015-04-01'].get())
             ).to include({"job_id" => "sh_job_wait2_2015-04-01", "state" => Patriot::JobStore::JobState::SUSPEND})
 
-      expect(JSON.parse(@client_auth['/'].patch(
+      expect(JSON.parse(@client_auth['/'].put(
         JSON.generate({:job_ids => ["sh_job_wait1_2015-04-01", "sh_job_wait2_2015-04-01"],
                        :state => Patriot::JobStore::JobState::WAIT}),
         {:content_type => :json}
@@ -322,8 +322,8 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       }.to raise_error(RestClient::ResourceNotFound)
     end
 
-    it "should raise an error when calling patch with unexisitng job_id" do
-      expect{@client_auth['/sh_never_match_2015-04-01'].patch(
+    it "should raise an error when calling put with unexisitng job_id" do
+      expect{@client_auth['/sh_never_match_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::SUSPEND}), {:content_type => :json}
       )}.to raise_error(RestClient::ResourceNotFound)
     end
@@ -344,8 +344,8 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       )}.to raise_error(RestClient::Unauthorized)
     end
 
-    it "should raise an error when calling patch without auth" do
-      expect{@client['/sh_job_wait1_2015-04-01'].patch(
+    it "should raise an error when calling put without auth" do
+      expect{@client['/sh_job_wait1_2015-04-01'].put(
         JSON.generate({:state => Patriot::JobStore::JobState::SUSPEND}), {:content_type => :json}
       )}.to raise_error(RestClient::Unauthorized)
     end

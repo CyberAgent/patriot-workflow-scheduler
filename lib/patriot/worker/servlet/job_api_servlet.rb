@@ -81,7 +81,7 @@ module Patriot
           return JSON.generate({:job_id => job.job_id})
         end
 
-        patch '/' do
+        put '/' do
           protected!
           body = JSON.parse(request.body.read)
           job_ids = body["job_ids"]
@@ -90,7 +90,7 @@ module Patriot
           return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id, "state" => state} })
         end
 
-        patch '/:job_id' do
+        put '/:job_id' do
           protected!
           job_id = params['job_id']
           job = @@job_store.get(job_id)
