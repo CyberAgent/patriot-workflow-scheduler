@@ -57,7 +57,7 @@ module.exports = React.createClass({
     this.updateJobs(jobIds, {state: this.state.postState}, {}, function(){
       hashHistory.push(this.props.path);
     }.bind(this));
-    this.setState({updateModalIsOpen : false });
+    this.setState({updateModalIsOpen : false, selected : {}, allChecked: false });
   },
   handleDelete: function(){
     var jobIds = this.getSelectedJobIds();
@@ -75,7 +75,7 @@ module.exports = React.createClass({
     this.deleteJobs(jobIds, {}, function(){
       hashHistory.push(this.props.path);
     }.bind(this));
-    this.setState({deleteModalIsOpen : false });
+    this.setState({deleteModalIsOpen : false, selected : {}, allChecked: false });
   },
   getSelectedJobIds: function(){
     var jobIds = [];
