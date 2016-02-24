@@ -34,6 +34,7 @@ module Patriot
       include Patriot::JobStore::Factory
 
       attr_accessor :host, :status, :cycle, :job_store, :config
+      attr_reader :started_at
 
       # @param config [Patriot::Util::Config::Base]
       def initialize(config)
@@ -122,6 +123,7 @@ module Patriot
         File.open(pid_file, 'w') {|f| f.write($$)} # save pid for shutdown
         set_traps
         @info_server.start_server
+        @started_at = Time.now
         @logger.info "initiating worker #{@node}@#{@host}"
         init_worker
         @status = Patriot::Worker::Status::ACTIVE
