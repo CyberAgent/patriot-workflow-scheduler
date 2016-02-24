@@ -28,11 +28,11 @@ module Patriot
     # @abstract
     # base class for worker implementations
     class Base
-      
+
       include Patriot::Util::Logger
       include Patriot::Util::Retry
       include Patriot::JobStore::Factory
-        
+
       attr_accessor :host, :status, :cycle, :job_store, :config
 
       # @param config [Patriot::Util::Config::Base]
@@ -136,7 +136,7 @@ module Patriot
 
       # should be overrided in sub class
       # This method is for implementation-specific configuration
-      def init_worker 
+      def init_worker
         raise NotImplementedError
       end
 

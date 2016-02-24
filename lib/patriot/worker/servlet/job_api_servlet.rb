@@ -39,11 +39,9 @@ module Patriot
           end
         end
 
-
         get '/stats' do
           return JSON.generate(@@job_store.get_job_size(:ignore_states => [Patriot::JobStore::JobState::SUCCEEDED]))
         end
-
 
         get '/' do
           state  = (params['state']  || Patriot::JobStore::JobState::FAILED).to_i
@@ -88,6 +86,15 @@ module Patriot
         end
 
 
+        put '/' do
+          protected!
+          body = JSON.parse(request.body.read)
+          job_ids = body["job_ids"]
+          state = body['state']
+          set_state_of_jobs(job_ids, state)
+          return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id, "state" => state} })
+        end
+
         put '/:job_id' do
           protected!
           job_id = params['job_id']
@@ -96,10 +103,24 @@ module Patriot
 
           body = JSON.parse(request.body.read)
           state = body['state']
-          set_state_of_jobs([job_id], state)
-          return JSON.generate({"job_id" => job_id, "state" => state})
+          options = body['option'] || {}
+          job_ids = set_state_of_jobs(job_id, state, options)
+          return JSON.generate(job_ids.map{|jid| {"job_id" => jid, "state" => state}})
         end
 
+        delete '/' do
+          protected!
+          body = request.body.read
+          job_ids = []
+          if body != ''
+            body = JSON.parse(body)
+            job_ids = body["job_ids"]
+          else
+            job_ids = JSON.parse(params["job_ids"])
+          end
+          job_ids.each{ |job_id| @@job_store.delete_job(job_id) }
+          return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id} })
+        end
 
         delete '/:job_id' do
           protected!
@@ -111,21 +132,25 @@ module Patriot
           return JSON.generate({"job_id" => job_id})
         end
 
-
         error JobNotFoundException do
           "Job #{env['sinatra.error'].message} is not found"
         end
 
         # @private
         def set_state_of_jobs(job_ids, state, opts = {})
-          opts = {:include_subsequent => false}.merge(opts)
+          job_ids = [job_ids] unless job_ids.is_a? Array
+          opts = {'with_subsequent' => false}.merge(opts)
           update_id = Time.now.to_i
           @@job_store.set_state(update_id, job_ids, state)
-          if opts[:include_subsequent]
+          if opts['with_subsequent']
             @@job_store.process_subsequent(job_ids) do |job_store, jobs|
-              @@job_store.set_state(update_id, jobs.map(&:job_id), state)
+              next if jobs.empty?
+              subsequent_ids = jobs.map(&:job_id)
+              @@job_store.set_state(update_id, subsequent_ids, state)
+              job_ids |= subsequent_ids
             end
           end
+          return job_ids.uniq
         end
         private :set_state_of_jobs
 

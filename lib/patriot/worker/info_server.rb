@@ -1,3 +1,5 @@
+require 'thin'
+
 module Patriot
   module Worker
     # info server (web management console and for monitoring)
@@ -16,7 +18,8 @@ module Patriot
       # configuration key for rack handler used to start this server
       RACK_HANDLER_KEY   = 'info_server.rack.handler'
       # default rack handler
-      DEFAULT_RACK_HANDLER = 'Rack::Handler::WEBrick'
+      # DEFAULT_RACK_HANDLER = 'Rack::Handler::WEBrick'
+      DEFAULT_RACK_HANDLER = 'Rack::Handler::Thin'
 
       include Patriot::Util::Config
       include Patriot::Util::Logger
@@ -44,12 +47,13 @@ module Patriot
             @handler = eval(@config.get(RACK_HANDLER_KEY, DEFAULT_RACK_HANDLER))
             app = Rack::URLMap.new(get_url_map)
             app = Rack::CommonLogger.new(app, build_access_logger)
-            @handler.run app, {:Port => @port, :Host => '0.0.0.0'}
+            # TODO set options based on Handler type
+            @handler.run app, {:Port => @port, :Host => '0.0.0.0', :signals => false}
           rescue => e
             @logger.error e
           end
         end
-        @logger.info "info server has started"
+        @logger.info "info server has started with #{@handler.class}"
         return true
       end
 
@@ -57,7 +61,8 @@ module Patriot
       def get_url_map
         urls = @config.get(URLS_KEY, nil)
         if urls.nil?
-          urlmap = {"/jobs"   => Patriot::Worker::Servlet::JobServlet,
+          urlmap = {"/"       => Patriot::Worker::Servlet::IndexServlet,
+                    "/jobs"   => Patriot::Worker::Servlet::JobServlet,
                     "/api/v1/jobs" => Patriot::Worker::Servlet::JobAPIServlet,
                     "/worker" => Patriot::Worker::Servlet::WorkerStatusServlet}
         else
@@ -83,8 +88,13 @@ module Patriot
       def shutdown_server
         return false if @server.nil?
         unless @server_thread.nil?
-          @handler.shutdown
-          @logger.info "info server shutdowned"
+          begin
+            @handler.shutdown
+            @logger.info "info server shutdowned"
+          rescue => e
+            @logger.error "failed to shutdown infoserver", e
+            raise e
+          end
         end
       end
 
