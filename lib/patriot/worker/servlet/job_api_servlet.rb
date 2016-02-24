@@ -54,14 +54,12 @@ module Patriot
           return JSON.generate(job_ids.map{|job_id| {:job_id => job_id, :state => state}})
         end
 
-
         get '/:job_id' do
           job_id = params[:job_id]
           job = @@job_store.get(job_id, {:include_dependency => true})
           halt(404, json({ERROR: "Job #{job_id} not found"})) if job.nil?
           return JSON.generate(job.attributes.merge({'job_id' => job_id, "update_id" => job.update_id}))
         end
-
 
         get '/:job_id/histories' do
           job_id = params[:job_id]
@@ -70,7 +68,6 @@ module Patriot
           return JSON.generate(histories)
         end
 
-
         post '/' do
           protected!
           body = JSON.parse(request.body.read)
@@ -78,20 +75,18 @@ module Patriot
           halt(400, json({ERROR: "Patriot::Command::CommandGroup is not acceptable"})) if body["COMMAND_CLASS"] == "Patriot::Command::CommandGroup"
           command_class = body.delete("COMMAND_CLASS").gsub(/\./, '::').constantize
 
-          # build_commands returns several jobs only when the class is CommandGroup
-          job = build_commands(command_class, body)[0]
-
+          job = _build_command(command_class, body)[0]
+          job[Patriot::Command::STATE_ATTR] ||= body["state"]
           @@job_store.register(Time.now.to_i, [job])
           return JSON.generate({:job_id => job.job_id})
         end
-
 
         put '/' do
           protected!
           body = JSON.parse(request.body.read)
           job_ids = body["job_ids"]
           state = body['state']
-          set_state_of_jobs(job_ids, state)
+          _set_state_of_jobs(job_ids, state)
           return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id, "state" => state} })
         end
 
@@ -104,7 +99,7 @@ module Patriot
           body = JSON.parse(request.body.read)
           state = body['state']
           options = body['option'] || {}
-          job_ids = set_state_of_jobs(job_id, state, options)
+          job_ids = _set_state_of_jobs(job_id, state, options)
           return JSON.generate(job_ids.map{|jid| {"job_id" => jid, "state" => state}})
         end
 
@@ -137,9 +132,10 @@ module Patriot
         end
 
         # @private
-        def set_state_of_jobs(job_ids, state, opts = {})
+        def _set_state_of_jobs(job_ids, state, opts = {})
           job_ids = [job_ids] unless job_ids.is_a? Array
           opts = {'with_subsequent' => false}.merge(opts)
+          opts = {:include_subsequent => false}.merge(opts)
           update_id = Time.now.to_i
           @@job_store.set_state(update_id, job_ids, state)
           if opts['with_subsequent']
@@ -152,21 +148,10 @@ module Patriot
           end
           return job_ids.uniq
         end
-        private :set_state_of_jobs
+        private :_set_state_of_jobs
 
         # @private
-        def construct_time(exec_date, start_after)
-          return nil if exec_date.blank? && start_after.blank?
-          # set tomorrow as default
-          date = (exec_date || (Date.today + 1).strftime("%Y-%m-%d")).split("-").map(&:to_i)
-          # set midnight as default
-          time = (start_after || "00:00:00").split(":").map(&:to_i)
-          return Time.new(date[0], date[1], date[2], time[0], time[1], time[2])
-        end
-        private :construct_time
-
-        # @private
-        def build_commands(clazz, params)
+        def _build_command(clazz, params)
           _params = params.dup
           _params["target_datetime"] = Date.today
           cmd = clazz.new(@@config)
@@ -175,7 +160,7 @@ module Patriot
           cmds = cmd.build(_params)
           return cmds.map{|c| c.to_job}
         end
-        private :build_commands
+        private :_build_command
 
       end
     end

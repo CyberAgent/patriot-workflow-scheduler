@@ -15,7 +15,6 @@ module.exports = React.createClass({
     this.props.closeHandler();
   },
   render: function() {
-            console.log(this.props);
     return (
       <div>
         <Modal
