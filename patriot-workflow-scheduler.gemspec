@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
-require 'rubygems'
+$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
+require 'patriot/version'
+
 $:.push File.expand_path("../lib", __FILE__)
 
-Gem::Specification.new do |s|
-  s.name        = "patriot-workflow-scheduler"
-  s.version     = "0.8.0.alpha"
+Gem::Specification.new "patriot-workflow-scheduler", Patriot::VERSION do |s|
   s.licenses    = ['Apache License, Version 2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
