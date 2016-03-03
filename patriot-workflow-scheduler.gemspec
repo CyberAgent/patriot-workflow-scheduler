@@ -31,4 +31,5 @@ Gem::Specification.new "patriot-workflow-scheduler", Patriot::VERSION do |s|
   s.add_dependency 'mail', '~>2.6'
   s.add_dependency 'tilt', '~>1.4'
   s.add_dependency 'thin', '~>1.6'
+  s.add_dependency 'rack-rewrite', '~>1.5'
 end

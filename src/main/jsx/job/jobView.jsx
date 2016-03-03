@@ -1,10 +1,9 @@
-var React = require('react');
-var JobList = require('./jobList');
-var JobClient = require('./common/jobClient');
-var JobUtil = require('./common/jobUtil');
-var ChangeJobStateForm = require('./common/changeJobStateForm');
+import React from 'react';
+import JobList from './jobList';
+import JobClient from './common/jobClient';
+import JobUtil from './common/jobUtil';
+import ChangeJobStateForm from './common/changeJobStateForm';
 
-import { hashHistory } from 'react-router'
 import { formatPattern } from 'react-router/lib/PatternUtils';
 
 const commonJobAttributes = [
@@ -14,6 +13,9 @@ const commonJobAttributes = [
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState : function(){
     return {job : {}, history : []};
   },
@@ -32,7 +34,7 @@ module.exports = React.createClass({
     }.bind(this));
   },
   jobUpdateHandler : function(job_ids){
-    hashHistory.push("/job/detail/" + encodeURIComponent(this.props.params.jobId));
+    this.context.router.push("/job/detail/" + encodeURIComponent(this.props.params.jobId));
   },
   render : function(){
     var update_at = new Date(this.state.job.update_id * 1000).toString();

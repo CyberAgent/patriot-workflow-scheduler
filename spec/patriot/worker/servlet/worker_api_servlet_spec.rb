@@ -30,7 +30,18 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
     it "should get list of workers" do
       expect(JSON.parse(@client["/"].get()
       )).to contain_exactly(
-        "test-bat01", "test-bat02"
+       {"host" => "test-bat01", "port" => "36104"},
+       {"host" => "test-bat02", "port" => "36104"}
+      )
+    end
+
+    it "should get information on the worker" do
+      expect(JSON.parse(@client["/this"].get())).to match(
+        "host"       => anything,
+        "version"    => Patriot::VERSION,
+        "class"      => @worker.class.to_s,
+        "started_at" => @worker.started_at,
+        "config"     => {} # TODO
       )
     end
   end

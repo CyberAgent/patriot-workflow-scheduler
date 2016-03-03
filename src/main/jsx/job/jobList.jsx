@@ -1,12 +1,15 @@
-var React = require('react');
-var JobUtil = require('./common/jobUtil');
-var JobClient = require('./common/jobClient');
-var JobChangeConfirmModal = require('./common/jobChangeConfirmModal');
-import { Router, Route, Link, IndexRoute, hashHistory } from 'react-router'
+import React from 'react';
+import JobUtil from './common/jobUtil';
+import JobClient from './common/jobClient';
+import JobChangeConfirmModal from './common/jobChangeConfirmModal';
+import { Router, Route, Link, IndexRoute } from 'react-router'
 import { formatPattern } from 'react-router/lib/PatternUtils';
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState: function(){
     return {
       selected: {},
@@ -55,7 +58,7 @@ module.exports = React.createClass({
   requestUpdate: function(){
     var jobIds = this.getSelectedJobIds();
     this.updateJobs(jobIds, {state: this.state.postState}, {}, function(){
-      hashHistory.push(this.props.path);
+      this.context.router.push(this.props.path);
     }.bind(this));
     this.setState({updateModalIsOpen : false, selected : {}, allChecked: false });
   },
@@ -73,7 +76,7 @@ module.exports = React.createClass({
   requestDelete: function(){
     var jobIds = this.getSelectedJobIds();
     this.deleteJobs(jobIds, {}, function(){
-      hashHistory.push(this.props.path);
+      this.context.router.push(this.props.path);
     }.bind(this));
     this.setState({deleteModalIsOpen : false, selected : {}, allChecked: false });
   },

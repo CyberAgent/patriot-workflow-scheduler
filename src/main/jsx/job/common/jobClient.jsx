@@ -30,7 +30,7 @@ module.exports = {
   },
   updateJobState: function(jobId, state, option, callback){
     jobId = encodeURIComponent(jobId);
-    http.request_with_body(jobId, "PUT", {state : state, option: option}, function(body){
+    http.request_with_body(jobApiPath + jobId, "PUT", {state : state, option: option}, function(body){
       callback(body);
     });
   },

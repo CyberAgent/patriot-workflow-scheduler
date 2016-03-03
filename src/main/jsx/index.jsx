@@ -1,9 +1,9 @@
-var React = require('react');
-var ConfigClient = require('./common/configClient');
+import React from 'react';
+import WorkerClient from './worker/common/workerClient';
 import { Router, Route, Link, IndexRoute, IndexRedirect } from 'react-router'
 
 module.exports = React.createClass({
-  mixins: [ConfigClient],
+  mixins: [WorkerClient],
   getInitialState: function(){
     return {
       version: "",
@@ -14,6 +14,7 @@ module.exports = React.createClass({
   componentWillMount: function(){
     this.getConfig(function(conf){
       this.setState({
+        host: conf["host"],
         version: conf["version"],
         workerClass: conf["class"],
         startedAt: conf["started_at"]
@@ -23,11 +24,14 @@ module.exports = React.createClass({
   render: function () {
     return (
       <div className="container">
-        <ul>
-          <li> VERSION : {this.state.version} </li>
-          <li> CLASS : {this.state.workerClass} </li>
-          <li> STARTED AT : {this.state.startedAt} </li>
-        </ul>
+        <h2> worker @ {this.state.host} </h2>
+        <table className="table table-bordered tabel-striped">
+          <tbody>
+            <tr><td>VERSION :</td><td>{this.state.version} </td></tr>
+            <tr><td>CLASS :</td><td> {this.state.workerClass} </td></tr>
+            <tr><td> STARTED AT :</td><td> {this.state.startedAt} </td></tr>
+          </tbody>
+        </table>
       </div>
       );
   }

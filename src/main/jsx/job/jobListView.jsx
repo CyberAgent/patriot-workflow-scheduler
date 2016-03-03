@@ -1,13 +1,16 @@
-var React = require('react');
-var JobList = require('./jobList');
-var JobUtil = require('./common/jobUtil');
-var JobClient = require('./common/jobClient');
+import React from 'react';
+import JobList from './jobList';
+import JobUtil from './common/jobUtil';
+import JobClient from './common/jobClient';
 
-import { hashHistory, Link } from 'react-router'
+import { Link } from 'react-router'
 import { formatPattern } from 'react-router/lib/PatternUtils';
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState : function(){
     return { offset : 0, limit : 50, jobs : [], filter_exp : "" };
   },
@@ -53,14 +56,18 @@ module.exports = React.createClass({
     var nextOffset = limit > this.state.jobs.length ? offset : offset + limit;
     return (
       <div>
-        <div className="clearfix">
-          <h1> {this.name_of_state(this.props.params.state)} Jobs </h1>
-          <form className="inline">
-            <input className="form-control" type="text" placeholder="filter by job_id" onChange={this.handleUpdateFilter} value={this.state.filter_exp}/>
-            <button className="btn btn-primary" onClick={this.handleFilterSubmit}> search </button>
-          </form>
-        </div>
-        <JobList jobs={this.state.jobs} path={this.props.location.pathname} hasDeleteButton={parseInt(this.props.params.state) == -2} />
+        <h1> {this.name_of_state(this.props.params.state)} Jobs </h1>
+        <form className="form-inline">
+          <div className="row">
+            <div className="col-xs-8">
+              <input className="form-control" style={{width: "100%"}} type="text" placeholder="job_id" onChange={this.handleUpdateFilter} value={this.state.filter_exp}/>
+            </div>
+            <div className="col-xs-2">
+              <button className="form-control btn btn-primary" onClick={this.handleFilterSubmit}> search </button>
+            </div>
+          </div>
+        </form>
+        <JobList jobs={this.state.jobs} history={this.props.history} path={this.props.location.pathname} hasDeleteButton={parseInt(this.props.params.state) == -2} />
         <div className ="pager">
           <ul>
             <li className={offset > 0 ? "previous" : "previous disabled"}>

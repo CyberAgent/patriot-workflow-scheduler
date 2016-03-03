@@ -18,7 +18,9 @@ module.exports = {
     req.end();
   },
   request: function(path, method, callback, options){
-    if(typeof options === "undefined") options ={headers:{}};
+    if(typeof options === "undefined") options ={};
+    if(typeof options.headers === "undefined") options.headers = {};
+    if(typeof options.e_callback === "undefined") options.e_callback = function(e){ alert(e.message); }
     options.path = path;
     options.method = method;
     options.headers["Accept"] = "text/json";
@@ -32,9 +34,7 @@ module.exports = {
         var data = JSON.parse(body);
         if (res.statusCode == 200) callback(data);
       });
-    }).on("error", function(e) {
-      alert(e.message);
-    });
+    }).on("error", options.e_callback);
   }
 }
 

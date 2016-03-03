@@ -1,13 +1,14 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-import { Router, Route, Link, IndexRoute, IndexRedirect } from 'react-router'
-var history = require('react-router').hashHistory
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Router, Route, Link, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 
-var Index = require('./index/index');
-var JobManager = require('./job/jobManager');
-var JobListView = require('./job/jobListView');
-var JobView = require('./job/jobView');
-var WorkerManager = require('./worker/workerManager');
+import Index from './index';
+import JobManager from './job/jobManager';
+import JobListView from './job/jobListView';
+import JobView from './job/jobView';
+
+import WorkerManager from './worker/workerManager';
+import WorkerView from './worker/workerView';
 
 var SchedulerManager = React.createClass({
   getInitialState: function() {
@@ -16,23 +17,25 @@ var SchedulerManager = React.createClass({
   render: function () {
     return (
       <div>
-        <div className="navbar navbar-inverse">
+        <nav className="navbar navbar-inverse">
           <div className="container-fluid">
-            <a href="./" className="navbar-brand">Patriot Workflow Scheduler</a>
-            <Link to="job" className="navbar-brand"> Job </Link>
-            <Link to="worker" className="navbar-brand"> Worker </Link>
+            <div className="navbar-header">
+              <Link to="/" className="navbar-brand">Patriot Workflow Scheduler</Link>
+            </div>
+            <ul className="nav navbar-nav">
+              <li> <Link to="/job"> Job </Link> </li>
+              <li> <Link to="/worker"> Worker </Link> </li>
+            </ul>
           </div>
-        </div>
-        <div>
-          {this.props.children}
-        </div>
+        </nav>
+        {this.props.children}
       </div>
     );
   }
 });
 
 ReactDOM.render((
-  <Router history={history}>
+  <Router history={browserHistory}>
     <Route path="/" component={SchedulerManager}>
       <IndexRoute component={Index} />
       <Route path="job" component={JobManager}>
@@ -41,6 +44,8 @@ ReactDOM.render((
         <Route path="detail/:jobId" component={JobView}/>
       </Route>
       <Route path="worker" component={WorkerManager}>
+        <IndexRedirect to="/worker/this" />
+        <Route path="this" component={WorkerView}/>
       </Route>
     </Route>
  </Router>),
