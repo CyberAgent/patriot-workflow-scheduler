@@ -42,7 +42,7 @@ module.exports = {
   },
   deleteJobs: function(jobIds, options, callback){
     // client and/or server may not support DELETE body
-    var path = jopApiPath + "?job_ids=" + encodeURIComponent(JSON.stringify(jobIds));
+    var path = jobApiPath + "?job_ids=" + encodeURIComponent(JSON.stringify(jobIds));
     http.request_with_body(path, "DELETE", {}, function(body){
       callback(body);
     });
