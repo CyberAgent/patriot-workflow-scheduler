@@ -7,7 +7,7 @@ module Patriot
       # excepton thrown when a woker is not accessible
       class WorkerInaccessibleException < Exception; end
       # provide worker management functionalities
-      class WorkerAPIServlet < Sinatra::Base
+      class WorkerAPIServlet < Patriot::Worker::Servlet::APIServletBase
         register Sinatra::Contrib
 
         HOST_KEY = "host"
@@ -22,31 +22,6 @@ module Patriot
 
         set :show_exceptions, :after_handler
 
-        # @param worker [Patriot::Wokrer::Base]
-        # @param config [Patriot::Util::Config::Base]
-        def self.configure(worker, config)
-          @@worker = worker
-          @@config = config
-          @@username  = config.get(USERNAME_KEY, "")
-          @@password  = config.get(PASSWORD_KEY, "")
-        end
-
-        ### Helper Methods
-        helpers do
-          # require authorization for updating
-          def protected!
-            return if authorized?
-            headers['WWW-Authenticate'] = 'Basic Realm="Admin Only"'
-            halt 401, "Not Authorized"
-          end
-
-          # authorize user (basic authentication)
-          def authorized?
-            @auth ||= Rack::Auth::Basic::Request.new(request.env)
-            return @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [@@username, @@password]
-          end
-        end
-
         get '/' do
           worker_hosts = @@config.get(Patriot::Util::Config::WORKER_HOST_KEY).map do |h|
             h = h.split(":")
@@ -58,6 +33,7 @@ module Patriot
 
         get '/this' do
           return JSON.generate(
+            STATE_KEY => @@worker.status,
             HOST_KEY => @@worker.host,
             VERSION_KEY => Patriot::VERSION,
             CLASS_KEY => @@worker.class.to_s,
@@ -68,11 +44,12 @@ module Patriot
 
         get '/this/state' do
           return JSON.generate(
-            'state' => @@worker.status
+            STATE_KEY => @@worker.status
           )
         end
 
         put '/this/state' do
+          protected!
           new_status = params['status']
           if [Patriot::Worker::Status::ACTIVE, Patriot::Worker::Status::SLEEP ]
             @@worker.status = new_status

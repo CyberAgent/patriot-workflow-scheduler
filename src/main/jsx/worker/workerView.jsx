@@ -17,7 +17,8 @@ module.exports = React.createClass({
         host: conf["host"],
         version: conf["version"],
         workerClass: conf["class"],
-        startedAt: conf["started_at"]
+        startedAt: conf["started_at"],
+        state: conf["state"]
       });
     }.bind(this))
   },
@@ -30,6 +31,7 @@ module.exports = React.createClass({
             <tr><td>VERSION :</td><td>{this.state.version} </td></tr>
             <tr><td>CLASS :</td><td> {this.state.workerClass} </td></tr>
             <tr><td> STARTED AT :</td><td> {this.state.startedAt} </td></tr>
+            <tr><td> STATE :</td><td> {this.state.state} </td></tr>
           </tbody>
         </table>
       </div>

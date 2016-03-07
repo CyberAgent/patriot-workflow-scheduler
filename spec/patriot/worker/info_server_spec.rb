@@ -9,6 +9,9 @@ describe  Patriot::Worker::InfoServer do
       port = @config.get(Patriot::Worker::InfoServer::PORT_KEY,
                          Patriot::Worker::InfoServer::DEFAULT_PORT)
       @url = "http://127.0.0.1:#{port}"
+      username  = @config.get(Patriot::Util::Config::USERNAME_KEY, "")
+      password  = @config.get(Patriot::Util::Config::PASSWORD_KEY, "")
+      @auth = 'Basic ' + Base64.encode64("#{username}:#{password}").chomp
       @worker = Patriot::Worker::MultiNodeWorker.new(@config)
       @job1 = TestEnvironment.build_job()
       @job2 = TestEnvironment.build_job()
@@ -32,7 +35,8 @@ describe  Patriot::Worker::InfoServer do
       it "should controll status (to be modified)" do
         expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::ACTIVE
         expect(RestClient.get("#{@url}/worker")).to match Patriot::Worker::Status::ACTIVE
-        RestClient.put("#{@url}/worker", :status => Patriot::Worker::Status::SLEEP)
+        resource = RestClient::Resource.new("#{@url}/worker/status")
+        resource.put({:status => Patriot::Worker::Status::SLEEP}, :Authorization => @auth )
         expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::SLEEP
         expect(RestClient.get("#{@url}/worker")).to match Patriot::Worker::Status::SLEEP
       end
@@ -40,7 +44,8 @@ describe  Patriot::Worker::InfoServer do
       it "should controll worker status" do
         expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::ACTIVE
         expect(RestClient.get("#{@url}/worker/status")).to match Patriot::Worker::Status::ACTIVE
-        RestClient.put("#{@url}/worker/status", :status => Patriot::Worker::Status::SLEEP)
+        resource = RestClient::Resource.new("#{@url}/worker/status")
+        resource.put({:status => Patriot::Worker::Status::SLEEP}, :Authorization => @auth )
         expect(@worker.instance_variable_get(:@status)).to eq Patriot::Worker::Status::SLEEP
         expect(RestClient.get("#{@url}/worker/status")).to match Patriot::Worker::Status::SLEEP
       end

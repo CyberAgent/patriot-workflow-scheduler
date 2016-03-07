@@ -28,7 +28,7 @@ module.exports = React.createClass({
                 <td><Link to="/worker/this">this worker</Link></td>
               </tr>
               {this.state.workers.map(function(w){
-                var addr = "http://" + w.host + ":" + w.port;
+                var addr = "http://" + w.host + ":" + w.port + "/worker/this";
                 return (<tr key={w.host}><td><a href={addr} > {w.host} </a></td></tr>);
               })}
             </tbody>

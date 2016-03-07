@@ -1,4 +1,5 @@
 require 'rest_client'
+require 'base64'
 
 module Patriot
   module Controller
@@ -18,6 +19,9 @@ module Patriot
         @config = config
         @logger = create_logger(config)
         set_default_values
+        username  = config.get(Patriot::Util::Config::USERNAME_KEY, "")
+        password  = config.get(Patriot::Util::Config::PASSWORD_KEY, "")
+        @auth = 'Basic ' + Base64.encode64("#{username}:#{password}").chomp
       end
 
       # @private
@@ -90,7 +94,8 @@ module Patriot
       # @param host [String] host name of the target host
       # @param port [String] port number of the worker process on the target host
       def put_worker_status(host, port, new_status)
-        return RestClient.put("http://#{host}:#{port}/worker", :status => new_status)
+        resource = RestClient::Resource.new("http://#{host}:#{port}/worker")
+        return resource.put({:status => new_status}, :Authorization => @auth )
       end
 
       # start target workers

@@ -25,6 +25,12 @@ module Patriot
       # port number used by info server
       INFO_SERVER_PORT_KEY = 'info_server_port'
 
+      # configuratio key for admin user name
+      USERNAME_KEY = 'info_server.admin.username'
+      # configuratio key for admin password
+      PASSWORD_KEY = 'info_server.admin.password'
+
+
       # load configuration file
       # @param option [Hash]
       # @option option :path [String] path to configuration file

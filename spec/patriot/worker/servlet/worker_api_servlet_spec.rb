@@ -37,6 +37,7 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
 
     it "should get information on the worker" do
       expect(JSON.parse(@client["/this"].get())).to match(
+        "state"      => Patriot::Worker::Status::ACTIVE,
         "host"       => anything,
         "version"    => Patriot::VERSION,
         "class"      => @worker.class.to_s,

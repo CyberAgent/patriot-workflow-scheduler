@@ -67,7 +67,7 @@ module.exports = React.createClass({
             </div>
           </div>
         </form>
-        <JobList jobs={this.state.jobs} history={this.props.history} path={this.props.location.pathname} hasDeleteButton={parseInt(this.props.params.state) == -2} />
+        <JobList jobs={this.state.jobs} path={this.props.location.pathname} hasDeleteButton={parseInt(this.props.params.state) == -2} />
         <div className ="pager">
           <ul>
             <li className={offset > 0 ? "previous" : "previous disabled"}>

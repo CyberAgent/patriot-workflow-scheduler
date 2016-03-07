@@ -66,7 +66,7 @@ module.exports = React.createClass({
       producers = (
         <div>
           <h4> Before </h4>
-          <JobList jobs={this.state.job.producers} />
+          <JobList jobs={this.state.job.producers} path={this.props.location.pathname} hasDeleteButton={false} />
         </div>
       );
     }
@@ -74,7 +74,7 @@ module.exports = React.createClass({
       consumers = (
         <div>
           <h4> After </h4>
-          <JobList jobs={this.state.job.consumers} />
+          <JobList jobs={this.state.job.consumers} path={this.props.location.pathname} hasDeleteButton={false} />
         </div>
       );
     }
