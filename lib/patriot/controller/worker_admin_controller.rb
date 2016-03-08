@@ -1,4 +1,5 @@
 require 'rest_client'
+require 'base64'
 
 module Patriot
   module Controller
@@ -18,13 +19,16 @@ module Patriot
         @config = config
         @logger = create_logger(config)
         set_default_values
+        username  = config.get(Patriot::Util::Config::USERNAME_KEY, "")
+        password  = config.get(Patriot::Util::Config::PASSWORD_KEY, "")
+        @auth = 'Basic ' + Base64.encode64("#{username}:#{password}").chomp
       end
 
       # @private
       def set_default_values
-        @default_hosts = @config.get('worker_hosts') || []
-        @default_port  = @config.get('info_server_port')
-        @user          = @config.get('admin_user')
+        @default_hosts = @config.get(WORKER_HOST_KEY) || []
+        @default_port  = @config.get(INFO_SERVER_PORT_KEY)
+        @user          = @config.get(ADMIN_USER_KEY)
       end
       private :set_default_values
 
@@ -32,7 +36,7 @@ module Patriot
       # @param options [Hash]
       # @option options :host  a target host
       # @option options :hosts a comma separated value of target hosts
-      # @option options :all   set true to target all hosts in the configuration 
+      # @option options :all   set true to target all hosts in the configuration
       # @return [Hash] a hash from host name to the result of the block
       def request_to_target_hosts(options = {}, &blk)
         hosts = []
@@ -90,7 +94,8 @@ module Patriot
       # @param host [String] host name of the target host
       # @param port [String] port number of the worker process on the target host
       def put_worker_status(host, port, new_status)
-        return RestClient.put("http://#{host}:#{port}/worker", :status => new_status)
+        resource = RestClient::Resource.new("http://#{host}:#{port}/worker")
+        return resource.put({:status => new_status}, :Authorization => @auth )
       end
 
       # start target workers
@@ -109,13 +114,13 @@ module Patriot
       # @param options @see {#request_to_target_hosts}
       def restart_worker(options = {})
         options = {:interval => 60}.merge(options)
-        target_nodes = request_to_target_hosts(options){|h,p| controll_worker_at(h,'stop')} 
+        target_nodes = request_to_target_hosts(options){|h,p| controll_worker_at(h,'stop')}
         target_nodes.keys.each{|host| target_nodes[host] = true}
 
         port = options.has_key?(:port) ? options[:port] : @default_port
         while(target_nodes.has_value?(true))
           target_nodes.keys.each do |host|
-            next unless target_nodes[host] # skip already started 
+            next unless target_nodes[host] # skip already started
             res = get_worker_status(host,port)
             if res.nil?
               controll_worker_at(host,'start')

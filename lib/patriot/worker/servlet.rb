@@ -10,16 +10,10 @@ module Patriot
       # default offset for searching jobs
       DEFAULT_JOB_OFFSET = 0
 
-      # configuratio key for admin user name
-      USERNAME_KEY = 'info_server.admin.username'
-      # configuratio key for admin password
-      PASSWORD_KEY = 'info_server.admin.password'
-
       require 'patriot/worker/servlet/index_servlet.rb'
-      require 'patriot/worker/servlet/job_servlet.rb' # deprecated to be removed
+      require 'patriot/worker/servlet/api_servlet_base.rb'
       require 'patriot/worker/servlet/job_api_servlet.rb'
-      require 'patriot/worker/servlet/worker_status_servlet.rb'
-
+      require 'patriot/worker/servlet/worker_api_servlet.rb'
     end
   end
 end

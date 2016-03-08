@@ -1,10 +1,9 @@
-var React = require('react');
-var JobList = require('./jobList');
-var JobClient = require('./common/jobClient');
-var JobUtil = require('./common/jobUtil');
-var ChangeJobStateForm = require('./common/changeJobStateForm');
+import React from 'react';
+import JobList from './jobList';
+import JobClient from './common/jobClient';
+import JobUtil from './common/jobUtil';
+import ChangeJobStateForm from './common/changeJobStateForm';
 
-import { hashHistory } from 'react-router'
 import { formatPattern } from 'react-router/lib/PatternUtils';
 
 const commonJobAttributes = [
@@ -14,6 +13,9 @@ const commonJobAttributes = [
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
   getInitialState : function(){
     return {job : {}, history : []};
   },
@@ -23,20 +25,19 @@ module.exports = React.createClass({
   componentWillReceiveProps: function(nextProps){
     this.updateJob(nextProps.params.jobId);
   },
+  componentWillUpdate: function(nextProps, newState){
+  },
   updateJob : function(jobId){
     this.getJob(jobId, function(job){
-      this.setState({job: job});
+      this.getHistory(jobId, 3, function(history){
+        this.setState({job: job, history: history });
+      }.bind(this));
     }.bind(this));
-    this.getHistory(jobId, 3, function(history){
-      this.setState({history: history });
-    }.bind(this));
-  },
-  jobUpdateHandler : function(job_ids){
-    hashHistory.push("/job/detail/" + encodeURIComponent(this.props.params.jobId));
   },
   render : function(){
     var update_at = new Date(this.state.job.update_id * 1000).toString();
     var commandAttributes = [];
+    var tdStyle = {wordWrap:"break-word", wordBreak:"break-all"}
     Object.keys(this.state.job).forEach(function(key){
       if( commonJobAttributes.indexOf(key) < 0 ){
         var obj = this.state.job[key];
@@ -45,7 +46,7 @@ module.exports = React.createClass({
             commandAttributes.push((
               <tr key={key+i}>
                 <td className="original main">{i==0 ? "" : key}</td>
-                <td colSpan="3">{JSON.stringify(e)}</td>
+                <td style={tdStyle} colSpan="3">{JSON.stringify(e)}</td>
               </tr>
             ));
           });
@@ -53,7 +54,7 @@ module.exports = React.createClass({
           commandAttributes.push((
             <tr key={key}>
               <td className="original main">{key}</td>
-              <td colSpan="3">{JSON.stringify(obj)}</td>
+              <td style={tdStyle} colSpan="3">{JSON.stringify(obj)}</td>
             </tr>
           ));
         }
@@ -65,7 +66,7 @@ module.exports = React.createClass({
       producers = (
         <div>
           <h4> Before </h4>
-          <JobList jobs={this.state.job.producers} />
+          <JobList jobs={this.state.job.producers} path={this.props.location.pathname} hasDeleteButton={false} />
         </div>
       );
     }
@@ -73,17 +74,17 @@ module.exports = React.createClass({
       consumers = (
         <div>
           <h4> After </h4>
-          <JobList jobs={this.state.job.consumers} />
+          <JobList jobs={this.state.job.consumers} path={this.props.location.pathname} hasDeleteButton={false} />
         </div>
       );
     }
 
     return (
 <div>
-  <div className="clearfix"><h1>{this.props.params.jobId}</h1></div>
+  <div><h1>{this.props.params.jobId}</h1></div>
   <h3> Job Info. </h3>
-  <ChangeJobStateForm jobId={this.props.params.jobId} currentState={this.state.job.state} completionHandler={this.jobUpdateHandler}/>
-  <table className="table table-bordered">
+  <ChangeJobStateForm jobId={this.props.params.jobId} currentState={this.state.job.state} />
+  <table className="table table-bordered" style={{tableLayout:"fixed"}}>
     <tbody>
       <tr>
         <td className="original main">Command Class</td><td colSpan='3'>{this.state.job.COMMAND_CLASS}</td>

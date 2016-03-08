@@ -45,9 +45,9 @@ module.exports = React.createClass({
     return (
     <div className="container">
       <div className="row">
-        <div className = "col-md-3">
+        <div className = "col-md-3 well well-lg">
           <h3> #Jobs </h3>
-          <table>
+          <table className="table">
             <tbody>
               <tr>
                 <td>Succeeded  :</td><td><Link to="/job/list/0">{this.state.jobStats["0"]}</Link></td>

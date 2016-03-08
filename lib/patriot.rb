@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'active_support'
 
+require 'patriot/version'
 require 'patriot/util'
 require 'patriot/command'
 require 'patriot/job_store'

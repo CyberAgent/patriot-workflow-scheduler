@@ -7,40 +7,15 @@ module Patriot
       # excepton thrown in case job not found
       class JobNotFoundException < Exception; end
       # provide job management functionalities
-      class JobAPIServlet < Sinatra::Base
+      class JobAPIServlet < Patriot::Worker::Servlet::APIServletBase
         register Sinatra::Contrib
         include Patriot::Util::DateUtil
         include Patriot::Command::Parser
 
         set :show_exceptions, :after_handler
 
-        # @param worker [Patriot::Wokrer::Base]
-        # @param config [Patriot::Util::Config::Base]
-        def self.configure(worker, config)
-          @@job_store = worker.job_store
-          @@config = config
-          @@username  = config.get(USERNAME_KEY, "")
-          @@password  = config.get(PASSWORD_KEY, "")
-        end
-
-        ### Helper Methods
-        helpers do
-          # require authorization for updating
-          def protected!
-            return if authorized?
-            headers['WWW-Authenticate'] = 'Basic Realm="Admin Only"'
-            halt 401, "Not Authorized"
-          end
-
-          # authorize user (basic authentication)
-          def authorized?
-            @auth ||= Rack::Auth::Basic::Request.new(request.env)
-            return @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [@@username, @@password]
-          end
-        end
-
         get '/stats' do
-          return JSON.generate(@@job_store.get_job_size(:ignore_states => [Patriot::JobStore::JobState::SUCCEEDED]))
+          return JSON.generate(@@worker.job_store.get_job_size(:ignore_states => [Patriot::JobStore::JobState::SUCCEEDED]))
         end
 
         get '/' do
@@ -50,13 +25,13 @@ module Patriot
 
           query = {:limit  => limit, :offset => offset}
           query[:filter_exp] = params['filter_exp'] unless params['filter_exp'].blank?
-          job_ids = @@job_store.find_jobs_by_state(state, query) || []
+          job_ids = @@worker.job_store.find_jobs_by_state(state, query) || []
           return JSON.generate(job_ids.map{|job_id| {:job_id => job_id, :state => state}})
         end
 
         get '/:job_id' do
           job_id = params[:job_id]
-          job = @@job_store.get(job_id, {:include_dependency => true})
+          job = @@worker.job_store.get(job_id, {:include_dependency => true})
           halt(404, json({ERROR: "Job #{job_id} not found"})) if job.nil?
           return JSON.generate(job.attributes.merge({'job_id' => job_id, "update_id" => job.update_id}))
         end
@@ -64,7 +39,7 @@ module Patriot
         get '/:job_id/histories' do
           job_id = params[:job_id]
           history_size = params['size'] || 3
-          histories = @@job_store.get_execution_history(job_id, {:limit => history_size})
+          histories = @@worker.job_store.get_execution_history(job_id, {:limit => history_size})
           return JSON.generate(histories)
         end
 
@@ -77,7 +52,7 @@ module Patriot
 
           job = _build_command(command_class, body)[0]
           job[Patriot::Command::STATE_ATTR] ||= body["state"]
-          @@job_store.register(Time.now.to_i, [job])
+          @@worker.job_store.register(Time.now.to_i, [job])
           return JSON.generate({:job_id => job.job_id})
         end
 
@@ -93,7 +68,7 @@ module Patriot
         put '/:job_id' do
           protected!
           job_id = params['job_id']
-          job = @@job_store.get(job_id)
+          job = @@worker.job_store.get(job_id)
           halt(404, json({ERROR: "Job #{job_id} not found"})) if job.nil?
 
           body = JSON.parse(request.body.read)
@@ -113,17 +88,17 @@ module Patriot
           else
             job_ids = JSON.parse(params["job_ids"])
           end
-          job_ids.each{ |job_id| @@job_store.delete_job(job_id) }
+          job_ids.each{ |job_id| @@worker.job_store.delete_job(job_id) }
           return JSON.generate(job_ids.map{|job_id| {"job_id" => job_id} })
         end
 
         delete '/:job_id' do
           protected!
           job_id = params['job_id']
-          job = @@job_store.get(job_id)
+          job = @@worker.job_store.get(job_id)
           halt(404, json({ERROR: "Job #{job_id} not found"})) if job.nil?
 
-          @@job_store.delete_job(job_id)
+          @@worker.job_store.delete_job(job_id)
           return JSON.generate({"job_id" => job_id})
         end
 
@@ -137,12 +112,12 @@ module Patriot
           opts = {'with_subsequent' => false}.merge(opts)
           opts = {:include_subsequent => false}.merge(opts)
           update_id = Time.now.to_i
-          @@job_store.set_state(update_id, job_ids, state)
+          @@worker.job_store.set_state(update_id, job_ids, state)
           if opts['with_subsequent']
-            @@job_store.process_subsequent(job_ids) do |job_store, jobs|
+            @@worker.job_store.process_subsequent(job_ids) do |job_store, jobs|
               next if jobs.empty?
               subsequent_ids = jobs.map(&:job_id)
-              @@job_store.set_state(update_id, subsequent_ids, state)
+              @@worker.job_store.set_state(update_id, subsequent_ids, state)
               job_ids |= subsequent_ids
             end
           end

@@ -14,11 +14,22 @@ module Patriot
       # default plugins directory
       DEFAULT_PLUGIN_DIR = "plugins"
       # plugin directory
-      PLUGIN_LIB_DIR = 'lib' 
+      PLUGIN_LIB_DIR = 'lib'
       # plugin initiation script
       PLUGIN_INIT_SCRIPT = 'init.rb'
       # admin user mail address
       ADMIN_USER_KEY = 'admin_user'
+
+      # a comma separated list of hosts where workers are running
+      WORKER_HOST_KEY = 'worker_hosts'
+      # port number used by info server
+      INFO_SERVER_PORT_KEY = 'info_server_port'
+
+      # configuratio key for admin user name
+      USERNAME_KEY = 'info_server.admin.username'
+      # configuratio key for admin password
+      PASSWORD_KEY = 'info_server.admin.password'
+
 
       # load configuration file
       # @param option [Hash]
@@ -26,8 +37,8 @@ module Patriot
       # @option option :type [String] load type (differe by tool)
       # @option option :ignore_plugin [Boolean] set true not to load plugins
       def load_config(option = {})
-        option = {:path => DEFAULT_CONFIG, 
-                  :type => nil, 
+        option = {:path => DEFAULT_CONFIG,
+                  :type => nil,
                   :ignore_plugin => false }.merge(option)
         conf = nil
         case File.extname(option[:path])
