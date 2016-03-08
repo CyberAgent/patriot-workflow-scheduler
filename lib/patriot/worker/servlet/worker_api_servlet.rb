@@ -23,6 +23,8 @@ module Patriot
         set :show_exceptions, :after_handler
 
         get '/' do
+          worker_hosts = @@config.get(Patriot::Util::Config::WORKER_HOST_KEY)
+          worker_hosts = [worker_hosts] unless worker_hosts.is_a?(Array)
           worker_hosts = @@config.get(Patriot::Util::Config::WORKER_HOST_KEY).map do |h|
             h = h.split(":")
             port = h.size == 2 ? h[1] : Patriot::Worker::InfoServer::DEFAULT_PORT
@@ -51,10 +53,10 @@ module Patriot
         put '/this/state' do
           protected!
           new_status = params['status']
-          if [Patriot::Worker::Status::ACTIVE, Patriot::Worker::Status::SLEEP ]
+          if [Patriot::Worker::Status::ACTIVE, Patriot::Worker::Status::SLEEP ].include?(@@worker.status)
             @@worker.status = new_status
           else
-            # state cannot be changed in shotdown process
+            # state cannot be changed in shutdown process
             halt 403
           end
         end
