@@ -1,9 +1,9 @@
 module Patriot
   module Command
     # a command which is composed of multiple sub commands
-    class CompositeCommand < Patriot::Command::CommandGroup 
-      declare_command_name :composite_command 
-      declare_command_name :composite_job 
+    class CompositeCommand < Patriot::Command::CommandGroup
+      declare_command_name :composite_command
+      declare_command_name :composite_job
       private_command_attr :contained_commands => []
       command_attr :name, :name_suffix
 
@@ -27,7 +27,8 @@ module Patriot
         @name_suffix ||= _date_
         # don't do flatten to handle nested composite commands
         @subcommands.map do |cmd|
-           cmd.build(@param).each do |cmd|
+          cmd = cmd.clone
+          cmd.build(@param).each do |cmd|
             _validate_command(cmd)
             require cmd['requisites']
             produce cmd['products']
@@ -43,7 +44,7 @@ module Patriot
         @contained_commands.each do |c|
           c.execute
         end
-      end 
+      end
 
       # @private
       # validate command
