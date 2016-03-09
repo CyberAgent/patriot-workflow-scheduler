@@ -27,6 +27,11 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
       @info_server.shutdown_server
     end
 
+    it "should get a response with application/json" do
+      expect(@client["/"].get().headers[:content_type]
+      ).to eq("application/json;charset=utf8")
+    end
+
     it "should get list of workers" do
       expect(JSON.parse(@client["/"].get()
       )).to contain_exactly(

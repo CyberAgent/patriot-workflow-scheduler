@@ -31,6 +31,9 @@ module Patriot
           @@password  = config.get(Patriot::Util::Config::PASSWORD_KEY, "")
         end
 
+        before do
+          content_type 'application/json;charset=utf8'
+        end
       end
     end
   end
