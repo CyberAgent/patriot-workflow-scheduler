@@ -52,7 +52,7 @@ module Patriot
               # for web console
               rewrite %r{^(?!/api)}, "/"
             }
-            app = Rack::Static.new(app, :urls => ["/js", "/css"], :root => "public")
+            app = Rack::Static.new(app, :urls => ["/js", "/css"], :root => File.join($home, "public"))
             # TODO set options based on Handler type
             @handler.run app, {:Port => @port, :Host => '0.0.0.0', :signals => false}
           rescue => e
