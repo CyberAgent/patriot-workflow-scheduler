@@ -38,6 +38,12 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
     end
 
 
+    it "should get a response with application/json" do
+      expect(@client["/stats"].get().headers[:content_type]
+      ).to eq("application/json;charset=utf8")
+    end
+
+
     it "should get stats" do
       expect(JSON.parse(@client["/stats"].get()
       )).to match_array([
