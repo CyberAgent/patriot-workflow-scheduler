@@ -113,6 +113,14 @@ module Patriot
         raise NotImplementedError
       end
 
+      # get nodes and edges information to render graph
+      # @param  [String]  job_id  JOB ID
+      # @param  [Hash]    opts    options
+      # @return [Array]   [nodes, edges]
+      def get_graph(job_id, opts = {})
+        raise NotImplementedError
+      end
+
       # @param [Patriot::JobStore::JobState] state
       # @param [Hash] opts
       # @option ops [Integer] :limit a max nubmer of jobs fetched at once

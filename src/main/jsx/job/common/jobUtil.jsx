@@ -18,6 +18,7 @@ module.exports = {
     switch(exit_code){
       case 0  : return "SUCCEEDED"
       case 1  : return "FAILED"
+      case null:return ""
       default : return "unknown exit code: " + exit_code
     }
   }

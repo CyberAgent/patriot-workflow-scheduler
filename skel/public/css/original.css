@@ -65,3 +65,115 @@ h1.original {
   width: 12px;
   height: 12px;
 }
+
+.nodeTree .node rect {
+  stroke: #999;
+  fill: #eee;
+  stroke-width: 1px;
+}
+
+.nodeTree .edgePath path {
+  stroke: #333;
+  stroke-width: 1.5px;
+  cursor: pointer;
+}
+
+.nodeTree .node {
+  cursor: pointer;
+}
+
+.nodeTree .job_title {
+  white-space: normal;
+}
+
+.nodeTree .status {
+  height: 45px;
+  width: 30px;
+  display: block;
+  float: left;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  margin: 0 4 0 0;
+}
+
+.status.WAITING {
+  background-color: #77e;
+}
+
+.status.SUCCEEDED {
+  background-color: #7e7;
+}
+
+.status.RUNNING {
+  animation: blink 3s infinite;
+  background-color: #7e7;
+}
+
+.status.SUSPENDED {
+  background-color: #ffc;
+}
+
+.status.FAILED {
+  fill: #f77;
+}
+.status.FAILED {
+  background-color: #f77;
+}
+
+.status.INITIATING {
+  background-color: #777;
+}
+
+.status.DISCARDED {
+  background-color: #000;
+}
+
+.stateExplanation {
+  width: 12px;
+  height:12px;
+  margin: 0 3 0 15;
+  vertical-align: middle;
+  display: inline-block;
+  border: 1px solid #000;
+}
+
+@keyframes blink {
+  0% { background-color: #fff; }
+}
+
+.nodeTree .label {
+  text-align: left;
+  color: #000;
+  font-weight: normal;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+#statePanel {
+  text-align: right;
+  position: absolute;
+  top: 100px;
+  right: 0px;
+  opacity: 0.9;
+  background-color: #fff;
+}
+
+
+table.jobTooltipTable {
+  border: solid 1px #000;
+  z-index: 10;
+  background-color: #e6e6fa;
+  opacity: 0.9;
+}
+
+table.jobTooltipTable th {
+  line-height: 150%;
+  text-align: right;
+  padding: 0 10 0 10;
+}
+
+table.jobTooltipTable td {
+  line-height: 150%;
+  padding: 0 10 0 10;
+}
+

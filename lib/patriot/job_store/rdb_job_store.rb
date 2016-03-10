@@ -238,59 +238,164 @@ END_OB_QUERY
         connect(@db_config){|c| c.execute_statement(stmt, :update)}
       end
 
+      # @param  [String]  job_id  JOB ID
+      # @return [Patriot::JobStore::Job]
       # @see Patriot::JobStore::Base#get_job
       def get_job(job_id)
-        connect(@db_config) do |c|
-          records = c.select(JOB_TABLE, {:job_id => job_id})
-          return nil if records.empty?
-          raise "duplicate job_ticket for #{job_id}" unless records.size == 1
-          record = records[0]
-          serial_id = record.to_hash[:id]
-          job = _record_to_job(record)
-          job[Patriot::Command::PRODUCTS_ATTR] = c.select(PRODUCER_TABLE, {:job_id => serial_id}).map{|r| r.product}
-          job[Patriot::Command::REQUISITES_ATTR] = c.select(CONSUMER_TABLE, {:job_id => serial_id}).map{|r| r.product}
-          return job
-        end
+        connect(@db_config) {|c| return _get_job(job_id, c)}
       end
+
+      # @param  [String]  job_id  JOB ID
+      # @param  [Patriot::Util::DBClient::Base] c
+      # @return [Patriot::JobStore::Job]
+      def _get_job(job_id, c)
+        records = c.select(JOB_TABLE, {:job_id => job_id})
+        return nil if records.empty?
+        raise "duplicate job_ticket for #{job_id}" unless records.size == 1
+        record = records[0]
+        serial_id = record.to_hash[:id]
+        job = _record_to_job(record)
+        job[Patriot::Command::PRODUCTS_ATTR] = c.select(PRODUCER_TABLE, {:job_id => serial_id}).map{|r| r.product}
+        job[Patriot::Command::REQUISITES_ATTR] = c.select(CONSUMER_TABLE, {:job_id => serial_id}).map{|r| r.product}
+        return job
+      end
+      private :_get_job
 
       # @see Patriot::JobStore::Base#get_producers
       def get_producers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
-        return _get_jobs_for_products(PRODUCER_TABLE, products, opts)
+        connect(@db_config) {|c| return _get_jobs_for_products(PRODUCER_TABLE, products, opts, c)}
       end
 
       # @see Patriot::JobStore::Base#get_producers
       def get_consumers(products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
-        return _get_jobs_for_products(CONSUMER_TABLE, products, opts)
+        connect(@db_config) {|c| return _get_jobs_for_products(CONSUMER_TABLE, products, opts, c)}
       end
 
-      def _get_jobs_for_products(table, products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]})
+      def _get_jobs_for_products(table, products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]}, c)
         result = []
         return result if products.blank?
         products = [products] unless products.is_a? Array
         included_cols = (opts[:include_attrs] || []).map{|a| ATTR_TO_COLUMN[a]}
-        connect(@db_config) do |c|
-          products.each do |product|
-            jids = c.select(table, {:product => product}).map{|r| r.job_id}
-            next if jids.empty?
-            included_cols = (['job_id'] | (included_cols || [])).uniq
-            query = "SELECT #{included_cols.join(', ')} FROM jobs WHERE #{jids.map{|jid| "id = #{jid}" }.join(' OR ')}"
-            c.execute_statement(query, :select).each do |r|
-              result.push(r.to_hash)
-            end
+
+        products.each do |product|
+          jids = c.select(table, {:product => product}).map{|r| r.job_id}
+          next if jids.empty?
+          included_cols = (['job_id'] | (included_cols || [])).uniq
+          query = "SELECT #{included_cols.join(', ')} FROM jobs WHERE #{jids.map{|jid| "id = #{jid}" }.join(' OR ')}"
+          c.execute_statement(query, :select).each do |r|
+            result.push(r.to_hash)
           end
         end
         return result.uniq
       end
       private :_get_jobs_for_products
 
-      # @see Patriot::JobStore::JobState
+      # @param  [String]  job_id  JOB ID
+      # @param  [Hash]    opts    options
+      # @return [Hash]    histories
       def get_execution_history(job_id, opts = {})
+        connect(@db_config) {|c| return _get_execution_history(job_id, opts, c)}
+      end
+
+      # @param  [String]  job_id  JOB ID
+      # @param  [Hash]    opts    options
+      # @param  [Patriot::Util::DBClient::Base] c
+      # @return [Hash]    histories
+      def _get_execution_history(job_id, opts, c)
         opts = {:limit => 1, :order => :DESC}.merge(opts)
         query = "SELECT * FROM #{HISTORY_TABLE} WHERE job_id = '#{job_id}' ORDER BY id #{opts[:order]} LIMIT #{opts[:limit]}"
-        connect(@db_config) do |c|
-          return c.execute_statement(query, :select).map(&:to_hash)
+
+        return c.execute_statement(query, :select).map(&:to_hash)
+      end
+      private :_get_execution_history
+
+      # get nodes and edges information to render graph
+      # @param  [String]  job_id  JOB ID
+      # @param  [Hash]    opts    options
+      # @return [Array]   [nodes, edges]
+      def get_graph(job_id, opts = {})
+        connect(@db_config) do |db_conn|
+          job = _get_job(job_id, db_conn)
+
+          job[:consumers] = _get_jobs_for_products(CONSUMER_TABLE, job[Patriot::Command::PRODUCTS_ATTR], opts, db_conn) || []
+          job[:producers] = _get_jobs_for_products(PRODUCER_TABLE, job[Patriot::Command::REQUISITES_ATTR], opts, db_conn) || []
+          history = _get_execution_history(job_id, {}, db_conn)[0]
+
+          hashed_job = {
+            :job_id => job.job_id,
+            :history => history,
+            :depth => 0
+          }.merge(job.attributes)
+
+          # set self node
+          nodes = {job_id => hashed_job}
+          edges = []
+
+          _set_dependency(
+            db_conn,
+            :producers,
+            opts[:producer_depth],
+            nodes,
+            edges,
+            hashed_job
+          )
+
+          _set_dependency(
+            db_conn,
+            :consumers,
+            opts[:consumer_depth],
+            nodes,
+            edges,
+            hashed_job
+          )
+
+          return {:nodes => nodes, :edges => edges}
         end
       end
+
+      # get dependency and set nodes and edges
+      #
+      # @private
+      # @param  [Patriot::Util::DBClient::Base] db_conn
+      # @param  [Symbol]  direction       :producers or :consumers
+      # @param  [Integer] depth           dependency depth to get
+      # @param  [Hash]    nodes           nodes to set for dager-d3
+      # @param  [Array]   edges           edges to set for dager-d3
+      # @param  [Hash]    base_job        base job to get dependency
+      def _set_dependency(db_conn, direction, depth, nodes, edges, base_job)
+        return if nodes[base_job[:job_id]][:depth] == depth
+
+        base_job[direction].map{|depend_job|
+          job = _get_job(depend_job[:job_id], db_conn)
+          job[:consumers] = _get_jobs_for_products(CONSUMER_TABLE, job[Patriot::Command::PRODUCTS_ATTR], {}, db_conn) || []
+          job[:producers] = _get_jobs_for_products(PRODUCER_TABLE, job[Patriot::Command::REQUISITES_ATTR], {}, db_conn) || []
+          history = _get_execution_history(depend_job[:job_id], {}, db_conn)[0]
+
+          hashed_job = {
+            :job_id => job.job_id,
+            :history => history,
+            :depth => base_job[:depth] + 1
+          }.merge(job.attributes)
+
+          nodes[job.job_id] = hashed_job
+          if direction == :producers
+            edges.push([job.job_id, base_job[:job_id]])
+          else
+            edges.push([base_job[:job_id], job.job_id])
+          end
+
+          # call recursively
+          _set_dependency(
+            db_conn,
+            direction,
+            depth,
+            nodes,
+            edges,
+            hashed_job
+          )
+        }
+      end
+      private :_set_dependency
 
       # @see Patriot::JobStore::Base#find_jobs_by_state
       def find_jobs_by_state(state, opts = {})
