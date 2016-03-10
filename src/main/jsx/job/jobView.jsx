@@ -81,7 +81,7 @@ module.exports = React.createClass({
 
     return (
 <div>
-  <div><h1>{this.props.params.jobId}</h1></div>
+  <div><h1 className="original">{this.props.params.jobId}</h1></div>
   <h3> Job Info. </h3>
   <ChangeJobStateForm jobId={this.props.params.jobId} currentState={this.state.job.state} />
   <table className="table table-bordered" style={{tableLayout:"fixed"}}>

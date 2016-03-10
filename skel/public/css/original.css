@@ -12,43 +12,56 @@ fieldset {
 }
 
 form.inline {
-	display: inline;
-	vertical-align: top;
-	padding: 2px;
+  display: inline;
+  vertical-align: top;
+  padding: 2px;
 }
 
 .primary.original {
-    text-align: center;
-    width: 40px;
+  text-align: center;
+  width: 40px;
 }
 .important.original {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .warning.original {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .notice.original {
-    font-size: 13px;
+  font-size: 13px;
+}
+
+.table {
+  font-size: 13px;
 }
 
 th.original.main {
-	border-radius: 0 0 0 4px;
-	background-color: #F9F9F9;
-    vertical-align: top;
+  border-radius: 0 0 0 4px;
+  background-color: #F9F9F9;
+  vertical-align: top;
 }
 
 td.original.main {
-	border-radius: 0 0 0 4px;
-	background-color: #F9F9F9;
-	border-top: 1px solid #DDDDDD;
-    vertical-align: top;
+  border-radius: 0 0 0 4px;
+  background-color: #F9F9F9;
+  border-top: 1px solid #DDDDDD;
+  vertical-align: top;
 }
 
 table th.original{
-	background-color: #F9F9F9;
-    font-weight: normal;
-    padding-top: 9px;
-    vertical-align: middle;
+  background-color: #F9F9F9;
+  font-weight: normal;
+  padding-top: 9px;
+  vertical-align: middle;
+}
+
+h1.original {
+  word-wrap: break-word;
+}
+
+.small-checkbox {
+  width: 12px;
+  height: 12px;
 }
