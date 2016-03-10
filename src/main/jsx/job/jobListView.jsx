@@ -34,6 +34,11 @@ module.exports = React.createClass({
   handleUpdateFilter: function(event){
     this.setState({filter_exp: event.target.value});
   },
+  handleFilterKeyPress: function(event){
+    if (event.key == "Enter") {
+      this.handleFilterSubmit();
+    }
+  },
   handleFilterSubmit: function(){
     var param = {
       state  : parseInt(this.props.params.state),
@@ -57,16 +62,14 @@ module.exports = React.createClass({
     return (
       <div>
         <h1> {this.name_of_state(this.props.params.state)} Jobs </h1>
-        <form className="form-inline">
-          <div className="row">
-            <div className="col-xs-8">
-              <input className="form-control" style={{width: "100%"}} type="text" placeholder="job_id" onChange={this.handleUpdateFilter} value={this.state.filter_exp}/>
-            </div>
-            <div className="col-xs-2">
-              <button className="form-control btn btn-primary" onClick={this.handleFilterSubmit}> search </button>
-            </div>
+        <div className="row">
+          <div className="col-xs-8">
+            <input className="form-control" style={{width: "100%"}} type="text" placeholder="job_id" onChange={this.handleUpdateFilter} onKeyPress={this.handleFilterKeyPress} value={this.state.filter_exp}/>
           </div>
-        </form>
+          <div className="col-xs-2">
+            <button type="button" className="form-control btn btn-primary" onClick={this.handleFilterSubmit}> search </button>
+          </div>
+        </div>
         <JobList jobs={this.state.jobs} path={this.props.location.pathname} hasDeleteButton={parseInt(this.props.params.state) == -2} />
         <div className ="pager">
           <ul>
@@ -82,4 +85,3 @@ module.exports = React.createClass({
     );
   }
 });
-
