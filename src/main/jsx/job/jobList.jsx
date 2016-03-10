@@ -117,7 +117,7 @@ module.exports = React.createClass({
           <tbody>
             {this.props.jobs.map(function(job){
               return (<tr key={job.job_id}>
-                        <td><input className="form-control" type="checkbox" onChange={this.jobSelectionHandler(job.job_id)} checked={this.state.selected[job.job_id]}></input> </td>
+                        <td onClick={this.jobSelectionHandler(job.job_id)}><input className="form-control small-checkbox" type="checkbox" checked={this.state.selected[job.job_id]}></input> </td>
                         <td><Link to={formatPattern("/job/detail/:job_id", {job_id: job.job_id})}> {job.job_id} </Link> </td>
                         <td> {this.name_of_state(job.state)} </td>
                       </tr> );
