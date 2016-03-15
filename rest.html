@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>REST API &mdash; patriot-workflow-scheduler 0.8.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="patriot-workflow-scheduler 0.8.0 documentation" href="index.html"/>
+        <link rel="next" title="System Configuration" href="config.html"/>
+        <link rel="prev" title="Web Console" href="web.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> patriot-workflow-scheduler
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arch.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbc.html">Job Configuration DSL (PBC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web.html">Web Console</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">REST API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#apis">APIs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-api-v1-jobs">GET /api/v1/jobs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#get-api-v1-jobs-stats">GET /api/v1/jobs/stats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-api-v1-jobs-job-id">GET /api/v1/jobs/&lt;job_id&gt;</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#get-api-v1-jobs-job-id-histories">GET /api/v1/jobs/&lt;job_id&gt;/histories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#post-api-v1-jobs">POST /api/v1/jobs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-of-parameters">Example of parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#put-api-v1-jobs-job-id">PUT /api/v1/jobs/&lt;job_id&gt;</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#delete-api-v1-jobs-job-id">DELETE /api/v1/jobs/&lt;job_id&gt;</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">System Configuration</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">patriot-workflow-scheduler</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>REST API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/rest.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rest-api">
+<h1>REST API<a class="headerlink" href="#rest-api" title="Permalink to this headline">¶</a></h1>
+<p>Patriot Workflow Scheduler also provides REST API to manage jobs. The REST API works along with <a class="reference internal" href="web.html"><em>&#8216;Web Console&#8217;</em></a> at the moment.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#authentication" id="id6">Authentication</a></li>
+<li><a class="reference internal" href="#apis" id="id7">APIs</a><ul>
+<li><a class="reference internal" href="#get-api-v1-jobs" id="id8">GET /api/v1/jobs</a></li>
+<li><a class="reference internal" href="#get-api-v1-jobs-stats" id="id9">GET /api/v1/jobs/stats</a></li>
+<li><a class="reference internal" href="#get-api-v1-jobs-job-id" id="id10">GET /api/v1/jobs/&lt;job_id&gt;</a></li>
+<li><a class="reference internal" href="#get-api-v1-jobs-job-id-histories" id="id11">GET /api/v1/jobs/&lt;job_id&gt;/histories</a></li>
+<li><a class="reference internal" href="#post-api-v1-jobs" id="id12">POST /api/v1/jobs</a></li>
+<li><a class="reference internal" href="#put-api-v1-jobs-job-id" id="id13">PUT /api/v1/jobs/&lt;job_id&gt;</a></li>
+<li><a class="reference internal" href="#delete-api-v1-jobs-job-id" id="id14">DELETE /api/v1/jobs/&lt;job_id&gt;</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="authentication">
+<h2><a class="toc-backref" href="#id6">Authentication</a><a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>Some APIs need Basic authentication. When calling these APIs, you should provide username and password which are written in the config file as <cite>info_server.admin.username</cite> and <cite>info_server.admin.password</cite> (See <a class="reference internal" href="config.html"><em>&#8216;System Configuration&#8217;</em></a>).</p>
+</div>
+<div class="section" id="apis">
+<h2><a class="toc-backref" href="#id7">APIs</a><a class="headerlink" href="#apis" title="Permalink to this headline">¶</a></h2>
+<p>Described here are the APIs provided at the moment.</p>
+<hr class="docutils" />
+<div class="section" id="get-api-v1-jobs">
+<h3><a class="toc-backref" href="#id8">GET /api/v1/jobs</a><a class="headerlink" href="#get-api-v1-jobs" title="Permalink to this headline">¶</a></h3>
+<p>Retrieves jobs with conditions provided with the parameters below.</p>
+<div class="section" id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>state (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Filters jobs (default: 4, FAILED). The options are:</div>
+<div class="line-block">
+<div class="line">-2: DISCARDED</div>
+<div class="line">-1: INIT</div>
+<div class="line">0: SUCCEEDED</div>
+<div class="line">1: WAIT</div>
+<div class="line">2: RUNNING</div>
+<div class="line">3: SUSPEND</div>
+<div class="line">4: FAILED</div>
+</div>
+</div>
+</dd>
+<dt>limit (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Limits the number of jobs to get (default: 50).</div>
+</div>
+</dd>
+<dt>offset (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Adds offset (default: 0).</div>
+</div>
+</dd>
+<dt>filter_exp (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Filters jobs with the provided expression.</div>
+<div class="line">This expression will be given to a LIKE clause of SQL.</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="get-api-v1-jobs-stats">
+<h3><a class="toc-backref" href="#id9">GET /api/v1/jobs/stats</a><a class="headerlink" href="#get-api-v1-jobs-stats" title="Permalink to this headline">¶</a></h3>
+<p>A handy way to get status and its number of jobs respectively.</p>
+<p>The responce would be like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">20</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>It means that there are 3 jobs with status -1(INIT), 100 jobs with status 1(WAIT), and so on. Note that status -2(DISCARDED) and 0(SUCCEEDED) are not included in this API.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="get-api-v1-jobs-job-id">
+<h3><a class="toc-backref" href="#id10">GET /api/v1/jobs/&lt;job_id&gt;</a><a class="headerlink" href="#get-api-v1-jobs-job-id" title="Permalink to this headline">¶</a></h3>
+<p>Retrieves the detail of the job.</p>
+<div class="section" id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>job_id (required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the job_id</div>
+</div>
+</dd>
+<dt>include_dependency (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Determines if the information of <cite>consumers</cite> and <cite>producers</cite> is included (default: true)</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="get-api-v1-jobs-job-id-histories">
+<h3><a class="toc-backref" href="#id11">GET /api/v1/jobs/&lt;job_id&gt;/histories</a><a class="headerlink" href="#get-api-v1-jobs-job-id-histories" title="Permalink to this headline">¶</a></h3>
+<p>Retrieves the execution history of the job.</p>
+<div class="section" id="id2">
+<h4>Parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>job_id (required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the job_id</div>
+</div>
+</dd>
+<dt>size (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Sets the size of history (default: 3)</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="post-api-v1-jobs">
+<h3><a class="toc-backref" href="#id12">POST /api/v1/jobs</a><a class="headerlink" href="#post-api-v1-jobs" title="Permalink to this headline">¶</a></h3>
+<p>Registers a new job.</p>
+<p>You should check what parameters the command requires and give them properly.</p>
+<div class="section" id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>COMMAND_CLASS (required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates a command class you want to create.</div>
+</div>
+</dd>
+<dt>name (optional, but strongly recommended)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the job name. This parameter will be given to the command, and the command will generate a job_id accordingly.</div>
+</div>
+</dd>
+<dt>requisites (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates products which will be required by the job before its execution.</div>
+</div>
+</dd>
+<dt>produces (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates products which will be produced by the job after its execution.</div>
+</div>
+</dd>
+<dt>priority (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Sets the priority of the job (default: 1).</div>
+</div>
+</dd>
+<dt>exec_date (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the date when the job can start (default: the next day of the day when this API is called)</div>
+<div class="line">The format is supposed to be &#8220;YYYY-MM-DD&#8221;.</div>
+</div>
+</dd>
+<dt>start_after (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the time when the job can start after.</div>
+<div class="line">The format is supposed to be &#8220;hh:mm:ss&#8221;.</div>
+</div>
+</dd>
+<dt>exec_node (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates a node (a group of hosts) where the job can be executed.</div>
+</div>
+</dd>
+<dt>exec_host (optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates a host where the job is executed.</div>
+</div>
+</dd>
+<dt>(other parameters, optional)</dt>
+<dd><div class="first last line-block">
+<div class="line">If other parameters are given, they will be provided to the command which is created along with <cite>COMMAND_CLASS</cite>.</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="example-of-parameters">
+<h4>Example of parameters<a class="headerlink" href="#example-of-parameters" title="Permalink to this headline">¶</a></h4>
+<p>Following parameters can be provided in the JSON body of a POST request.</p>
+<p>Here <cite>name</cite>, <cite>name_suffix</cite>, <cite>connector</cite>, <cite>commands</cite> are parameters for <cite>Patriot.Command.ShCommand</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+ &quot;COMMAND_CLASS&quot;: &quot;Patriot.Command.ShCommand&quot;,
+ &quot;name&quot;         : &quot;calculation_b&quot;
+ &quot;name_suffix&quot;  : &quot;2016-01-01&quot;
+ &quot;priority&quot;     : 10,
+ &quot;exec_date&quot;    : &quot;2016-01-01&quot;,
+ &quot;start_after&quot;  : &quot;01:30:00&quot;,
+ &quot;connector&quot;    : &quot;&amp;&amp;&quot;,
+ &quot;commands&quot;     : [&quot;sudo -u hdfs hadoop fs -rmr /tmp/nbu_battleslot_slot/2013-07-06&quot;]}],
+ &quot;exec_node&quot;    : &quot;calc_node&quot;,
+ &quot;requisites&quot;   : [&quot;calculation_a_2016-01-01&quot;, &quot;master_data_2016-01-01],
+ &quot;produces&quot;     : [&quot;calculation_b_2016_01_01&quot;],
+}
+</pre></div>
+</div>
+<p>This request will return a JSON response like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+ <span class="s">&quot;job_id&quot;</span><span class="p">:</span> <span class="s">&quot;sh_calculation_b_2016-01-01&quot;</span><span class="p">,</span>
+ <span class="s">&quot;state&quot;</span> <span class="p">:</span> <span class="s">&quot;INIT&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="put-api-v1-jobs-job-id">
+<h3><a class="toc-backref" href="#id13">PUT /api/v1/jobs/&lt;job_id&gt;</a><a class="headerlink" href="#put-api-v1-jobs-job-id" title="Permalink to this headline">¶</a></h3>
+<p>Modifies the state of the specified job.</p>
+<div class="section" id="id4">
+<h4>Parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>job_id (required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the job_id</div>
+</div>
+</dd>
+<dt>state(required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates a new state.</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="delete-api-v1-jobs-job-id">
+<h3><a class="toc-backref" href="#id14">DELETE /api/v1/jobs/&lt;job_id&gt;</a><a class="headerlink" href="#delete-api-v1-jobs-job-id" title="Permalink to this headline">¶</a></h3>
+<p>Deletes the specified job and its relation.</p>
+<div class="section" id="id5">
+<h4>Parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>job_id (required*)</dt>
+<dd><div class="first last line-block">
+<div class="line">Indicates the job_id</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="config.html" class="btn btn-neutral float-right" title="System Configuration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="web.html" class="btn btn-neutral" title="Web Console" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Cyberagent, Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.8.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
