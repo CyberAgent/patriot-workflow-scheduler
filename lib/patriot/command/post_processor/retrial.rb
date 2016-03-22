@@ -3,8 +3,8 @@ module Patriot
     module PostProcessor
       class Retrial < Patriot::Command::PostProcessor::Base
 
-        COUNT_PROP_KEY    = 'count'
-        INTERVAL_PROP_KEY = 'interval'
+        COUNT_PROP_KEY    = :count
+        INTERVAL_PROP_KEY = :interval
 
         declare_post_processor_name :retrial
 
@@ -21,7 +21,7 @@ module Patriot
             found = true
             # count first attempt in
             pp.props[COUNT_PROP_KEY] = pp.props[COUNT_PROP_KEY] - 1
-            return if pp.props[COUNT_PROP_KEY] == 0 
+            return if pp.props[COUNT_PROP_KEY] == 0
             cmd.start_datetime = Time.now + pp.props[INTERVAL_PROP_KEY]
           end
           job = cmd.to_job

@@ -22,8 +22,9 @@ module Patriot
 
         # @param props [Hash] properties of this post processor
         def initialize(props = {})
-          validate_props(props)
-          @props = props
+          @props = {}
+          props.each{|k,v| @props[k.to_sym] = v}
+          validate_props(@props)
         end
 
         def validate_props(props)

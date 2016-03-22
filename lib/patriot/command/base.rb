@@ -145,7 +145,7 @@ module Patriot
       def init_param
         # set parameter value to instance variable
         @param.each do |k,v|
-          raise "a reserved word #{k} is used as parameter name" if Patriot::Command::COMMAND_CLASS_KEY == k
+          raise "a reserved word #{k} is used as parameter name" if Patriot::Command::COMMAND_CLASS_KEY == k.to_sym
           raise "#{k} is already used in #{self.job_id}" unless instance_variable_get("@#{k}".to_sym).nil?
           # don't evaluate here since all parameters are not set to instance variables
           instance_variable_set("@#{k}".to_sym,v)
@@ -177,7 +177,7 @@ module Patriot
           val = self.instance_variable_get("@#{attr}".to_sym)
           logics.each do |l|
             unless l.call(self, attr, val)
-              raise "validation error : #{attr}=#{val} (#{self.class})" 
+              raise "validation error : #{attr}=#{val} (#{self.class})"
             end
           end
         end

@@ -18,7 +18,7 @@ module Patriot
       # @param k [String] attribute name
       # @param v [Object] attribute value
       def []=(k,v)
-        raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
+        raise "key #{k} should be symbol but #{k.class}" unless k.is_a?(Symbol)
         @attributes[k] = v
       end
 
@@ -26,7 +26,7 @@ module Patriot
       # @param k [String] attribute name
       # @return [Object] the attribute value
       def [](k)
-        raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
+        raise "key #{k} should be symbol but #{k.class}" unless k.is_a?(Symbol)
         return @attributes[k]
       end
 
@@ -34,7 +34,7 @@ module Patriot
       # @param k [String] attribute name
       # @return [Object] the deleted attribute value
       def delete(k)
-        raise "key #{k} should be string but #{k.class}" unless k.is_a?(String)
+        raise "key #{k} should be symbol but #{k.class}" unless k.is_a?(Symbol)
         return @attributes.delete(k)
       end
 
@@ -57,19 +57,19 @@ module Patriot
           hash[Patriot::Command::COMMAND_CLASS_KEY] = obj.class.to_s.gsub(/::/, '.')
           obj.class.serde_attrs.each do |attr|
             value = obj.instance_variable_get("@#{attr}".to_sym)
-            hash[attr.to_s] = _to_stdobj(value) unless value.nil?
+            hash[attr.to_sym] = _to_stdobj(value) unless value.nil?
           end
           return hash
         elsif obj.is_a?(Patriot::Command::PostProcessor::Base)
           hash = {}
           hash[Patriot::Command::PostProcessor::POST_PROCESSOR_CLASS_KEY] = obj.class.to_s.gsub(/::/, '.')
           obj.props.each do |k,v|
-            hash[k.to_s] = _to_stdobj(v) unless v.nil?
+            hash[k.to_sym] = _to_stdobj(v) unless v.nil?
           end
           return hash
         elsif obj.is_a?(Hash)
           hash = {}
-          obj.each{|k,v| hash[k.to_s] = _to_stdobj(v)}
+          obj.each{|k,v| hash[k.to_sym] = _to_stdobj(v)}
           return hash
         elsif obj.is_a?(Array)
           return obj.map{|e| _to_stdobj(e)}
@@ -107,7 +107,7 @@ module Patriot
             return cmd_cls.new(obj)
           else
             hash = {}
-            obj.each{|k,v| hash[k] = _from_stdobj(v, config)}
+            obj.each{|k,v| hash[k.to_sym] = _from_stdobj(v, config)}
             return hash
           end
         elsif obj.is_a?(Array)
@@ -117,7 +117,7 @@ module Patriot
         end
       end
 
-      # @param attrs [Array<String>] a list of attribute names
+      # @param attrs [Array<Symbol>] a list of attribute names
       # @return [Hash] a set of attribute name value pairs for specified attributes
       def filter_attributes(attrs)
         filtered = {}

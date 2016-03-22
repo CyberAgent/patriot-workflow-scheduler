@@ -4,10 +4,10 @@ module Patriot
     module PostProcessor
       class MailNotification  < Patriot::Command::PostProcessor::Base
 
-        TO_PROP_KEY = 'to'
-        ON_PROP_KEY = 'on'
+        TO_PROP_KEY = :to
+        ON_PROP_KEY = :on
 
-        declare_post_processor_name :mail_notification 
+        declare_post_processor_name :mail_notification
 
         def validate_props(props)
           raise "#{TO_PROP_KEY} is not specified" unless props.has_key?(TO_PROP_KEY)

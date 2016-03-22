@@ -63,17 +63,18 @@ module Patriot
       end
 
       # get a job
-      # @param [String] job_id
-      # @param [Hash] opts
+      # @param job_id [String] job_id
+      # @param opts [Hash]
       # @option opts [String] :include_dependency include jobs with 1-hop dependency
       # @return [Patrio::JobStore::Job] in case of include_dependency is true,
       # jobs in dependency set to :consumers/:producers as a hash from job_id to state
       def get(job_id, opts={})
+        return nil if job_id.nil?
         job = get_job(job_id)
         return if job.nil?
         if opts[:include_dependency] == true
-          job['consumers'] = get_consumers(job[Patriot::Command::PRODUCTS_ATTR]) || []
-          job['producers'] = get_producers(job[Patriot::Command::REQUISITES_ATTR]) || []
+          job[:consumers] = get_consumers(job[Patriot::Command::PRODUCTS_ATTR]) || []
+          job[:producers] = get_producers(job[Patriot::Command::REQUISITES_ATTR]) || []
         end
         return job
       end
@@ -147,8 +148,7 @@ module Patriot
         }.compact.flatten
         consumers = get_consumers(products)
         while !consumers.empty?
-          # TODO unify to Symbol
-          jobs = consumers.map{|job| get_job(job[:job_id]||job["job_id"])}.compact
+          jobs = consumers.map{|job| get_job(job[:job_id])}.compact
           yield self, jobs
           products = jobs.map{|j| j[Patriot::Command::PRODUCTS_ATTR]}.compact.flatten
           consumers = get_consumers(products)

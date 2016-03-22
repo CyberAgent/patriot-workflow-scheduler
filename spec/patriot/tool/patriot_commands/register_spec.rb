@@ -10,7 +10,7 @@ describe Patriot::Tool::PatriotCommands::Register do
     @job_store = Patriot::JobStore::InMemoryStore.new("root", config_for_test)
     allow(Patriot::JobStore::Factory).to receive(:create_jobstore).and_return(@job_store)
   end
-  
+
   describe "help" do
     it "should show help" do
       args = ['help']
@@ -28,8 +28,8 @@ describe Patriot::Tool::PatriotCommands::Register do
         ]
       expect(@job_store).not_to receive(:retry_dependent)
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
-      expect(@job_store.get("sh_echo_2013-01-01")['priority']).to eq Patriot::JobStore::DEFAULT_PRIORITY
+      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_echo_2013-01-01")[:priority]).to eq Patriot::JobStore::DEFAULT_PRIORITY
       expect(@job_store.get("sh_echo_2013-01-01").update_id).to be_between(Time.now.to_i - 60, Time.now.to_i)
     end
 
@@ -112,7 +112,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUSPEND
+      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::SUSPEND
       args = [
           'register',
           "--config=#{@config}",
@@ -120,7 +120,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::WAIT
     end
 
     it "can register with state specified in PBC" do
@@ -131,7 +131,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh_skip.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_skip_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUCCEEDED
+      expect(@job_store.get("sh_echo_skip_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::SUCCEEDED
       args = [
           'register',
           "--config=#{@config}",
@@ -139,7 +139,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh_suspend.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_suspend_2013-01-01")['state']).to eq Patriot::JobStore::JobState::SUSPEND
+      expect(@job_store.get("sh_echo_suspend_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::SUSPEND
     end
 
     it "can register with priority" do
@@ -151,7 +151,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")['priority']).to eq 50
+      expect(@job_store.get("sh_echo_2013-01-01")[:priority]).to eq 50
 
       # FROM PBC
       args = [
@@ -161,7 +161,7 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/sh_priority.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_priority_2013-01-01")['priority']).to eq 99
+      expect(@job_store.get("sh_echo_priority_2013-01-01")[:priority]).to eq 99
     end
 
     it "should include files under non-reserved directories" do
@@ -172,8 +172,8 @@ describe Patriot::Tool::PatriotCommands::Register do
           "#{ROOT_PATH}/spec/pbc/interval",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_non_reserved_dir_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
-      expect(@job_store.get("sh_daily_2013-01-01")['state']).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_non_reserved_dir_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_daily_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::WAIT
       expect(@job_store.get("sh_monthly_2013-01-01")).to be nil
     end
   end

@@ -1,11 +1,11 @@
 require 'init_test'
 
-describe Patriot::Command::PostProcessor::Retrial do 
+describe Patriot::Command::PostProcessor::Retrial do
 
   include JobStoreMatcher
   include Patriot::Command::Parser
 
-  before :each do 
+  before :each do
     @config = config_for_test
     @worker = Patriot::Worker::Base.new(@config)
     @target_datetime = Time.new(2015,8,1)
@@ -66,7 +66,7 @@ EOJ
     retrial 'count' => 3, 'interval' => 2
     sh {
       name 'test_retrial_set_at_job_group_which_has_sh_command'
-      commands 'sh -c "exit 1"' 
+      commands 'sh -c "exit 1"'
     }
   }
 EOJ
@@ -99,7 +99,7 @@ EOJ
     sh {
       retrial 'count' => 3, 'interval' => 2
       name 'test_retrial_set_at_command_in_job_group'
-      commands 'sh -c "exit 1"' 
+      commands 'sh -c "exit 1"'
     }
   }
 EOJ
@@ -174,7 +174,7 @@ EOJ
 
       sh {
         name 'ok'
-        commands 'sh -c "exit 1"' 
+        commands 'sh -c "exit 1"'
       }
     }
   }
@@ -268,7 +268,7 @@ job_group {
     sh {
       retrial 'count' => 3, 'interval' => 2
       name 'ng'
-      commands 'sh -c "exit 1"' 
+      commands 'sh -c "exit 1"'
     }
   }
 }

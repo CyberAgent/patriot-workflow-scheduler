@@ -1,12 +1,12 @@
 require 'init_test'
 
-describe Patriot::Command::PostProcessor::MailNotification do 
+describe Patriot::Command::PostProcessor::MailNotification do
 
   include JobStoreMatcher
   include Patriot::Command::Parser
 
 
-  before :all do 
+  before :all do
     @dt     = '2015-08-01'
     @config = config_for_test
     @worker = Patriot::Worker::Base.new(@config)

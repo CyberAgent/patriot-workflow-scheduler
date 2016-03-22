@@ -52,16 +52,16 @@ describe <%= job_store_class %> do
       expect(job_entries.size).to eq 1
     end
 
-    it "should include dependency" do 
+    it "should include dependency" do
       job = @job_store.get(@c_job.job_id, :include_dependency=>true)
-      expect(job['consumers']).to be_empty
-      expect(job['producers']).to contain_exactly({"job_id" => @p_job.job_id, "state" => 1})
+      expect(job[:consumers]).to be_empty
+      expect(job[:producers]).to contain_exactly({:job_id => @p_job.job_id, :state => 1})
       job = @job_store.get(@p_job.job_id, :include_dependency=>true)
-      expect(job['consumers']).to contain_exactly({"job_id" => @c_job.job_id, "state" => 1})
-      expect(job['producers']).to be_empty
+      expect(job[:consumers]).to contain_exactly({:job_id => @c_job.job_id, :state => 1})
+      expect(job[:producers]).to be_empty
     end
 
-    it "should include product" do 
+    it "should include product" do
       job = @job_store.get(@c_job.job_id, :include_products=>true)
       expect(job[Patriot::Command::PRODUCTS_ATTR]).to be_empty
       expect(job[Patriot::Command::REQUISITES_ATTR]).to contain_exactly("p")
@@ -74,7 +74,7 @@ describe <%= job_store_class %> do
       it "should return producers" do
         producers = @job_store.get_producers("p")
         expect(producers.size).to eq 1
-        expect(producers.map{|p| p["job_id"]}).to contain_exactly(@p_job.job_id)
+        expect(producers.map{|p| p[:job_id]}).to contain_exactly(@p_job.job_id)
       end
     end
 
@@ -82,7 +82,7 @@ describe <%= job_store_class %> do
       it "should return consumers" do
         consumers = @job_store.get_consumers("p")
         expect(consumers.size).to eq 1
-        expect(consumers.map{|c| c["job_id"]}).to contain_exactly(@c_job.job_id)
+        expect(consumers.map{|c| c[:job_id]}).to contain_exactly(@c_job.job_id)
       end
     end
   end
@@ -265,17 +265,17 @@ describe <%= job_store_class %> do
 
     it "should delete a consumer job from db" do
       job_id = @c_job.job_id
-      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].map{|c| c["job_id"]}).to include(job_id)
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})[:consumers].map{|c| c[:job_id]}).to include(job_id)
       @job_store.delete_job(job_id)
-      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})['consumers'].map{|c| c["job_id"]}).not_to include(job_id)
+      expect(@job_store.get(@p_job.job_id, {:include_dependency => true})[:consumers].map{|c| c[:job_id]}).not_to include(job_id)
       expect(@job_store.get(job_id)).to be nil
     end
 
     it "should delete a producer job from db" do
       job_id = @p_job.job_id
-      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].map{|p| p["job_id"]}).to include(job_id)
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})[:producers].map{|p| p[:job_id]}).to include(job_id)
       @job_store.delete_job(job_id)
-      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})['producers'].map{|p| p["job_id"]}).not_to include(job_id)
+      expect(@job_store.get(@c_job.job_id, {:include_dependency => true})[:producers].map{|p| p[:job_id]}).not_to include(job_id)
       expect(@job_store.get(job_id)).to be nil
     end
 
@@ -283,9 +283,9 @@ describe <%= job_store_class %> do
       command = Patriot::Command::CommandGroup.new(@config)
       command.target_datetime = DateTime.new(2015,4,1)
       command.instance_eval(<<EOJ
-      sh do 
-        produce ["product1_#{@hour}"]  
-        require ["product2_#{@hour}"]  
+      sh do
+        produce ["product1_#{@hour}"]
+        require ["product2_#{@hour}"]
         param 'hour' => ['00','08','16']
         exec_date '1970-01-01'
         start_after '#{@hour}:00:00'
@@ -330,35 +330,35 @@ EOJ
       jobs = [TestEnvironment.build_job({:job_id => 'p1', :command => 'echo \'p1\'', :produce => ['1']})]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
-      expect(job['consumers'].map{|c| c["job_id"]}).to include(@consumer1.job_id)
+      expect(job[:consumers].map{|c| c[:job_id]}).to include(@consumer1.job_id)
     end
 
     it "should remove the deprecated dependency " do
       consumer2 = TestEnvironment.build_job({:job_id => 'c2', :command => 'echo \'c2\'', :require => ['2']})
-      consumer2['requisites'] << "1"
-      consumer2['requisites'].delete("2")
+      consumer2[:requisites] << "1"
+      consumer2[:requisites].delete("2")
       jobs = [consumer2]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer2.job_id, :include_dependency => true)
-      expect(job['consumers'].map{|c| c["job_id"]}).not_to include(@consumer2.job_id)
+      expect(job[:consumers].map{|c| c[:job_id]}).not_to include(@consumer2.job_id)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
-      expect(job['consumers'].map{|c| c["job_id"]}).to include(@consumer2.job_id)
+      expect(job[:consumers].map{|c| c[:job_id]}).to include(@consumer2.job_id)
     end
 
     it "should clear dependency " do
       consumer1 = TestEnvironment.build_job({:job_id => 'c1', :command => 'echo \'c1\''})
-      consumer1['requisites'] = []
+      consumer1[:requisites] = []
       jobs = [consumer1]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer1.job_id, :include_dependency => true)
-      expect(job['consumers']).not_to include(@consumer1.job_id)
+      expect(job[:consumers]).not_to include(@consumer1.job_id)
 
       consumer2 = TestEnvironment.build_job({:job_id => 'c2', :command => 'echo \'c2\''})
-      consumer2['requisites'] = nil
+      consumer2[:requisites] = nil
       jobs = [consumer2]
       @job_store.register(Time.now.to_i, jobs)
       job = @job_store.get(@producer2.job_id, :include_dependency => true)
-      expect(job['consumers']).not_to include(@consumer2.job_id)
+      expect(job[:consumers]).not_to include(@consumer2.job_id)
     end
   end
 end

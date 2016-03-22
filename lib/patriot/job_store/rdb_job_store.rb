@@ -344,7 +344,7 @@ END_OB_QUERY
         job.update_id = record.update_id
         ATTR_TO_COLUMN.each{|attr, col| job[attr] = record.send(col) }
         unless record.content.nil?
-          content = JSON.parse(record.content)
+          content = JSON.parse(record.content, {:symbolize_names => true})
           content.each{|k,v| job[k] = v}
         end
         return job
