@@ -74,6 +74,7 @@ module Patriot
           job_ticket.exit_code  = Patriot::Command::ExitCode::SUCCEEDED
         rescue Exception => e
           @logger.warn " job : #{job_ticket.job_id} failed"
+          @logger.warn e
           job_ticket.description = e.to_s
         else
           job_ticket.description = command.description
