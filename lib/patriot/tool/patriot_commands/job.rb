@@ -17,7 +17,7 @@ module Patriot
             when "delete"
               job_id.each do |jid|
                 if job_store.delete_job(jid)
-                  puts "#{jid} is deleted" 
+                  puts "#{jid} is deleted"
                 else
                   puts "#{jid} does not exist"
                 end
@@ -42,11 +42,11 @@ module Patriot
                 products = job_store.get_producers(product)
                 values << "#{'  '*indent}<= #{product} = WARN: no producer exists" if products.empty?
                 products.each do |p|
-                  jid = p['job_id']
+                  jid = p[:job_id]
                   state = p[Patriot::Command::STATE_ATTR]
                   dep_status = "#{jid}, #{state}"
                   producer_job = job_store.get(jid, :include_dependency => true)
-                  unless producer_job['consumers'].map{|c| c['job_id']}.include?(job_id)
+                  unless producer_job[:consumers].map{|c| c[:job_id]}.include?(job_id)
                     dep_status = "WARN: currupted dependency #{dep_status}"
                   end
                   values << "#{'  '*indent}<= #{product} = #{dep_status}"

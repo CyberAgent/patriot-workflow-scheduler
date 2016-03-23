@@ -62,7 +62,7 @@ EOS
       @illegal_job = TestEnvironment.build_job({:require => ['illegal']})
       @job_store.register(@update_id, [@p_job, @m_job, @c_job, @illegal_job])
       allow(@job_store).to receive(:get).and_call_original
-      allow(@job_store).to receive(:get).with(anything, {:include_dependency => true}).and_return({'consumers' => {}, 'producers' => {}})
+      allow(@job_store).to receive(:get).with(anything, {:include_dependency => true}).and_return({:consumers => {}, :producers => {}})
     end
 
     it "should show corrupted dependency" do

@@ -1,26 +1,26 @@
 # the root name space for this scheduler
 module Patriot
   # a name space for commands
-  module Command 
+  module Command
     # a parameter key for command class name (used in jobs)
-    COMMAND_CLASS_KEY   = "COMMAND_CLASS"
+    COMMAND_CLASS_KEY   = :COMMAND_CLASS
 
     # attribute name for required products
-    REQUISITES_ATTR     = "requisites"
+    REQUISITES_ATTR     = :requisites
     # attribute name for produced products
-    PRODUCTS_ATTR       = "products"
+    PRODUCTS_ATTR       = :products
     # attribute name for job state
-    STATE_ATTR          = "state"
+    STATE_ATTR          = :state
     # attribute name for job priority
-    PRIORITY_ATTR       = "priority"
+    PRIORITY_ATTR       = :priority
     # attribute name for job execution node constraint
-    EXEC_NODE_ATTR      = "exec_node"
+    EXEC_NODE_ATTR      = :exec_node
     # attribute name for job execution host constraint
-    EXEC_HOST_ATTR      = "exec_host"
+    EXEC_HOST_ATTR      = :exec_host
     # attribute name for start time constraint
-    START_DATETIME_ATTR = "start_datetime"
+    START_DATETIME_ATTR = :start_datetime
     # attribute name for retry configration
-    POST_PROCESSORS_ATTR = "post_processors"
+    POST_PROCESSORS_ATTR = :post_processors
 
     # a list of command attributes
     COMMON_ATTRIBUTES = [

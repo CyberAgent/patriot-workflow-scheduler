@@ -16,8 +16,8 @@ describe Patriot::JobStore::Job do
       cmd.commands 'test cmd'
       job = cmd.to_job
       expect(job.job_id).to eq cmd.job_id
-      expect(job['state']).to be Patriot::JobStore::JobState::INIT
-      expect(job['commands']).to contain_exactly('test cmd')
+      expect(job[Patriot::Command::STATE_ATTR]).to be Patriot::JobStore::JobState::INIT
+      expect(job[:commands]).to contain_exactly('test cmd')
 
       _cmd = job.to_command(@config)
       expect(_cmd).to be_a Patriot::Command::ShCommand
@@ -36,7 +36,7 @@ EOS
       cmd.name = "test"
       job = Patriot::JobStore::Job.new(cmd.job_id)
       job.read_command(cmd)
-      expect(job['commands'][0]).to eq shcmd
+      expect(job[:commands][0]).to eq shcmd
 
       _cmd = job.to_command(@config)
       expect(_cmd).to be_a Patriot::Command::ShCommand
@@ -51,8 +51,8 @@ EOS
       cmd.name = "test"
       job = Patriot::JobStore::Job.new(cmd.job_id)
       job.read_command(cmd)
-      expect(job['commands'].size).to eq 1
-      expect(job['commands'][0]).to eq "echo 'テスト'"
+      expect(job[:commands].size).to eq 1
+      expect(job[:commands][0]).to eq "echo 'テスト'"
 
       _cmd = job.to_command(@config)
       expect(_cmd).to be_a Patriot::Command::ShCommand
@@ -72,9 +72,9 @@ EOS
       cmd.instance_variable_set(:@contained_commands, [sh1, sh2])
       job = Patriot::JobStore::Job.new(cmd.job_id)
       job.read_command(cmd)
-      expect(job['contained_commands'].size).to eq 2
-      expect(job['contained_commands'][0][Patriot::Command::COMMAND_CLASS_KEY]).to eq 'Patriot.Command.ShCommand'
-      expect(job['contained_commands'][0]['commands']).to contain_exactly 'echo 1'
+      expect(job[:contained_commands].size).to eq 2
+      expect(job[:contained_commands][0][Patriot::Command::COMMAND_CLASS_KEY]).to eq 'Patriot.Command.ShCommand'
+      expect(job[:contained_commands][0][:commands]).to contain_exactly 'echo 1'
 
       _cmd = job.to_command(@config)
       expect(_cmd).to be_a Patriot::Command::CompositeCommand

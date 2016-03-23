@@ -143,6 +143,8 @@ module Patriot
 
       # @see Patriot::JobStore::Base#get_job
       def get_job(job_id)
+        return nil if job_id.nil?
+        raise "string is expected but job_id is a #{job_id.class}" unless job_id.is_a?(String)
         return @jobs[job_id.to_sym]
       end
 
@@ -155,7 +157,7 @@ module Patriot
           @producers.map{|pid, prods|
             if prods.include?(product)
               job = @jobs[pid].filter_attributes(opts[:include_attrs])
-              job["job_id"] = pid.to_s
+              job[:job_id] = pid.to_s
               producers.push(job)
             end
           }
@@ -172,7 +174,7 @@ module Patriot
           @consumers.map{|pid, prods|
             if prods.include?(product)
               job = @jobs[pid].filter_attributes(opts[:include_attrs])
-              job["job_id"] = pid.to_s
+              job[:job_id] = pid.to_s
               consumers.push(job)
             end
           }

@@ -13,6 +13,7 @@ module Patriot
       # @param [Integer] update_id
       # @param [String] node the name of node on which the job should be executed
       def initialize(job_id, update_id, node=nil)
+        raise "job_id should be Symbol but #{job_id} is a #{job_id.class}" unless job_id.is_a?(String)
         @job_id    = job_id
         @update_id = update_id
         @node      = node
