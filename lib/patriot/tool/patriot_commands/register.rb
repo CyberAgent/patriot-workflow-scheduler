@@ -27,11 +27,11 @@ module Patriot
               :type     => :boolean,
               :default  => false,
               :desc     => "don't change current state of jobs (only change definition)"
-          method_option :retry_dep, 
-              :type     => :boolean, 
+          method_option :retry_dep,
+              :type     => :boolean,
               :desc     =>  'set states of dependent jobs to WAIT'
           method_option :update_id,
-              :type     => :string,
+              :type     => :numeric,
               :default  => Time.now.to_i,
               :desc     => 'default value is current unixtime (default value is Time.now.to_i)'
           def register(date, *paths)
@@ -45,8 +45,10 @@ module Patriot
                              :store_id       => Patriot::JobStore::ROOT_STORE_ID,
                              :retry_interval => 300,
                              :retry_limite   => 10}.merge(opts)
-              opts[:state] = nil if opts[:keep_state]
-
+              if opts[:keep_state]
+                opts[:state] = nil
+                opts[:update_id] = nil
+              end
               job_store = Patriot::JobStore::Factory.create_jobstore(opts[:store_id], config)
               parser  = Patriot::Tool::BatchParser.new(config)
               jobs    = []

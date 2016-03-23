@@ -35,11 +35,14 @@ module Patriot
 
       def _upsert(update_id, job)
         job_id        = job.job_id.to_sym
-        job.update_id = update_id
         if @jobs.has_key?(job_id) # update
-          job[Patriot::Command::STATE_ATTR] ||= @jobs[job_id][Patriot::Command::STATE_ATTR]
+          original = @jobs[job_id]
+          job[Patriot::Command::STATE_ATTR] ||= original[Patriot::Command::STATE_ATTR]
+          job.update_id = original.update_id
         else # insert
           job[Patriot::Command::STATE_ATTR] ||= Patriot::JobStore::JobState::INIT
+          raise "update_id id should not be nil for new jobs" if update_id.nil?
+          job.update_id = update_id
         end
         @jobs[job_id]      = job
         @producers[job_id] = job[Patriot::Command::PRODUCTS_ATTR] || []

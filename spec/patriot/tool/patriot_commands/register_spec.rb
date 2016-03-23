@@ -104,24 +104,44 @@ describe Patriot::Tool::PatriotCommands::Register do
     end
 
     it "can register with state and keeping state" do
+      update_id = Time.now.to_i - 1000
       args = [
           'register',
           "--config=#{@config}",
+          "--update_id=#{update_id}",
           "--state=3",
           '2013-01-01',
           "#{ROOT_PATH}/spec/pbc/sh.pbc",
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::SUSPEND
+      job = @job_store.get("sh_echo_2013-01-01")
+      expect(job[:state]).to eq Patriot::JobStore::JobState::SUSPEND
+      expect(job.update_id).to eq update_id
       args = [
           'register',
           "--config=#{@config}",
+          "--keep-state",
           '2013-01-01',
-          "#{ROOT_PATH}/spec/pbc/sh.pbc",
+          "#{ROOT_PATH}/spec/pbc/sh.pbc"
         ]
       expect{Patriot::Tool::PatriotCommand.start(args)}.not_to raise_error
-      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::WAIT
+      expect(@job_store.get("sh_echo_2013-01-01")[:state]).to eq Patriot::JobStore::JobState::SUSPEND
+      expect(@job_store.get("sh_echo_2013-01-01").update_id).to eq update_id
     end
+
+    it "should raise error keep_state is set for new jobs" do
+      job = @job_store.get("sh_echo_2013-01-01")
+      expect(job).to be nil
+      args = [
+          'register',
+          "--config=#{@config}",
+          "--keep-state",
+          '2013-01-01',
+          "#{ROOT_PATH}/spec/pbc/sh.pbc"
+        ]
+      expect{Patriot::Tool::PatriotCommand.start(args)}.to raise_error
+    end
+
 
     it "can register with state specified in PBC" do
       args = [
