@@ -167,9 +167,10 @@ describe <%= job_store_class %> do
       expect(c_job[Patriot::Command::STATE_ATTR]).to eq Patriot::JobStore::JobState::SUSPEND
       c_job     = TestEnvironment.build_job({:job_id => 'with_host', :host => @host, :require => ['p']})
       c_job.delete(Patriot::Command::STATE_ATTR)
-      @job_store.register(update_id, [c_job])
+      @job_store.register(nil, [c_job])
       c_job = @job_store.get(@c_job.job_id)
       expect(c_job[Patriot::Command::STATE_ATTR]).to eq Patriot::JobStore::JobState::SUSPEND
+      expect(c_job.update_id).to eq update_id
     end
 
     it "should reset exec_node and host" do

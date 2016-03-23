@@ -72,7 +72,8 @@ module Patriot
       end
 
       def _upsert_job(update_id, job, c)
-        new_vals = {:job_id => job.job_id, :update_id => update_id, :priority => DEFAULT_PRIORITY}
+        new_vals = {:job_id => job.job_id, :priority => DEFAULT_PRIORITY}
+        new_vals[:update_id] = update_id unless update_id.nil?
         job_attr = job.attributes.dup
         # extract and remove command attributes
         requisites = job_attr.delete(Patriot::Command::REQUISITES_ATTR) || []
@@ -89,6 +90,7 @@ module Patriot
         new_vals[:content] = JSON.generate(job_attr)
 
         if prev_vals.empty?
+          raise "update_id should not be nil for new jobs" if new_vals[:update_id].nil?
           new_vals[:state] ||= Patriot::JobStore::JobState::INIT # set default state
           serial_id = c.insert(JOB_TABLE, new_vals)
         elsif prev_vals.size == 1
