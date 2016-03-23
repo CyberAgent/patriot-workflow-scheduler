@@ -69,7 +69,7 @@ module Patriot
           return hash
         elsif obj.is_a?(Hash)
           hash = {}
-          obj.each{|k,v| hash[k.to_sym] = _to_stdobj(v)}
+          obj.each{|k,v| hash[k.to_s] = _to_stdobj(v)}
           return hash
         elsif obj.is_a?(Array)
           return obj.map{|e| _to_stdobj(e)}
@@ -107,7 +107,7 @@ module Patriot
             return cmd_cls.new(obj)
           else
             hash = {}
-            obj.each{|k,v| hash[k.to_sym] = _from_stdobj(v, config)}
+            obj.each{|k,v| hash[k.to_s] = _from_stdobj(v, config)}
             return hash
           end
         elsif obj.is_a?(Array)
