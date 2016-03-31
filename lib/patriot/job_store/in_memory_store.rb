@@ -208,6 +208,83 @@ module Patriot
         return @job_history[job_id.to_sym] || []
       end
 
+      # get nodes and edges information to render graph
+      # @param  [String]  job_id  JOB ID
+      # @param  [Hash]    opts    options
+      # @return [Array]   [nodes, edges]
+      def get_graph(job_id, opts = {})
+        job = get(job_id)
+        history = get_execution_history(job_id, {})[0]
+
+        hashed_job = {
+          :job_id => job.job_id,
+          :history => history,
+          :depth => 0
+        }.merge(job.attributes)
+
+        # set self node
+        nodes = {job_id => hashed_job}
+        edges = []
+
+        _set_dependency(
+          :producers,
+          opts[:producer_depth],
+          nodes,
+          edges,
+          hashed_job
+        )
+
+        _set_dependency(
+          :consumers,
+          opts[:consumer_depth],
+          nodes,
+          edges,
+          hashed_job
+        )
+
+        return {:nodes => nodes, :edges => edges}
+      end
+
+      # get dependency and set nodes and edges
+      #
+      # @private
+      # @param  [Symbol]  direction       :producers or :consumers
+      # @param  [Integer] depth           dependency depth to get
+      # @param  [Hash]    nodes           nodes to set for dager-d3
+      # @param  [Array]   edges           edges to set for dager-d3
+      # @param  [Hash]    base_job        base job to get dependency
+      def _set_dependency(direction, depth, nodes, edges, base_job)
+        return if nodes[base_job[:job_id]][:depth] == depth
+
+        base_job[direction].map{|depend_job|
+          job = get(depend_job[:job_id])
+          history = get_execution_history(depend_job[:job_id], {})[0]
+
+          hashed_job = {
+            :job_id => job.job_id,
+            :history => history,
+            :depth => base_job[:depth] + 1
+          }.merge(job.attributes)
+
+          nodes[job.job_id] = hashed_job
+          if direction == :producers
+            edges.push([job.job_id, base_job[:job_id]])
+          else
+            edges.push([base_job[:job_id], job.job_id])
+          end
+
+          # call recursively
+          _set_dependency(
+            direction,
+            depth,
+            nodes,
+            edges,
+            hashed_job
+          )
+        }
+      end
+      private :_set_dependency
+
       # @see Patriot::JobStore::Base#get_job_size
       def get_job_size(opts = {})
         opts  = {:ignore_states => []}.merge(opts)

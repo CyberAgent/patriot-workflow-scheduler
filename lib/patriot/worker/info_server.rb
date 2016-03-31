@@ -54,7 +54,11 @@ module Patriot
             }
             app = Rack::Static.new(app, :urls => ["/js", "/css"], :root => File.join($home, "public"))
             # TODO set options based on Handler type
-            @handler.run app, {:Port => @port, :Host => '0.0.0.0', :signals => false}
+            @handler.run(app, {:Port => @port, :Host => '0.0.0.0', :signals => false}) do |server|
+              server.threaded = true
+              server.threadpool_size = 5
+              server.timeout = 60
+            end
           rescue => e
             @logger.error e
             raise e

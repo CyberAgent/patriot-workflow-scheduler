@@ -43,6 +43,19 @@ module Patriot
           return JSON.generate(histories)
         end
 
+        # get dependency graph of the specified job
+        #
+        # @param [String] job_id
+        # @param [String] p_level a max number of producer dependency level to get
+        # @param [String] c_level a max number of consumer dependency level to get
+        get '/:job_id/graph' do
+          job_id = params[:job_id]
+          producer_depth = (params['p_depth'] || 2).to_i
+          consumer_depth = (params['c_depth'] || 2).to_i
+          graph = @@worker.job_store.get_graph(job_id, {:producer_depth => producer_depth, :consumer_depth => consumer_depth})
+          return JSON.generate(graph)
+        end
+
         post '/' do
           protected!
           body = JSON.parse(request.body.read)

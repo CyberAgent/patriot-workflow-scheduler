@@ -28,6 +28,13 @@ module.exports = {
       callback(body);
     });
   },
+  getGraph: function(jobId, pDepth, cDepth, callback){
+    jobId = encodeURIComponent(jobId);
+    var path = jobId + "/graph?p_depth=" + pDepth + "&c_depth=" + cDepth;
+    http.get(jobApiPath + path, function(body){
+      callback(body);
+    });
+  },
   updateJobState: function(jobId, state, option, callback){
     jobId = encodeURIComponent(jobId);
     http.request_with_body(jobApiPath + jobId, "PUT", {state : state, option: option}, function(body){
