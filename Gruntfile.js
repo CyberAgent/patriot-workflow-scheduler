@@ -10,12 +10,23 @@ module.exports = function(grunt) {
       },
       dist: {
        files: {
-         'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js'  : ["src/main/jsx/**/*.jsx"]
+         'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js'  : ['src/main/jsx/**/*.jsx']
         }
+      }
+    },
+    env : {
+      development : {
+        NODE_ENV : 'development'
+      },
+      build : {
+        NODE_ENV : 'production'
       }
     },
     uglify: {
       options: {
+        compress: {
+          drop_console: true
+        },
         sourceMap: true
       },
       build: {
@@ -23,9 +34,15 @@ module.exports = function(grunt) {
         dest: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.min.js'
       }
     },
+    preprocess: {
+      html: {
+        src: 'skel/public/views/index.tpl.erb',
+        dest:'skel/public/views/index.erb'
+      }
+    },
     esteWatch: {
       options: {
-        dirs: ["src/main/jsx/**/"],
+        dirs: ['src/main/jsx/**/'],
         livereload: {
           enabled: false
         }
@@ -33,8 +50,11 @@ module.exports = function(grunt) {
       '*': function(filepath) { return 'browserify' }
     }
   });
-  grunt.loadNpmTasks("grunt-browserify");
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks("grunt-este-watch");
-  grunt.registerTask('default', ['browserify', 'uglify']);
+  grunt.loadNpmTasks('grunt-env');
+  grunt.loadNpmTasks('grunt-este-watch');
+  grunt.loadNpmTasks('grunt-preprocess');
+  grunt.registerTask('default', ['env:development', 'browserify', 'preprocess']);
+  grunt.registerTask('build', ['env:build', 'browserify', 'uglify', 'preprocess']);
 }
