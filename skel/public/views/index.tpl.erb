@@ -6,7 +6,12 @@
 </head>
 <body>
   <div id="mainContent">
+    <!-- @if NODE_ENV='development' -->
+    <script src="<%= url('js/patriot-workflow-scheduler-0.8.0.js') %>"></script>
+    <!-- @endif -->
+    <!-- @if NODE_ENV='production' -->
     <script src="<%= url('js/patriot-workflow-scheduler-0.8.0.min.js') %>"></script>
+    <!-- @endif -->
   </div>
 </body>
 </html>
