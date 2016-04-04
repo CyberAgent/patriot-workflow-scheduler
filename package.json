@@ -19,7 +19,8 @@
     "dagre-d3": "^0.4.17",
     "grunt": "^0.4.5",
     "grunt-browserify": "^4.0.1",
-    "grunt-este-watch": "^0.1.18",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-preprocess": "^5.1.0",
     "lodash": "^4.6.1",
     "moment": "^2.12.0",
     "react": "^0.14.6",
@@ -27,6 +28,7 @@
     "react-modal": "^0.6.1",
     "react-numeric-input": "^2.0.3",
     "react-router": "^2.0.0",
-    "react-tabs": "^0.5.3"
+    "react-tabs": "^0.5.3",
+    "watchify": "^3.7.0"
   }
 }
