@@ -24,7 +24,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js'  : ['src/main/jsx/**/*.jsx']
+          'public/js/patriot-workflow-scheduler-<%= pkg.version %>.js'  : ['src/main/jsx/**/*.jsx']
         }
       }
     },
@@ -36,14 +36,14 @@ module.exports = function(grunt) {
         sourceMap: true
       },
       build: {
-        src: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js',
-        dest: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.min.js'
+        src: 'public/js/patriot-workflow-scheduler-<%= pkg.version %>.js',
+        dest: 'public/js/patriot-workflow-scheduler-<%= pkg.version %>.min.js'
       }
     },
     preprocess: {
       html: {
         src: 'skel/public/views/index.tpl.erb',
-        dest:'skel/public/views/index.erb'
+        dest:'public/views/index.erb'
       }
     }
   });
