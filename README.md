@@ -27,10 +27,21 @@ Getting Started
 
 ### Install
 
+- install
+
 ```
 % gem install patriot-workflow-scheduler
 % patriot-init ${install_dir}
 ```
+- update existing installation
+
+`gem install` won't upgrade the js for web console. The `patriot upgrade` should be used to replace the js with new one.
+
+```
+% cd ${install_dir}
+% ./bin/patriot upgrade
+```
+
 
 ### Execute a sample job
 
@@ -92,6 +103,16 @@ To compile the JSXs, install Nodejs and set up grunt.
 % npm install
 % grunt
 ```
+
+-- Build gem and upgrade installation
+
+```
+gem build patriot-workflow-scheduler.gemspec
+cd ${install_dir}
+./bin/patriot upgrade
+```
+
+
 
 Generate documents
 -------
