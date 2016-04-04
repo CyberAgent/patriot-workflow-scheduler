@@ -14,6 +14,15 @@ module.exports = function(grunt) {
         }
       }
     },
+    uglify: {
+      options: {
+        sourceMap: true
+      },
+      build: {
+        src: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js',
+        dest: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.min.js'
+      }
+    },
     esteWatch: {
       options: {
         dirs: ["src/main/jsx/**/"],
@@ -25,6 +34,7 @@ module.exports = function(grunt) {
     }
   });
   grunt.loadNpmTasks("grunt-browserify");
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks("grunt-este-watch");
-  grunt.registerTask('default', ['browserify']);
+  grunt.registerTask('default', ['browserify', 'uglify']);
 }
