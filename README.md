@@ -91,6 +91,7 @@ To compile the JSXs, install Nodejs and set up grunt.
 % npm install -g grunt-cli
 % npm install
 % grunt
+( or "grunt --watch" to watchify, "grunt build" to uglify js files. )
 ```
 
 Generate documents
