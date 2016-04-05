@@ -28,8 +28,7 @@ module.exports = function(grunt) {
       options: {
         compress: {
           drop_console: true
-        },
-        sourceMap: true
+        }
       },
       build: {
         src: 'skel/public/js/patriot-workflow-scheduler-<%= pkg.version %>.js',
