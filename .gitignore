@@ -9,7 +9,6 @@ run
 script
 /public
 /skel/public/js/patriot-workflow-scheduler-*.js
-/skel/public/js/patriot-workflow-scheduler-*.js.map
 
 # ignore plugins
 plugins/*
