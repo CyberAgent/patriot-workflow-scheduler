@@ -87,6 +87,22 @@ module.exports = React.createClass({
 
     return humanReadableDiffString;
   },
+  refresh: function() {
+    this.getGraph(
+      this.props.job.job_id,
+      this.props.dependencyProducerDepth,
+      this.props.dependencyConsumerDepth,
+      function(graph) {
+        if (lodash.isEqual(graph.nodes, this.state.graphNodes) === false ||
+            lodash.isEqual(graph.edges.sort(), this.state.graphEdges.sort()) === false) {
+          this.setState({
+            graphNodes: graph.nodes,
+            graphEdges: graph.edges,
+          });
+        }
+      }.bind(this)
+    );
+  },
   render: function() {
     var nodes = this.state.graphNodes;
     var edges = this.state.graphEdges;
@@ -227,6 +243,7 @@ module.exports = React.createClass({
 
     return (
       <div ref="graphDiv" className="nodeTree">
+        <button onClick={this.refresh}>refresh</button>
         <svg ref="nodeTree">
           <g ref="nodeTreeGroup"/>
         </svg>
