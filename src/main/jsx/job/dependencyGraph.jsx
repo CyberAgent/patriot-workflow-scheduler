@@ -11,39 +11,47 @@ import lodash from 'lodash';
 import moment from 'moment';
 
 module.exports = React.createClass({
-  mixins : [JobUtil, JobClient],
+  mixins: [JobUtil, JobClient],
   getDefaultProps: function() {
     return {
       rectHeight: 45
-    }
+    };
   },
   getInitialState: function(){
     return {
-      job: this.props.job,
       graphNodes: {},
       graphEdges: {},
-      dependencyProducerDepth: this.props.dependencyProducerDepth,
-      dependencyConsumerDepth: this.props.dependencyConsumerDepth,
-      divWidth: 0, // div width to draw a graph
-      divHeight: 0 // div height to draw a graph
     };
   },
   componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
-    this.setState({
-      job: this.props.job,
-      divWidth: ReactDOM.findDOMNode(this).offsetWidth,
-      divHeight: innerHeight - 150
-    });
+
+    this.getGraph(
+      this.props.job.job_id,
+      this.props.dependencyProducerDepth,
+      this.props.dependencyConsumerDepth,
+      function(graph) {
+        if (Object.keys(graph.nodes).length > 0) {
+          this.setState({
+            graphNodes: graph.nodes,
+            graphEdges: graph.edges
+          });
+        }
+      }.bind(this)
+    );
   },
   componentWillReceiveProps: function(nextProps) {
-    this.setState({
-      job: nextProps.job,
-      graphNodes: {},
-      graphEdges: {},
-      dependencyProducerDepth: nextProps.dependencyProducerDepth,
-      dependencyConsumerDepth: nextProps.dependencyConsumerDepth
-    });
+    this.getGraph(
+      nextProps.job.job_id,
+      nextProps.dependencyProducerDepth,
+      nextProps.dependencyConsumerDepth,
+      function(graph) {
+        this.setState({
+          graphNodes: graph.nodes,
+          graphEdges: graph.edges,
+        });
+      }.bind(this)
+    );
   },
   componentWillMount: function(){
     this.redraw = lodash.debounce(this.redraw, 200);
@@ -51,18 +59,8 @@ module.exports = React.createClass({
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.handleResize);
   },
-  shouldComponentUpdate: function(nextProps, nextState) {
-    if (typeof(nextState.job.job_id) === 'undefined') {
-      return false;
-    } else {
-      return true;
-    }
-  },
   redraw: function() {
-    this.setState({
-      divWidth: ReactDOM.findDOMNode(this).offsetWidth,
-      divHeight: innerHeight - 150
-    });
+    this.render();
   },
   handleResize: function(e) {
     this.redraw();
@@ -89,18 +87,33 @@ module.exports = React.createClass({
 
     return humanReadableDiffString;
   },
+  refresh: function() {
+    this.getGraph(
+      this.props.job.job_id,
+      this.props.dependencyProducerDepth,
+      this.props.dependencyConsumerDepth,
+      function(graph) {
+        if (lodash.isEqual(graph.nodes, this.state.graphNodes) === false ||
+            lodash.isEqual(graph.edges.sort(), this.state.graphEdges.sort()) === false) {
+          this.setState({
+            graphNodes: graph.nodes,
+            graphEdges: graph.edges,
+          });
+        }
+      }.bind(this)
+    );
+  },
   render: function() {
-    if (typeof(this.state.job.job_id) === 'undefined') return <div />;
-    this.getGraph(this.state.job.job_id, this.state.dependencyProducerDepth, this.state.dependencyConsumerDepth, function(graph) {
-      var nodes = graph.nodes;
-      var edges = graph.edges;
+    var nodes = this.state.graphNodes;
+    var edges = this.state.graphEdges;
 
-      if (typeof(window.d3) === "undefined") {
-        // set a global variable because d3 >=3.4 no longer exports a global d3
-        // https://github.com/mbostock/d3/issues/1727
-        window.d3 = d3;
-      }
+    if (typeof(window.d3) === "undefined") {
+      // set a global variable because d3 >=3.4 no longer exports a global d3
+      // https://github.com/mbostock/d3/issues/1727
+      window.d3 = d3;
+    }
 
+    if (Object.keys(nodes).length > 0) {
       // changing dependency depth from 4 to 0 always re-produces this problem
       var g = new dagreD3.graphlib.Graph().setGraph({})
         .setDefaultEdgeLabel(function() { return {}; });
@@ -131,7 +144,7 @@ module.exports = React.createClass({
         };
 
         // highlight selfJob
-        if (this.state.job.job_id === node.job_id) {
+        if (this.props.job.job_id === node.job_id) {
           nodeSetting['style'] = 'fill: #afeeee;';
         }
         g.setNode(key, nodeSetting);
@@ -143,8 +156,8 @@ module.exports = React.createClass({
       }.bind(this));
 
       // set up an svg group so that we can translate the final graph.
-      var svg = d3.select(ReactDOM.findDOMNode(this.refs.nodeTree));
-      var inner = d3.select(ReactDOM.findDOMNode(this.refs.nodeTreeGroup));
+      var svg = d3.select(this.refs.nodeTree);
+      var inner = d3.select(this.refs.nodeTreeGroup);
 
       // set up zoom support
       var zoom = d3.behavior.zoom().on("zoom", function() {
@@ -159,19 +172,22 @@ module.exports = React.createClass({
       // run the renderer. this is what draws the final graph.
       render(inner, g);
 
-      var initialScaleHorizontal = this.state.divWidth / g.graph().width;
-      var initialScaleVertical = this.state.divHeight / g.graph().height;
+      var divWidth  = this.refs.graphDiv.offsetWidth;
+      var divHeight = innerHeight;
+
+      var initialScaleHorizontal = divWidth / g.graph().width;
+      var initialScaleVertical = divHeight / g.graph().height;
 
       var initialScale = initialScaleHorizontal < initialScaleVertical ? initialScaleHorizontal : initialScaleVertical;
       if (initialScale >= 1) initialScale = 1;
 
       // center and resize
       zoom
-        .translate([(this.state.divWidth - g.graph().width * initialScale) / 2, 20])
+        .translate([(divWidth - g.graph().width * initialScale) / 2, 20])
         .scale(initialScale)
         .event(svg);
-      svg.attr('height', this.state.divHeight);
-      svg.attr('width', this.state.divWidth);
+      svg.attr('height', divHeight);
+      svg.attr('width', divWidth);
 
       // tooltip
       var tooltip = d3.select("body")
@@ -208,7 +224,7 @@ module.exports = React.createClass({
           .style("visibility", "visible");
       }.bind(this))
       .on("mousemove", function(){
-        if (d3.event.pageX > this.state.divWidth / 2 + 200) {
+        if (d3.event.pageX > divWidth / 2 + 200) {
           return tooltip.style("top", (d3.event.pageY+10)+"px").style("left", (d3.event.pageX-300)+"px");
         } else {
           return tooltip.style("top", (d3.event.pageY+10)+"px").style("left", (d3.event.pageX+10)+"px");
@@ -223,10 +239,11 @@ module.exports = React.createClass({
 
       // set fixed height even if scaled to x %
       svg.selectAll("g.node rect").attr("height", this.props.rectHeight);
-    }.bind(this));
+    }
 
     return (
-      <div className="nodeTree">
+      <div ref="graphDiv" className="nodeTree">
+        <button onClick={this.refresh}>refresh</button>
         <svg ref="nodeTree">
           <g ref="nodeTreeGroup"/>
         </svg>
