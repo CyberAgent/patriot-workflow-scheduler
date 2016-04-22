@@ -20,61 +20,19 @@ module PatriotAWS
 
       # @see Patriot::Command::Base#configure
       def configure
-        # check ini file
-        if @inifile
-          ini = IniFile.load(@inifile)
-          raise Exception, 'inifile not found.' if ini.nil?
-
-          @options ||= {}
-          @options[:access_key_id] ||=
-            ini['common']['access_key_id'] || ini['s3']['access_key_id']
-          @options[:secret_access_key] ||=
-            ini['s3']['secret_access_key'] || ini['common']['secret_access_key']
-          @options[:region] ||=
-            ini['s3']['region'] || ini['common']['region']
-        end
-
-        @options[:cmd_opts] = {} if @options[:cmd_opts].nil?
-        @options[:cmd_opts][:multipart_threshold] ||= 15_728_640
-
-        # check region
-        raise Exception, 'region is not set.' if @options[:region].nil?
-
-        # check credentials
-        if @options[:access_key_id].nil?
-          raise Exception, 'access_key_id is not set.'
-        end
-        if @options[:secret_access_key].nil?
-          raise Exception, 'secret_access_key is not set.'
-        end
-
-        # check command
-        raise Exception, 's3 comamnd is not set.' if @command.nil?
-
-        # check command and resources
-        case @command
-        when COMMAND_COPY.to_s
-          raise Exception, 'src or dest are not set.' if @src.nil? || @dest.nil?
-
-          # check target if file exists
-          raise Exception, 'src file does not exist.' unless File.exist?(@src)
-
-          # check if file is not empty
-          raise Exception, 'The target file is empty.' unless File.size?(@src)
-        else
-          raise Exception,
-                'command is invalid. '\
-                "supported commands are #{S3_COMMANDS.map(&:to_s)}"
-        end
-
         self
       end
 
       def execute
         @logger.info "start s3 #{@command}"
-        @options = @options.symbolize_keys
 
-        config(@options)
+        @options ||= {}
+        @options = @options.symbolize_keys
+        @options = _set_options(@inifile, @options)
+
+        _check_attrs(@command, @options, @src, @dest)
+
+        config_aws(@options)
         s3_cli = Aws::S3::Client.new
 
         case @command
@@ -88,6 +46,70 @@ module PatriotAWS
                 "supported commands are #{S3_COMMANDS.map(&:to_s)}"
         end
       end
+
+      # @private
+      # get inifile info and set options parameters
+      # @param  String          inifile
+      # @param  Hash            options
+      # @return Hash            options
+      def _set_options(inifile, options)
+        if inifile
+          ini = IniFile.load(inifile)
+          raise Exception, 'inifile not found.' if ini.nil?
+
+          options[:access_key_id] =
+            ini['common']['access_key_id'] || ini['s3']['access_key_id']
+          options[:secret_access_key] =
+            ini['s3']['secret_access_key'] || ini['common']['secret_access_key']
+          options[:region] ||=
+            ini['s3']['region'] || ini['common']['region']
+        end
+
+        options[:cmd_opts] = {} if options[:cmd_opts].nil?
+        options[:cmd_opts][:multipart_threshold] ||= 15_728_640
+
+        options
+      end
+      private :_set_options
+
+      # @private
+      # check command_attr
+      # @param  String          command
+      # @param  Hash            options
+      # @param  String          src
+      # @param  String          dest
+      def _check_attrs(command, options, src, dest)
+        # check region
+        raise Exception, 'region is not set.' if options[:region].nil?
+
+        # check credentials
+        if options[:access_key_id].nil?
+          raise Exception, 'access_key_id is not set.'
+        end
+        if options[:secret_access_key].nil?
+          raise Exception, 'secret_access_key is not set.'
+        end
+
+        # check command
+        raise Exception, 's3 comamnd is not set.' if command.nil?
+
+        # check command and resources
+        case command
+        when COMMAND_COPY.to_s
+          raise Exception, 'src or dest are not set.' if src.nil? || dest.nil?
+
+          # check target if file exists
+          raise Exception, 'src file does not exist.' unless File.exist?(src)
+
+          # check if file is not empty
+          raise Exception, 'The target file is empty.' unless File.size?(src)
+        else
+          raise Exception,
+                'command is invalid. '\
+                "supported commands are #{S3_COMMANDS.map(&:to_s)}"
+        end
+      end
+      private :_check_attrs
 
       # @private
       # copy file(s) between file and s3

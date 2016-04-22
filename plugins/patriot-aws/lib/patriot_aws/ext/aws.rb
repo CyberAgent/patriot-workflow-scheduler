@@ -7,7 +7,7 @@ module PatriotAWS
         cls.send(:include, Patriot::Util::System)
       end
 
-      def config(options)
+      def config_aws(options)
         options.symbolize_keys
         Aws.config.update(
           access_key_id: options[:access_key_id],
