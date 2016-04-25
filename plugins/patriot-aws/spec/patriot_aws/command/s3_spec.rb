@@ -18,7 +18,19 @@ describe PatriotAWS::Command::S3Command do
     it 'should get job_id' do
       cmd = new_command(PatriotAWS::Command::S3Command) do
         name 'test_s3'
-        name_suffix _date_
+        name_suffix 'name_suffix_test'
+        command 'copy'
+      end
+      cmd = cmd.build[0]
+
+      expect(cmd.job_id).to eq('s3_copy_test_s3_name_suffix_test')
+    end
+  end
+
+  describe 'configure' do
+    it 'should set date if name_suffix is not passed' do
+      cmd = new_command(PatriotAWS::Command::S3Command) do
+        name 'test_s3'
         command 'copy'
       end
       cmd = cmd.build[0]

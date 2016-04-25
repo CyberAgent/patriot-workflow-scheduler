@@ -13,13 +13,13 @@ module PatriotAWS
       S3_COMMANDS = [COMMAND_COPY].freeze
 
       def job_id
-        job_id = "#{command_name}_#{@command}_#{@name}"
-        job_id += "_#{@name_suffix}" if @name_suffix
+        job_id = "#{command_name}_#{@command}_#{@name}_#{@name_suffix}"
         job_id
       end
 
       # @see Patriot::Command::Base#configure
       def configure
+        @name_suffix ||= _date_
         self
       end
 
