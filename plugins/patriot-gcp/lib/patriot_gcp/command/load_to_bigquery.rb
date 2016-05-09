@@ -5,34 +5,32 @@ module PatriotGCP
       include PatriotGCP::Ext::BigQuery
 
       command_attr :inifile, :project_id, :dataset, :table, :schema, :options, :input_file, :name_suffix, :polling_interval
+      validate_existence :inifile, :project_id, :dataset, :table
 
       class BigQueryException < Exception; end
       class GoogleCloudPlatformException < Exception; end
 
       def job_id
-        job_id = "#{command_name}_#{@project_id}_#{@dataset}_#{@table}"
-        job_id = "#{job_id}_#{@name_suffix}" unless @name_suffix.nil?
-        return job_id
+        "#{command_name}_#{@project_id}_#{@dataset}_#{@table}_#{@name_suffix}"
       end
 
       # @see Patriot::Command::Base#configure
       def configure
+        @name_suffix ||= _date_
+        self
+      end
+
+      def execute
+        @logger.info "start load_to_bigquery"
+
         ini = IniFile.load(@inifile)
         if ini.nil?
           raise Exception, "inifile not found"
         end
 
-        @service_account  = ini["gcp"]["service_account"]
-        @private_key      = ini["gcp"]["private_key"]
-        @key_pass         = ini["gcp"]["key_pass"]
-        @project_id     ||= ini["bigquery"]["project_id"]
-        @dataset        ||= ini["bigquery"]["dataset"]
-
-        return self
-      end
-
-      def execute
-        @logger.info "start load_to_bigquery"
+        service_account  = ini["gcp"]["service_account"]
+        private_key      = ini["gcp"]["private_key"]
+        key_pass         = ini["gcp"]["key_pass"]
 
         unless File.exist?(@input_file)
           raise Exception, "The given file doesn't exist."
@@ -43,17 +41,15 @@ module PatriotGCP
           return
         end
 
-        if @service_account.nil? or @private_key.nil?
+        if service_account.nil? or private_key.nil?
           raise GoogleCloudPlatformException, "configuration for GCP is not enough."
-        elsif @project_id.nil? or @dataset.nil?
-          raise BigQueryException, "configuration for BigQuery is not enough."
         end
 
         @logger.info "start uploading"
         stat_info = bq_load(@input_file,
-                            @private_key,
-                            @key_pass,
-                            @service_account,
+                            private_key,
+                            key_pass,
+                            service_account,
                             @project_id,
                             @dataset,
                             @table,
