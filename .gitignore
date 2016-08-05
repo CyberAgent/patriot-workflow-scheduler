@@ -26,4 +26,7 @@ node_modules
 _yardoc
 doc/
 
+# target dir for Sphinx docs
+docs/build/
+
 !.gitignore
