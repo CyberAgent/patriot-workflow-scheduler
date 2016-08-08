@@ -15,6 +15,7 @@ This command enables you to upload data into BigQuery.
 Option Name | Description
 ----------- | ------------
 inifile | Indicate the location of the ini file. Assumed format is described below.
+project_id | Set the name of the project id to use.
 dataset | Set the name of the dataset you want to upload data into.
 table | Set the name of the table under the dataset. If the table doesn't exist, it will be created along with the schema you indicate.
 schema | Set the schema which generated data would have.
@@ -33,9 +34,6 @@ An ini file for this plugin should have the following directives:
 service_account = <your service account email address>
 private_key = <the location of your p12 key file>
 key_pass = <the key phrase for the private key>
-
-[bigquery]
-project_id = <project_id you want to upload into>
 ```
 
 
@@ -46,7 +44,8 @@ You can use `load_to_bigquery` command in your PBC file like the following. If t
 ```
 load_to_bigquery {
   input_file "/tmp/data_#{_date_}.tsv"
-  inifile '/home/foo/.project.ini'
+  inifile '/home/foo/.gcp.ini'
+  project_id 'the_project_id'
   dataset 'the_dataset'
   table 'the_table' + _month_.gsub(/-/, "_")
   schema 'fields' => [{ "name"=> "timestamp",
