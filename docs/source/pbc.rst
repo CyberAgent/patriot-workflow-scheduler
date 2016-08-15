@@ -252,6 +252,57 @@ By using the custom commands, the configurations can be written as below.
     query "SELECT count(1) FROM table WHERE dt = '#{_date_}'"
   }
 
+Schedule Jobs
+=============
+
+Jobs can be scheduled like cron.
+There are several ways to set scheduled jobs.
+
+Cron Like Format
+----------------
+
+To set jobs to execute at 1 a.m. every day, write the following line anywhere in the pbc file.
+The format is as same as cron format.
+
+.. code-block:: ruby
+
+  #interval 0 1 * * *
+
+Other formats
+----------------
+
+To set jobs at the end of months, write the following line anywhere in the pbc files.
+
+.. code-block:: ruby
+
+  #interval end_of_every_month
+
+To set jobs at specific date, add *exec_date* option to any command, job_group or composite_job.
+The configuration can be written as below.
+
+.. code-block:: ruby
+
+  sh{
+    name 'test'
+    commands ["echo 'hello world' > /tmp/out.txt"]
+    exec_date '2015-07-30'
+  }
+
+To set jobs at specific time, add *start_after* option to any command, job_group or composite_job.
+The configuration can be written as below.
+
+.. code-block:: ruby
+
+  sh{
+    name 'test'
+    commands ["echo 'hello world' > /tmp/out.txt"]
+    start_after '01:30:00'
+  }
+
+*exec_date* and *start_after* can be used together or separately.
+If only *exec_date* is used, the execute time is set to 00:00:00.
+And if only *start_after* is used, the execute date is set to the day after given target date.
+
 Other Configuration Options
 ===========================
 
