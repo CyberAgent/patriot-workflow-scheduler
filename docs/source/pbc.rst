@@ -252,8 +252,8 @@ By using the custom commands, the configurations can be written as below.
     query "SELECT count(1) FROM table WHERE dt = '#{_date_}'"
   }
 
-Schedule Jobs
-=============
+Creating Scheduled Jobs
+=======================
 
 Jobs can be scheduled like cron.
 There are several ways to set scheduled jobs.
@@ -272,12 +272,13 @@ Other formats
 ----------------
 
 To set jobs at the end of months, write the following line anywhere in the pbc files.
+The job with this configuration will be processed only when registered with a date argument of a last day of a month.
 
 .. code-block:: ruby
 
   #interval end_of_every_month
 
-To set jobs at specific date, add *exec_date* option to any command, job_group or composite_job.
+To set jobs at specific date, add **exec_date** option to any command, job_group or composite_job.
 The configuration can be written as below.
 
 .. code-block:: ruby
@@ -288,7 +289,7 @@ The configuration can be written as below.
     exec_date '2015-07-30'
   }
 
-To set jobs at specific time, add *start_after* option to any command, job_group or composite_job.
+To set jobs at specific time, add **start_after** option to any command, job_group or composite_job.
 The configuration can be written as below.
 
 .. code-block:: ruby
@@ -299,9 +300,9 @@ The configuration can be written as below.
     start_after '01:30:00'
   }
 
-*exec_date* and *start_after* can be used together or separately.
-If only *exec_date* is used, the execute time is set to 00:00:00.
-And if only *start_after* is used, the execute date is set to the day after given target date.
+**exec_date** and **start_after** can be used together or separately.
+If only **exec_date** is used, the execute time is set to 00:00:00.
+And if only **start_after** is used, the execute date is set to the day after given target date.
 
 Other Configuration Options
 ===========================
@@ -309,7 +310,7 @@ Other Configuration Options
 Priority
 ---------
 
-Priority can be set by using *priority* in each job or job group.
+Priority can be set by using **priority** in each job or job group.
 Jobs in JobStore are sorted by the priority in ascending order.
 Therefore, jobs with lower priority value are preferentially fetched.
 
@@ -332,7 +333,7 @@ Skip / Suspend
 ----------------
 
 Jobs can be skipped or suspended when they should not be executed automatically.
-Each state can be set by putting *skip* or *suspend*, respectively
+Each state can be set by putting **skip** or **suspend**, respectively
 
 .. code-block:: ruby
 
@@ -352,9 +353,9 @@ Each state can be set by putting *skip* or *suspend*, respectively
 Limiting Node/Host
 ----------------------
 
-When a job should be run on a certain host, this can be achieved by setting *exec_host* or *exec_node*.
-The *exec_host* limits the host where the job is executed (limited by hostname).
-Jobs with *exec_node* are only executed by threads labeled with the configured labels (see :doc:`system configuration <config>`).
+When a job should be run on a certain host, this can be achieved by setting **exec_host** or **exec_node**.
+The **exec_host** limits the host where the job is executed (limited by hostname).
+Jobs with **exec_node** are only executed by threads labeled with the configured labels (see :doc:`system configuration <config>`).
 
 .. code-block:: ruby
 
@@ -390,7 +391,7 @@ In the retry configuration, retry interval and the number of retries can be conf
 Mail Notification
 ----------------------
 
-To send a mail when a job finished, *mail_notification* should be set to the job.
+To send a mail when a job finished, **mail_notification** should be set to the job.
 For using this functionality, SMTP should be configured on the host where the worker process is running.
 
 .. code-block:: ruby
