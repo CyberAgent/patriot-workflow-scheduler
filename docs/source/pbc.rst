@@ -117,6 +117,29 @@ Since PBC is an Ruby-internal DSL, this example can be written more concisely.
     commands ["hive -e 'SELECT count(1) FROM table WHERE dt = \'#{_date_}\'' > result_#{_date_}"]
   }
 
+A job with a series of jobs
+===========================
+
+Basically, each job will be processed on any different worker host.
+But sometimes you may want to execute a series of jobs on the very same host, or you may want to re-execute whole jobs when a job in the middle of a series failed.
+**composite_job** is to be used for such a situation.
+
+.. code-block:: ruby
+
+  composite_job {
+    produce ["dump_file_#{_date_}"]
+
+    sh {
+      name "mysqldump_#{_date_}"
+      commands ["mysqldump -u user_name database_name table_name > filename"]
+    }
+
+    sh {
+      name "scp_to_another_host_#{_date_}"
+      commands ["scp filename user@host:/tmp/filename"]
+    }
+  }
+
 Implementing and Using Custom Commands
 =========================================
 
