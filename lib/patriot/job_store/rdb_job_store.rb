@@ -273,7 +273,7 @@ END_OB_QUERY
 
       def _get_jobs_for_products(table, products, opts = {:include_attrs => [Patriot::Command::STATE_ATTR]}, c)
         result = []
-        return result if products.blank?
+        return result if products.empty?
         products = [products] unless products.is_a? Array
         included_cols = (opts[:include_attrs] || []).map{|a| ATTR_TO_COLUMN[a]}
 

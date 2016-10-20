@@ -24,7 +24,7 @@ module Patriot
           offset = (params['offset'] || DEFAULT_JOB_OFFSET).to_i
 
           query = {:limit  => limit, :offset => offset}
-          query[:filter_exp] = params['filter_exp'] unless params['filter_exp'].blank?
+          query[:filter_exp] = params['filter_exp'] unless params['filter_exp'].nil? || params['filter_exp'].empty?
           job_ids = @@worker.job_store.find_jobs_by_state(state, query) || []
           return JSON.generate(job_ids.map{|job_id| {:job_id => job_id, :state => state}})
         end
@@ -59,7 +59,7 @@ module Patriot
         post '/' do
           protected!
           body = JSON.parse(request.body.read)
-          halt(400, json({ERROR: "COMMAND_CLASS is not provided"})) if body["COMMAND_CLASS"].blank?
+          halt(400, json({ERROR: "COMMAND_CLASS is not provided"})) if body["COMMAND_CLASS"].empty?
           halt(400, json({ERROR: "Patriot::Command::CommandGroup is not acceptable"})) if body["COMMAND_CLASS"] == "Patriot::Command::CommandGroup"
           command_class = body.delete("COMMAND_CLASS").gsub(/\./, '::').constantize
 
