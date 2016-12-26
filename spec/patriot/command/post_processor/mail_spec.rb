@@ -41,6 +41,16 @@ describe Patriot::Command::PostProcessor::MailNotification do
     name 'fail_fail'
     commands 'sh -c "exit 1"'
   }
+  sh{
+    mail_notification 'to' => ['to1@test', 'to2@test'], 'on' => 'failed'
+    name 'multi_recipients'
+    commands 'sh -c "exit 1"'
+  }
+  sh{
+    mail_notification 'to' => [], 'on' => 'failed'
+    name 'dummy_recipients'
+    commands 'sh -c "exit 1"'
+  }
 EOJ
     )
     @job_store = @worker.instance_variable_get(:@job_store)
@@ -92,6 +102,21 @@ EOJ
   it "should notify on failure with failure enabled setting" do
     job_ticket = Patriot::JobStore::JobTicket.new("sh_fail_fail_#{@dt}", @update_id)
     expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to@test", "#{job_ticket.job_id} has been failed", anything)
+    expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
+    job = @job_store.get_job(job_ticket.job_id)
+    expect(job).to be_failed_in @job_store
+  end
+  it "should notify to multiple recipients" do
+    job_ticket = Patriot::JobStore::JobTicket.new("sh_multi_recipients_#{@dt}", @update_id)
+    expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to1@test", "#{job_ticket.job_id} has been failed", anything)
+    expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).to receive(:deliver).with("from@test", "to2@test", "#{job_ticket.job_id} has been failed", anything)
+    expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
+    job = @job_store.get_job(job_ticket.job_id)
+    expect(job).to be_failed_in @job_store
+  end
+  it "should not notify in case of empty recipients " do
+    job_ticket = Patriot::JobStore::JobTicket.new("sh_dummy_recipients_#{@dt}", @update_id)
+    expect_any_instance_of(Patriot::Command::PostProcessor::MailNotification).not_to receive(:deliver)
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
     job = @job_store.get_job(job_ticket.job_id)
     expect(job).to be_failed_in @job_store

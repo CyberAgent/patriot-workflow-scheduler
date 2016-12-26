@@ -39,7 +39,8 @@ module Patriot
           to   = @props[TO_PROP_KEY]
           subject = "#{job_ticket.job_id} has been failed"
           body = "#{job_ticket.job_id} has been failed \n\n --- \n #{job_ticket.description}"
-          deliver(from, to, subject, body)
+          to = [to] unless to.is_a? Array
+          to.each{|to_addr| deliver(from, to_addr, subject, body) }
         end
 
         def deliver(from_addr, to_addr, msg_subj, msg_body)
