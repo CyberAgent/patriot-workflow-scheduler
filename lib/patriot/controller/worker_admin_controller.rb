@@ -29,6 +29,7 @@ module Patriot
         @default_hosts = @config.get(WORKER_HOST_KEY) || []
         @default_port  = @config.get(INFO_SERVER_PORT_KEY)
         @user          = @config.get(ADMIN_USER_KEY)
+        @worker_user   = @config.get(WORKER_USER_KEY)
       end
       private :set_default_values
 
@@ -140,7 +141,8 @@ module Patriot
       # execute a worker command at a remote host
       # @param host [String] host name of the target host
       def controll_worker_at(host, cmd)
-        ssh_cmd = "ssh -l #{@user} #{host} sudo #{WORKER_COMMAND} #{cmd}"
+        sudoer = @worker_user.nil? ? "" : "-u #{@worker_user}"
+        ssh_cmd = "ssh -l #{@user} #{host} sudo #{sudoer} #{WORKER_COMMAND} #{cmd}"
         @logger.info ssh_cmd
         puts `#{ssh_cmd}`
       end

@@ -17,8 +17,10 @@ module Patriot
       PLUGIN_LIB_DIR = 'lib'
       # plugin initiation script
       PLUGIN_INIT_SCRIPT = 'init.rb'
-      # admin user mail address
+      # admin user to access remote host
       ADMIN_USER_KEY = 'admin_user'
+      # user who runs worker
+      WORKER_USER_KEY = 'worker_user'
 
       # a comma separated list of hosts where workers are running
       WORKER_HOST_KEY = 'worker_hosts'
