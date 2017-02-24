@@ -158,11 +158,11 @@ module Patriot
       def set_traps
         Patriot::Worker::SIGNAL_FOR_GRACEFUL_SHUTDOWN.each do |s|
           Signal.trap(s) do
-            @logger.info "SIG#{s}: worker will terminate"
             @status = Patriot::Worker::Status::SHUTDOWN
           end
         end
         Patriot::Worker::SIGNAL_FOR_THREAD_DUMP.each do |s|
+          # TODO may not work on Ruby 2.x
           Signal.trap(s) do
             # TODO output to separated stream
             Thread.list.each do |t|
