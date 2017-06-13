@@ -25,7 +25,6 @@ Each job can be in one of following states.
 
       The web console has a capability for filtering jobs by job_id.
       The filter searches jobs by complete match.
-      If you want to search jobs with job_ids prefixed with 'prefix', the filter should be set as 'prefix%'.
 
   * Discarded State
 

@@ -401,7 +401,7 @@ END_OB_QUERY
       def find_jobs_by_state(state, opts = {})
         raise "OFFSET is set WITHOUT LIMIT" if opts.has_key?(:offset) && !opts.has_key?(:limit)
         condition = ["state = #{state}", "id != #{@initiator_id}"]
-        condition |= ["job_id LIKE '#{opts[:filter_exp]}'"] if opts.has_key?(:filter_exp)
+        condition |= ["job_id LIKE '#{opts[:filter_exp]}%'"] if opts.has_key?(:filter_exp)
         query = "SELECT job_id FROM jobs WHERE #{condition.join(' AND ')}"
         query = "#{query} ORDER BY update_id DESC"
         if opts.has_key?(:limit)
