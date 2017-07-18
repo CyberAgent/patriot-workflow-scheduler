@@ -4,6 +4,7 @@ import JobClient from './common/jobClient';
 import JobChangeConfirmModal from './common/jobChangeConfirmModal';
 import { Router, Route, Link, IndexRoute } from 'react-router'
 import { formatPattern } from 'react-router/lib/PatternUtils';
+import moment from 'moment';
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
@@ -18,6 +19,28 @@ module.exports = React.createClass({
       updateModalIsOpen : false,
       deleteModalIsOpen : false
     };
+  },
+  componentDidMount: function(){
+    this.setHistory(this.props.jobs);
+  },
+  componentWillReceiveProps : function(nextProps){
+    if (nextProps.jobs != this.props.jobs) {
+      this.setHistory(nextProps.jobs);
+    }
+  },
+  setHistory: function(jobs){
+    jobs.forEach(job => {
+      this.getHistory(job.job_id, 3, function(history){
+        // update jobs
+        for (var idx=0; jobs.length > idx; idx++) {
+          if (jobs[idx].job_id == job.job_id) {
+            jobs[idx].history = history;
+          }
+        }
+
+        this.setState({ jobs });
+      }.bind(this));
+    });
   },
   handleAllChecked: function(){
     var allChecked = !this.state.allChecked;
@@ -87,6 +110,29 @@ module.exports = React.createClass({
     }.bind(this));
     return jobIds;
   },
+  getBeginAt: function(job) {
+    if (
+      job.state != this.constants.INITIATING &&
+      job.state != this.constants.WAITING &&
+      typeof(job.history) != 'undefined'
+    ) {
+      return moment(job.history[0].begin_at).format('YYYY-MM-DD HH:mm');
+    } else {
+      return '';
+    }
+  },
+  getEndAt: function(job) {
+    if (
+      job.state != this.constants.INITIATING &&
+      job.state != this.constants.WAITING &&
+      job.state != this.constants.RUNNING &&
+      typeof(job.history) != 'undefined'
+    ) {
+      return moment(job.history[0].end_at).format('YYYY-MM-DD HH:mm');
+    } else {
+      return '';
+    }
+  },
   render : function(){
     return (
       <div className="alt-table-responsive">
@@ -110,8 +156,10 @@ module.exports = React.createClass({
               <th className="col-md-1">
                 <input type="checkbox" onChange={this.handleAllChecked} checked={this.state.allChecked}></input>
               </th>
-              <th className="col-md-9"> Job ID </th>
+              <th className="col-md-5"> Job ID </th>
               <th className="col-md-2"> State </th>
+              <th className="col-md-2"> Start </th>
+              <th className="col-md-2"> End </th>
             </tr>
           </thead>
           <tbody>
@@ -120,6 +168,8 @@ module.exports = React.createClass({
                         <td onClick={this.jobSelectionHandler(job.job_id)}><input className="form-control small-checkbox" type="checkbox" checked={this.state.selected[job.job_id]}></input> </td>
                         <td><Link to={formatPattern("/job/detail/:job_id", {job_id: job.job_id})}> {job.job_id} </Link> </td>
                         <td> {this.name_of_state(job.state)} </td>
+                        <td> {this.getBeginAt(job)} </td>
+                        <td> {this.getEndAt(job)} </td>
                       </tr> );
             }.bind(this))}
           </tbody>
