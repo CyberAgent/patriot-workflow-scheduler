@@ -65,6 +65,7 @@ module Patriot
 
           job = _build_command(command_class, body)[0]
           job[Patriot::Command::STATE_ATTR] ||= body["state"]
+          job[Patriot::Command::START_DATETIME_ATTR] = Time.parse body["start_datetime"] if body["start_datetime"]
           @@worker.job_store.register(Time.now.to_i, [job])
           return JSON.generate({:job_id => job.job_id})
         end
