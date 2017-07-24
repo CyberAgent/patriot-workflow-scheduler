@@ -41,6 +41,11 @@ module.exports = {
       callback(body);
     });
   },
+  updateJob: function(job, callback){
+    http.request_with_body(jobApiPath, "POST", job, function(body){
+      callback(body);
+    });
+  },
   updateJobs: function(jobIds, postStatus, options, callback){
     postStatus.job_ids = jobIds;
     http.request_with_body(jobApiPath, "PUT", postStatus, function(body){

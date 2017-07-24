@@ -12,6 +12,8 @@ import Tab from 'react-tabs/lib/components/Tab';
 import Tabs from 'react-tabs/lib/components/Tabs';
 import TabList from 'react-tabs/lib/components/TabList';
 import TabPanel from 'react-tabs/lib/components/TabPanel';
+import TextareaAutosize from 'react-autosize-textarea';
+import moment from 'moment';
 
 const commonJobAttributes = [
   "COMMAND_CLASS", "update_id", "state", "priority", "start_datetime", "exec_host", "exec_node",
@@ -22,6 +24,9 @@ const tabIndex = {
   "TAB_INDEX_DEFAULT": 0,
   "TAB_INDEX_GRAPH": 1
 };
+
+const datetime_regex = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.*/;
+const int_regex = /^[0-9]+$/;
 
 module.exports = React.createClass({
   mixins : [JobUtil, JobClient],
@@ -41,6 +46,7 @@ module.exports = React.createClass({
     this.setHistory(this.props.params.jobId);
   },
   componentWillReceiveProps: function(nextProps){
+    this.setState({ editMode: false });
     this.setHistory(nextProps.params.jobId);
   },
   componentWillUpdate: function(nextProps, newState){
@@ -48,7 +54,7 @@ module.exports = React.createClass({
   setHistory : function(jobId){
     this.getJob(jobId, function(job){
       this.getHistory(jobId, 3, function(history){
-        this.setState({job: job, history: history });
+        this.setState({job: job, originalJob: Object.assign({}, job), history: history });
       }.bind(this));
     }.bind(this));
   },
@@ -60,6 +66,135 @@ module.exports = React.createClass({
   },
   handleChangeConsumerGraphDepth: function(val) {
     this.setState({dependencyConsumerDepth: val});
+  },
+  handleEditMode: function() {
+    this.setState({ editMode: true });
+  },
+  handleCancelEdit: function() {
+    this.setState({
+      job: Object.assign({}, this.state.originalJob),
+      editMode: false,
+    });
+  },
+  handleEditingField: function(editingField) {
+    this.setState({ editingField });
+  },
+  handleUpdateJob: function(e) {
+    let { job } = this.state;
+    const { editingField } = this.state;
+
+    if (Array.isArray(job[editingField])) {
+      job[editingField] = e.target.value.split("\n");
+    } else {
+      job[editingField] = e.target.value;
+    }
+
+    // job[editingField] = e.target.value;
+    this.setState({ job });
+  },
+  handleUpdateJobSubmit: function() {
+    let { job } = this.state;
+    const { originalJob } = this.state;
+
+    if (JSON.stringify(job) === JSON.stringify(originalJob)) {
+      // Nothing to update
+      this.setState({ editMode: false });
+      return;
+    } else if (this.validateJobInfo(job) == false) {
+      return;
+    }
+
+    // replace empty with null
+    Object.keys(job).forEach((key) => {
+      if (typeof(job[key]) == 'string' && job[key].length == 0) {
+        job[key] = null;
+      } else if (Array.isArray(job[key])) {
+        job[key]= job[key].filter((item) => {return item.length > 0});
+      }
+    });
+
+    this.updateJob(job, function(res){
+      this.context.router.replace("/job/detail/" + encodeURIComponent(res.job_id));
+    }.bind(this));
+
+    this.setState({ editMode: false });
+  },
+  handleOnKeyUp: function(e) {
+    const ENTER = 13;
+    if (e.keyCode == ENTER) {
+      this.handleUpdateJobSubmit();
+    }
+  },
+  validateJobInfo: function(job) {
+    let hasError = false;
+    let errorMsg = '';
+
+    if (job['start_datetime'] && datetime_regex.test(job['start_datetime']) == false) {
+      hasError = true;
+      errorMsg = 'ERROR: [Start After] date format is invalid. Valid format is YYYY-MM-DD HH24:MI:SS';
+    } else if (job['start_datetime'] && moment(job['start_datetime']).isValid() == false) {
+      hasError = true;
+      errorMsg = 'ERROR: [Start After] date format is invalid.';
+    } else if (job['priority'] && int_regex.test(job['priority']) == false) {
+      hasError = true;
+      errorMsg = 'ERROR: [Priority] should be number and over 0.';
+    }
+
+    if (hasError) {
+      alert(errorMsg);
+      return false;
+    } else {
+      return true;
+    }
+  },
+  renderJobInfo: function(editingField) {
+    const { editMode } = this.state;
+    let val = this.state.job[editingField];
+
+    if (editMode) {
+      if (editingField== 'start_datetime' && val && val.length > 0) {
+        val = val && datetime_regex.test(val)? moment(val).format('YYYY-MM-DD HH:mm:ss'): val;
+
+        return (<input type="text" value={val} onFocus={() => this.handleEditingField(editingField)} onChange={this.handleUpdateJob} onKeyUp={this.handleOnKeyUp} />);
+      } else if (Array.isArray(val)) {
+        val = val.join("\n");
+        return (
+          <div>
+            <TextareaAutosize
+              rows={2}
+              maxRows={6}
+              value={val}
+              onFocus={() => this.handleEditingField(editingField)}
+              onChange={this.handleUpdateJob}
+            />
+            &nbsp;Please split parameters with new lines.
+          </div>
+        );
+      } else {
+        return (<input type="text" value={val} onFocus={() => this.handleEditingField(editingField)} onChange={this.handleUpdateJob} onKeyUp={this.handleOnKeyUp} />);
+      }
+    } else {
+      if (Array.isArray(val)) {
+        return val.map((item, idx) => {
+          return (<div key={item + idx}>{item}<br /></div>);
+        });
+      } else {
+        return val;
+      }
+    }
+  },
+  renderEditButton() {
+    if (this.state.editMode) {
+      return (
+        <div>
+          <button onClick={() => this.handleCancelEdit()} className="btn btn-default btn-xs">Cancel</button>
+          &nbsp;
+          <button onClick={() => this.handleUpdateJobSubmit()} className="btn btn-primary btn-xs">Submit</button>
+        </div>
+      );
+    } else {
+      return <button onClick={() => this.handleEditMode()} className="btn btn-default btn-xs">edit</button>;
+    }
   },
   render : function(){
     var update_at = new Date(this.state.job.update_id * 1000).toString();
@@ -81,7 +216,7 @@ module.exports = React.createClass({
           commandAttributes.push((
             <tr key={key}>
               <td className="original main">{key}</td>
-              <td style={tdStyle} colSpan="3">{JSON.stringify(obj)}</td>
+              <td style={tdStyle} colSpan='3'>{JSON.stringify(obj)}</td>
             </tr>
           ));
         }
@@ -121,7 +256,12 @@ module.exports = React.createClass({
       <TabPanel>
         <div><h1 className="original">{this.props.params.jobId}</h1></div>
         <h3> Job Info. </h3>
-        <ChangeJobStateForm jobId={this.props.params.jobId} currentState={this.state.job.state} />
+        <div style={{display: "inline-block"}}>
+          <ChangeJobStateForm jobId={this.props.params.jobId} currentState={this.state.job.state} />
+        </div>
+        <div style={{display: "inline-block", float: "right"}}>
+          {this.renderEditButton()}
+        </div>
         <table className="table table-bordered" style={{tableLayout:"fixed"}}>
           <tbody>
             <tr>
@@ -130,15 +270,15 @@ module.exports = React.createClass({
               <td className="original main">Updated at</td><td>{update_at}</td>
               <td className="original main">State</td><td>{this.name_of_state(this.state.job.state)}</td>
             </tr><tr>
-              <td className="original main">Priority</td><td>{this.state.job.priority}</td>
-              <td className="original main">Start After</td><td>{this.state.job.start_datetime}</td>
+              <td className="original main">Priority</td><td>{this.renderJobInfo('priority')}</td>
+              <td className="original main">Start After</td><td>{this.renderJobInfo('start_datetime')}</td>
             </tr><tr>
-              <td className="original main">Host</td><td>{this.state.job.exec_host}</td>
-              <td className="original main">Node</td><td>{this.state.job.exec_node}</td>
+              <td className="original main">Host</td><td>{this.renderJobInfo('exec_host')}</td>
+              <td className="original main">Node</td><td>{this.renderJobInfo('exec_node')}</td>
             </tr><tr>
-              <td className="original main">Produced Products</td><td colSpan='3'>{this.state.job.products}</td>
+              <td className="original main">Produced Products</td><td colSpan='3'>{this.renderJobInfo('products')}</td>
             </tr><tr>
-              <td className="original main">Required Products</td><td colSpan='3'>{this.state.job.requisites}</td>
+              <td className="original main">Required Products</td><td colSpan='3'>{this.renderJobInfo('requisites')}</td>
             </tr><tr>
               <td className="original main" colSpan='4'> content </td>
             </tr>
