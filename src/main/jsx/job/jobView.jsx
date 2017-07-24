@@ -38,14 +38,14 @@ module.exports = React.createClass({
     };
   },
   componentWillMount: function(){
-    this.updateJob(this.props.params.jobId);
+    this.setHistory(this.props.params.jobId);
   },
   componentWillReceiveProps: function(nextProps){
-    this.updateJob(nextProps.params.jobId);
+    this.setHistory(nextProps.params.jobId);
   },
   componentWillUpdate: function(nextProps, newState){
   },
-  updateJob : function(jobId){
+  setHistory : function(jobId){
     this.getJob(jobId, function(job){
       this.getHistory(jobId, 3, function(history){
         this.setState({job: job, history: history });
