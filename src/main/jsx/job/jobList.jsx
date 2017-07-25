@@ -114,7 +114,8 @@ module.exports = React.createClass({
     if (
       job.state != this.constants.INITIATING &&
       job.state != this.constants.WAITING &&
-      typeof(job.history) != 'undefined'
+      typeof(job.history) != 'undefined' &&
+      job.history.length > 0
     ) {
       return moment(job.history[0].begin_at).format('YYYY-MM-DD HH:mm');
     } else {
@@ -126,7 +127,8 @@ module.exports = React.createClass({
       job.state != this.constants.INITIATING &&
       job.state != this.constants.WAITING &&
       job.state != this.constants.RUNNING &&
-      typeof(job.history) != 'undefined'
+      typeof(job.history) != 'undefined' &&
+      job.history.length > 0
     ) {
       return moment(job.history[0].end_at).format('YYYY-MM-DD HH:mm');
     } else {
