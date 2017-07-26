@@ -113,7 +113,7 @@ module Patriot
       # This command should be executed after the return value of this method
       # @return [Time]
       def start_date_time
-        return nil if @exec_date.nil? && @start_after.nil?
+        return @start_datetime if @exec_date.nil? && @start_after.nil?
         # set tomorrow as default
         date = (@exec_date || date_add(_date_, 1)).split("-").map(&:to_i)
         # set midnight as default
