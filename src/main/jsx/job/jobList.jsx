@@ -117,7 +117,7 @@ module.exports = React.createClass({
       typeof(job.history) != 'undefined' &&
       job.history.length > 0
     ) {
-      return moment(job.history[0].begin_at).format('YYYY-MM-DD HH:mm');
+      return moment(job.history[0].begin_at, 'YYYY-MM-DD HH:mm:ss Z').format('YYYY-MM-DD HH:mm');
     } else {
       return '';
     }
@@ -130,7 +130,7 @@ module.exports = React.createClass({
       typeof(job.history) != 'undefined' &&
       job.history.length > 0
     ) {
-      return moment(job.history[0].end_at).format('YYYY-MM-DD HH:mm');
+      return moment(job.history[0].end_at, 'YYYY-MM-DD HH:mm:ss Z').format('YYYY-MM-DD HH:mm');
     } else {
       return '';
     }
