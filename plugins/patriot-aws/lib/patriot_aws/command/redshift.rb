@@ -15,7 +15,7 @@ sample_copy.pbc
 redshift {
   name "s3_to_redshift"
   name_suffix _date_
-  inifile '/Users/b06959/tmp/redshift.ini'
+  inifile '/path/to/redshift.ini'
   query <<-EOS
     COPY #{schema}.#{table}
     FROM '#{s3_path}'
