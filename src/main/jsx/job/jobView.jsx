@@ -132,7 +132,7 @@ module.exports = React.createClass({
     if (job['start_datetime'] && datetime_regex.test(job['start_datetime']) == false) {
       hasError = true;
       errorMsg = 'ERROR: [Start After] date format is invalid. Valid format is YYYY-MM-DD HH24:MI:SS';
-    } else if (job['start_datetime'] && moment(job['start_datetime']).isValid() == false) {
+    } else if (job['start_datetime'] && moment(job['start_datetime'], 'YYYY-MM-DD HH:mm:ss Z').isValid() == false) {
       hasError = true;
       errorMsg = 'ERROR: [Start After] date format is invalid.';
     } else if (job['priority'] && int_regex.test(job['priority']) == false) {
@@ -153,7 +153,7 @@ module.exports = React.createClass({
 
     if (editMode) {
       if (editingField== 'start_datetime' && val && val.length > 0) {
-        val = val && datetime_regex.test(val)? moment(val).format('YYYY-MM-DD HH:mm:ss'): val;
+        val = val && datetime_regex.test(val)? moment(val, 'YYYY-MM-DD HH:mm:ss Z').format('YYYY-MM-DD HH:mm:ss'): val;
 
         return (<input type="text" value={val} onFocus={() => this.handleEditingField(editingField)} onChange={this.handleUpdateJob} onKeyUp={this.handleOnKeyUp} />);
       } else if (Array.isArray(val)) {
