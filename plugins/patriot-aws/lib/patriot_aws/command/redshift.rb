@@ -16,6 +16,9 @@ redshift {
   name "s3_to_redshift"
   name_suffix _date_
   inifile '/path/to/redshift.ini'
+  pre_statement <<-EOS
+    DELETE FROM #{schema}.#{table} WHERE ymd=#{date}
+  EOS
   query <<-EOS
     COPY #{schema}.#{table}
     FROM '#{s3_path}'
@@ -47,7 +50,7 @@ module PatriotAWS
       declare_command_name :redshift
       include PatriotAWS::Ext::AWS
 
-      command_attr :name, :name_suffix, :inifile, :options, :query
+      command_attr :name, :name_suffix, :inifile, :options, :pre_statement, :query
 
       def job_id
         job_id = "#{command_name}_#{@name}_#{@name_suffix}"
@@ -79,7 +82,12 @@ module PatriotAWS
           conn = PG::Connection.new(
             ini['connection'].symbolize_keys
           )
-          res   = conn.exec(@query)
+
+          res = {}
+          conn.transaction do |conn|
+            conn.exec(@pre_statement) unless @pre_statement.nil? || @pre_statement.empty?
+            res = conn.exec(@query)
+          end
 
           output_arr = Array.new
           if res then
