@@ -109,7 +109,15 @@ module.exports = React.createClass({
       if (typeof(job[key]) == 'string' && job[key].length == 0) {
         job[key] = null;
       } else if (Array.isArray(job[key])) {
-        job[key]= job[key].filter((item) => {return item.length > 0});
+        job[key] = job[key].filter((item) => {
+          if (typeof item === 'string' && item.length > 0) {
+            return true;
+          } else if (typeof item === 'object' && Object.keys(item).length > 0) {
+            return true;
+          } else {
+            return false;
+          }
+        });
       }
     });
 
