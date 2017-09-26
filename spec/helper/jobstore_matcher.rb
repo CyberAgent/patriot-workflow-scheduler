@@ -30,6 +30,15 @@ module JobStoreMatcher
     end
   end
 
+  RSpec::Matchers.define :be_discarded_in do |job_store|
+    match do |job|
+      job_store.find_jobs_by_state(Patriot::JobStore::JobState::DISCARDED).include?(job.job_id)
+    end
+    failure_message do |job|
+      "expected #{Patriot::JobStore::JobState::DISCARDED} but #{job_store.get_job(job.job_id)[Patriot::Command::STATE_ATTR]}"
+    end
+  end
+
   RSpec::Matchers.define :be_running_in do |job_store|
     match do |job|
       job_store.find_jobs_by_state(Patriot::JobStore::JobState::RUNNING).include?(job.job_id)

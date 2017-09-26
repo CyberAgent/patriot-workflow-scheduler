@@ -19,7 +19,8 @@ module Patriot
                        Patriot::JobStore::JobState::WAIT      => [],
                        Patriot::JobStore::JobState::RUNNING   => [],
                        Patriot::JobStore::JobState::SUSPEND   => [],
-                       Patriot::JobStore::JobState::FAILED    => []}
+                       Patriot::JobStore::JobState::FAILED    => [],
+                       Patriot::JobStore::JobState::DISCARDED => []}
         @producers   = {} # hash from job_id to produces products
         @consumers   = {} # hash from job_id to referece products
         @job_history = {} # hash from job_id to a array of its execution hisotry
