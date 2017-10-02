@@ -1,6 +1,15 @@
 var React = require('react');
 
 module.exports = {
+  constants: Object.freeze({
+    DISCARDED:  -2,
+    INITIATING: -1,
+    SUCCEEDED:  0,
+    WAITING:    1,
+    RUNNING:    2,
+    SUSPENDED:  3,
+    FAILED:     4,
+  }),
   name_of_state : function(state){
     if (typeof(state) == "string") state = parseInt(state);
     switch(state){

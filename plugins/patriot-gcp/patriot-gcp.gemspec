@@ -19,5 +19,6 @@ Gem::Specification.new do |s|
   s.files         = Dir.glob("lib/**/*") | ["init.rb"]
   s.require_paths = ["lib"]
 
+  s.add_dependency 'google-api-client', '~>0.8.7', '<0.9.0'
   s.add_dependency 'patriot-workflow-scheduler', '~>0.7'
 end
