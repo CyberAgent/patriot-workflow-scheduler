@@ -4,12 +4,12 @@ require 'json'
 module Patriot
   module Command
     module PostProcessor
-      class StateCallBack < Patriot::Command::PostProcessor::Base
+      class HttpNotification < Patriot::Command::PostProcessor::Base
 
         CALLBACK_URL = :callback_url
         ON_PROP_KEY = :on
 
-        declare_post_processor_name :state_callback
+        declare_post_processor_name :http_notification
 
         def validate_props(props)
           raise "#{CALLBACK_URL} is not specified" unless props.has_key?(CALLBACK_URL)
