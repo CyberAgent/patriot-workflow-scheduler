@@ -9,6 +9,7 @@ module Patriot
       require 'patriot/command/post_processor/discard_on_fail'
       require 'patriot/command/post_processor/retrial'
       require 'patriot/command/post_processor/mail_notification'
+      require 'patriot/command/post_processor/http_notification'
     end
   end
 end
