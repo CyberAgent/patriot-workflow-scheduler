@@ -13,6 +13,7 @@ describe Patriot::Command::PostProcessor::Retrial do
     @update_id = Time.now.to_i
   end
 
+
   it "should retry failed job" do
     retry_job_id = 'sh_test_2015-08-01'
 
@@ -58,6 +59,7 @@ EOJ
     end
   end
 
+
   it "should retry failed job with retrial set at job_group which has sh command" do
     retry_job_id = 'sh_test_retrial_set_at_job_group_which_has_sh_command_2015-08-01'
 
@@ -91,6 +93,7 @@ EOJ
     end
   end
 
+
   it "should retry failed job with retrial set at command in job_group" do
     retry_job_id = 'sh_test_retrial_set_at_command_in_job_group_2015-08-01'
 
@@ -123,6 +126,7 @@ EOJ
       end
     end
   end
+
 
   it "should retry failed job with retrial set at composite_job" do
     retry_job_id = 'composite_test_retrial_set_at_composite_job_2015-08-01'
@@ -161,6 +165,7 @@ EOJ
       end
     end
   end
+
 
   it "should retry failed job with retrial set at job_group which has composite_job" do
     retry_job_id = 'composite_test_retrial_set_at_job_group_which_has_composite_job_2015-08-01'
@@ -203,6 +208,7 @@ EOJ
     end
   end
 
+
   it "should retry failed job with retrial set at composite_job in job_group" do
     retry_job_id = 'composite_test_retrial_set_at_composite_job_in_job_group_2015-08-01'
 
@@ -243,6 +249,7 @@ EOJ
     end
   end
 
+
   it "should raise error when parsing pbc with retrial set at subcommand of composite_job" do
     pbc = <<'EOJ'
 composite_job {
@@ -258,6 +265,7 @@ EOJ
     parser = Patriot::Command::CommandGroup.new(@config)
     expect {parser.parse(@target_datetime, pbc)}.to raise_error(/you cannot set "post_processor" at subcommand of composite_job\'s/)
   end
+
 
   it "should raise error when parsing pbc with retrial set at subcommand of composite_job in job_group" do
     pbc = <<'EOJ'
@@ -277,4 +285,49 @@ EOJ
     expect {parser.parse(@target_datetime, pbc)}.to raise_error(/you cannot set "post_processor" at subcommand of composite_job\'s/)
   end
 
+
+  it "should skip postprocesses after retry" do
+    retry_job_id = 'sh_test_retrial_set_at_command_in_job_group_2015-08-01'
+
+    pbc = <<'EOJ'
+  job_group {
+    sh {
+      retrial 'count' => 3, 'interval' => 2
+      discard_on_fail
+      name 'test_retrial_set_at_command_in_job_group'
+      commands 'sh -c "exit 1"'
+    }
+  }
+EOJ
+    cmds = Patriot::Command::CommandGroup.new(@config).parse(@target_datetime, pbc)
+    jobs = cmds.map(&:to_job)
+    @job_store.register(@update_id, jobs)
+    job_ticket = @job_store.get_job_tickets("", [])[0]
+    expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
+    job = @job_store.get(retry_job_id)
+    expect(job).to be_waited_in @job_store
+  end
+
+
+  it "should not skip postprocesses after retry" do
+    retry_job_id = 'sh_test_retrial_set_at_command_in_job_group_2015-08-01'
+
+    pbc = <<'EOJ'
+  job_group {
+    sh {
+      retrial 'count' => 1, 'interval' => 2
+      discard_on_fail
+      name 'test_retrial_set_at_command_in_job_group'
+      commands 'sh -c "exit 1"'
+    }
+  }
+EOJ
+    cmds = Patriot::Command::CommandGroup.new(@config).parse(@target_datetime, pbc)
+    jobs = cmds.map(&:to_job)
+    @job_store.register(@update_id, jobs)
+    job_ticket = @job_store.get_job_tickets("", [])[0]
+    expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
+    job = @job_store.get(retry_job_id)
+    expect(job).to be_discarded_in @job_store
+  end
 end

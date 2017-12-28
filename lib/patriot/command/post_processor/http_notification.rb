@@ -29,6 +29,7 @@ module Patriot
           when Patriot::Command::ExitCode::SUCCEEDED then send_callback(job_ticket.job_id, callback_url, "SUCCEEDED")
           when Patriot::Command::ExitCode::FAILED then send_callback(job_ticket.job_id, callback_url, "FAILED")
           end
+          return true
         end
 
         def send_callback(job_id, callback_url, state)

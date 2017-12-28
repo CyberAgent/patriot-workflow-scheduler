@@ -24,6 +24,7 @@ module Patriot
           when Patriot::Command::ExitCode::SUCCEEDED then process_success(cmd, worker, job_ticket)
           when Patriot::Command::ExitCode::FAILED    then process_failure(cmd, worker, job_ticket)
           end
+          return true
         end
 
         def process_success(cmd, worker, job_ticket)
