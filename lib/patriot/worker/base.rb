@@ -85,10 +85,15 @@ module Patriot
             @logger.error job_store_error
           end
           unless command.post_processors.nil?
+            continue_post_processing = true
             command.post_processors.each do |pp|
               begin
-                @logger.info "executing post process by #{pp}"
-                pp.process(command, self, job_ticket)
+                if continue_post_processing
+                  @logger.info "executing post process by #{pp}"
+                  continue_post_processing = continue_post_processing && pp.process(command, self, job_ticket)
+                else
+                  @logger.info "skipping post process by #{pp}"
+                end
               rescue Exception => post_process_error
                 @logger.error "post process by #{pp} failed"
                 @logger.error post_process_error

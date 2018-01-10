@@ -32,15 +32,18 @@ module Patriot
 
         def process(cmd, worker, job_ticket)
           case job_ticket.exit_code
-          when Patriot::Command::ExitCode::SUCCEEDED then process_success(cmd, worker, job_ticket)
-          when Patriot::Command::ExitCode::FAILED    then process_failure(cmd, worker, job_ticket)
+          when Patriot::Command::ExitCode::SUCCEEDED then return process_success(cmd, worker, job_ticket)
+          when Patriot::Command::ExitCode::FAILED    then return process_failure(cmd, worker, job_ticket)
           end
+          return true
         end
 
         def process_success(cmd, worker, job_ticket)
+          return true
         end
 
         def process_failure(cmd, worker, job_ticket)
+          return true
         end
 
       end

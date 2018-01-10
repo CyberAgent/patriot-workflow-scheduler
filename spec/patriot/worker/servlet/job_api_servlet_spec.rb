@@ -47,11 +47,12 @@ describe Patriot::Worker::Servlet::JobAPIServlet do
     it "should get stats" do
       expect(JSON.parse(@client["/stats"].get()
       )).to match_array([
-        [Patriot::JobStore::JobState::INIT.to_s,    0],
-        [Patriot::JobStore::JobState::WAIT.to_s,    2],
-        [Patriot::JobStore::JobState::RUNNING.to_s, 1],
-        [Patriot::JobStore::JobState::SUSPEND.to_s, 0],
-        [Patriot::JobStore::JobState::FAILED.to_s,  1]
+        [Patriot::JobStore::JobState::INIT.to_s,      0],
+        [Patriot::JobStore::JobState::DISCARDED.to_s, 0],
+        [Patriot::JobStore::JobState::WAIT.to_s,      2],
+        [Patriot::JobStore::JobState::RUNNING.to_s,   1],
+        [Patriot::JobStore::JobState::SUSPEND.to_s,   0],
+        [Patriot::JobStore::JobState::FAILED.to_s,    1]
       ])
     end
 
