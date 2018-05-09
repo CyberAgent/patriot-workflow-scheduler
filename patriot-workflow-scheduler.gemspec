@@ -25,7 +25,7 @@ Gem::Specification.new "patriot-workflow-scheduler", Patriot::VERSION do |s|
   s.add_dependency 'json', '~>1.8'
   s.add_dependency 'inifile', '~>2.0'
   s.add_dependency 'thor', '~>0.18'
-  s.add_dependency 'rest-client', '~>1.6'
+  s.add_dependency 'rest-client', '~>2.0'
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-contrib', '~>1.4'
   s.add_dependency 'mail', '~>2.6'
