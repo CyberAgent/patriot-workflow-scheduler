@@ -31,9 +31,7 @@ An ini file for this plugin should have the following directives:
 
 ```
 [gcp]
-service_account = <your service account email address>
-private_key = <the location of your p12 key file>
-key_pass = <the key phrase for the private key>
+bigquery_keyfile = <path to json credential file>
 ```
 
 

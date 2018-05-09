@@ -1,4 +1,4 @@
-require 'google/api_client'
+require 'google/cloud/bigquery'
 require 'patriot_gcp/version'
 
 
@@ -12,127 +12,8 @@ module PatriotGCP
 
       class BigQueryException < Exception; end
 
-      def _get_auth_client(p12_key, key_pass, email)
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(p12_key, key_pass)
-        auth_client = Signet::OAuth2::Client.new(
-            :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
-            :audience => 'https://accounts.google.com/o/oauth2/token',
-            :scope => 'https://www.googleapis.com/auth/bigquery',
-            :issuer => email,
-            :signing_key => key)
-        auth_client.fetch_access_token!
-        return auth_client
-      end
-
-
-      def _get_api_client()
-        Google::APIClient.new(
-            :application_name => VERSION::PROJECT_NAME,
-            :application_version => VERSION::VERSION)
-      end
-
-
-      def _make_body(project_id, dataset_id, table_id, schema, options)
-        body = {
-          'configuration' => {
-            'load' => {
-              'schema' => schema,
-              'destinationTable' => {
-                'projectId' => project_id,
-                'datasetId' => dataset_id,
-                'tableId'   => table_id
-              }
-            }
-          }
-        }
-        if options
-          options.each{|key, value|
-            body['configuration']['load'][key] = value
-          }
-        end
-
-        return body
-      end
-
-
-      def _poll(bq_client,
-                api_client,
-                auth_client,
-                project_id,
-                job_id,
-                polling_interval)
-
-        polling_interval.times{
-          response = JSON.parse(api_client.execute(
-                                :api_method => bq_client.jobs.get,
-                                :parameters => {
-                                    'jobId' => job_id,
-                                    'projectId' => project_id
-                                },
-                                :headers => {'Content-Type' => 'application/json; charset=UTF-8'},
-                                :authorization => auth_client
-                            ).response.body)
-          state = response["status"]["state"]
-
-          if state == 'DONE'
-            if response["status"]["errors"]
-              raise BigQueryException, "upload failed: #{response['status']['errors']}"
-            else
-              return response["statistics"]
-            end
-          end
-
-          sleep 60
-        }
-
-        raise BigQueryException,"registered job didn't finish within: #{polling_interval} mins. please check if it will finish later on. jobId: #{job_id}"
-      end
-
-
-      def _bq_load(filename,
-                   project_id,
-                   dataset_id,
-                   table_id,
-                   auth_client,
-                   api_client,
-                   schema,
-                   options,
-                   polling_interval)
-
-        bq_client = api_client.discovered_api('bigquery', 'v2')
-        body = _make_body(project_id, dataset_id, table_id, schema, options)
-        media = Google::APIClient::UploadIO.new(filename, "application/octet-stream")
-
-        result = api_client.execute(
-          :api_method => bq_client.jobs.insert,
-          :parameters => {
-            'projectId' => project_id,
-            'uploadType' => 'multipart'
-          },
-          :body_object => body,
-          :authorization => auth_client,
-          :media => media
-        )
-
-        begin
-          job_id = JSON.parse(result.response.body)['jobReference']['jobId']
-        rescue
-          raise BigQueryException, "failed to register job: #{result.response.body}"
-        end
-
-        return _poll(bq_client,
-                     api_client,
-                     auth_client,
-                     project_id,
-                     job_id,
-                     polling_interval)
-      end
-
-
       def bq_load(filename,
-                  p12_key,
-                  key_pass,
-                  email,
+                  bigquery_keyfile,
                   project_id,
                   dataset_id,
                   table_id,
@@ -143,18 +24,60 @@ module PatriotGCP
         options ||= {}
         polling_interval ||= 60
 
-        api_client  = _get_api_client()
-        auth_client = _get_auth_client(p12_key, key_pass, email)
+        ENV['BIGQUERY_KEYFILE'] = bigquery_keyfile
 
-        return _bq_load(filename,
-                        project_id,
-                        dataset_id,
-                        table_id,
-                        auth_client,
-                        api_client,
-                        schema,
-                        options,
-                        polling_interval)
+        bigquery = Google::Cloud::Bigquery.new(
+          project: project_id,
+          retries: 3,
+          timeout: polling_interval * 60
+        )
+
+        # exclude partition string
+        # table_name$YYYYMMDD -> table_name
+        original_table_id = table_id.split('$')[0]
+
+        dataset = bigquery.dataset dataset_id
+        table = dataset.table original_table_id
+
+        if table.nil?
+          # TODO: 
+          # schemaとoptionがメソッドやその引数で指定されるようになっており、
+          # 大幅な仕様変更となっているが、旧ライブラリ同様の設定を読み込めるよう
+          # 議論されている。
+          # https://github.com/GoogleCloudPlatform/google-cloud-ruby/issues/1919
+          # 
+          # こちらが対応された場合は下記ソースを変更する。
+          dataset.create_table original_table_id do |updater|
+            updater.schema do |scm|
+              schema['fields'].each do |row|
+                name = row['name']
+                type = row['type'].downcase.to_sym
+                mode = row['mode'].downcase.to_sym if row['mode']
+
+                scm.method(type).call(name, mode: mode)
+              end
+            end
+            # 取り込み時間分割テーブルに設定
+            updater.time_partitioning_type = "DAY"
+          end
+        end
+
+        job = dataset.load_job(
+          table_id,
+          filename,
+          quote: options['quote'] || nil,
+          skip_leading: options['skipLeadingRows'] || nil,
+          write: options['writeDisposition'] || nil,
+          delimiter: options['fieldDelimiter'] || nil,
+        )
+
+        job.wait_until_done!
+
+        if job.failed?
+          raise BigQueryException, "upload failed: #{job.errors}"
+        else
+          return job.statistics
+        end
       end
 
     end
