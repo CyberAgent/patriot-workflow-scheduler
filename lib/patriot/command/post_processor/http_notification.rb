@@ -52,7 +52,10 @@ module Patriot
 
         def valid_url?(url)
           begin
-             URI.parse(url)
+            uri = URI.parse(url)
+            if uri.scheme != 'http' && uri.scheme != 'https'
+              return false
+            end
           rescue URI::InvalidURIError
             return false
           end
