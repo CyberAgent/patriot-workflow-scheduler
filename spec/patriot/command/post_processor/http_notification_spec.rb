@@ -42,6 +42,11 @@ describe Patriot::Command::PostProcessor::HttpNotification do
     commands 'sh -c "exit 1"'
   }
   sh{
+    http_notification 'callback_url' => 'https://localhost', 'on' => 'failed'
+    name 'https'
+    commands 'sh -c "exit 1"'
+  }
+  sh{
     http_notification 'callback_url' => 'http://localhost', 'on' => ['succeeded', 'failed']
     name 'callback_error'
     commands 'sh -c "exit 0"'
@@ -90,12 +95,18 @@ EOJ
     expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
   end
 
-  it "should not notify on success with an illegal url" do
+  it "should notify with https" do
+    job_ticket = Patriot::JobStore::JobTicket.new("sh_https_#{@dt}", @update_id)
+    expect_any_instance_of(Patriot::Command::PostProcessor::HttpNotification).to receive(:send_callback).with("#{job_ticket.job_id}", "https://localhost", "FAILED")
+    expect(@worker.execute_job(job_ticket)).to eq Patriot::Command::ExitCode::FAILED
+  end
+
+  it "should not notify on success with an invalid url" do
     expect{
       Patriot::Command::CommandGroup.new(@config).parse(Time.new(2015,8,1), <<'EOJ'
   sh{
-    http_notification 'callback_url' => 'http://@illegal_url', 'on' => ['succeeded', 'failed']
-    name 'illegal_url'
+    http_notification 'callback_url' => 'invalid_url', 'on' => ['succeeded', 'failed']
+    name 'invalid_url'
     commands 'sh -c "exit 0"'
   }
 EOJ
