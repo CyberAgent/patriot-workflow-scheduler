@@ -69,6 +69,7 @@ module PatriotGCP
           skip_leading: options['skipLeadingRows'] || nil,
           write: options['writeDisposition'] || nil,
           delimiter: options['fieldDelimiter'] || nil,
+          null_marker: options['nullMarker'] || nil,
         )
 
         job.wait_until_done!
