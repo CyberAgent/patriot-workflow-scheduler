@@ -4,8 +4,8 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-hadoop"
-  s.version     = "0.1.2.alpha"
-  s.licenses    = ['Apache License, Version 2.0']
+  s.version     = "0.1.3.alpha"
+  s.licenses    = ['Apache-2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
   s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler/tree/master/plugins/patriot-hadoop"

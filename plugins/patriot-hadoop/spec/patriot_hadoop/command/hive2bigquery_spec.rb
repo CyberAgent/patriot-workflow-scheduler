@@ -123,4 +123,96 @@ describe PatriotHadoop::Command::HiveCommand do
     cmd.execute
   end
 
+  it "should execute hive query with gzip option" do
+    query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
+    cmd = new_command(PatriotHadoop::Command::HiveCommand) do
+      hive_ql query
+      output_prefix File.join(SAMPLE_DIR, "hive_result")
+      compression 'gzip'
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    allow(Dir).to receive(:exist?).and_return(true)
+    allow(File).to receive(:write)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)
+    expect_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)\
+                                                    .once
+                                                    .with(File.join(SAMPLE_DIR, "hive_result.hql"),
+                                                          File.join(SAMPLE_DIR, "hive_result.tsv.gz"),
+                                                          nil)
+    expect(File).to receive(:write).with(File.join(SAMPLE_DIR, "hive_result.hql"), query)
+    cmd.execute
+  end
+
+  it "should execute hive query with gzip option(true)" do
+    query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
+    cmd = new_command(PatriotHadoop::Command::HiveCommand) do
+      hive_ql query
+      output_prefix File.join(SAMPLE_DIR, "hive_result")
+      compression true
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    allow(Dir).to receive(:exist?).and_return(true)
+    allow(File).to receive(:write)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)
+    expect_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)\
+                                                    .once
+                                                    .with(File.join(SAMPLE_DIR, "hive_result.hql"),
+                                                          File.join(SAMPLE_DIR, "hive_result.tsv.gz"),
+                                                          nil)
+    expect(File).to receive(:write).with(File.join(SAMPLE_DIR, "hive_result.hql"), query)
+    cmd.execute
+  end
+
+  it "should execute hive query with bzip2 option" do
+    query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
+    cmd = new_command(PatriotHadoop::Command::HiveCommand) do
+      hive_ql query
+      output_prefix File.join(SAMPLE_DIR, "hive_result")
+      compression 'bzip2'
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    allow(Dir).to receive(:exist?).and_return(true)
+    allow(File).to receive(:write)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)
+    expect_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)\
+                                                    .once
+                                                    .with(File.join(SAMPLE_DIR, "hive_result.hql"),
+                                                          File.join(SAMPLE_DIR, "hive_result.tsv.bz2"),
+                                                          nil)
+    expect(File).to receive(:write).with(File.join(SAMPLE_DIR, "hive_result.hql"), query)
+    cmd.execute
+  end
+
+  it "should execute hive query with invalid compression option" do
+    query = 'select count(1) from tmp where dt = \'2011-12-12\' and dev = \'test\''
+    cmd = new_command(PatriotHadoop::Command::HiveCommand) do
+      hive_ql query
+      output_prefix File.join(SAMPLE_DIR, "hive_result")
+      compression 'hoge'
+    end
+    cmd = cmd.build[0]
+    cmd = cmd.to_job.to_command(@config)
+
+    allow(Dir).to receive(:exist?).and_return(true)
+    allow(File).to receive(:write)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)
+    expect_any_instance_of(PatriotHadoop::Ext::Hive).to receive(:execute_hivequery)\
+                                                    .once
+                                                    .with(File.join(SAMPLE_DIR, "hive_result.hql"),
+                                                          File.join(SAMPLE_DIR, "hive_result.tsv"),
+                                                          nil)
+    expect(File).to receive(:write).with(File.join(SAMPLE_DIR, "hive_result.hql"), query)
+    cmd.execute
+  end
+
 end
