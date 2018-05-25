@@ -65,6 +65,7 @@ module PatriotGCP
         job = dataset.load_job(
           table_id,
           filename,
+          format: options['format'] || nil,
           quote: options['quote'] || nil,
           skip_leading: options['skipLeadingRows'] || nil,
           write: options['writeDisposition'] || nil,
