@@ -82,6 +82,24 @@ module PatriotGCP
         end
       end
 
+      def bq(bigquery_keyfile, project_id, statement)
+        ENV['BIGQUERY_KEYFILE'] = bigquery_keyfile
+
+        bigquery = Google::Cloud::Bigquery.new(
+          project: project_id,
+          retries: 3
+        )
+
+        job = bigquery.query_job statement
+
+        job.wait_until_done!
+
+        if job.failed?
+          raise BigQueryException, "statement execution failed: #{job.errors}"
+        else
+          return job.statistics
+        end
+      end
     end
   end
 end
