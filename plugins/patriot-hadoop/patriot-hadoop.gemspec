@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "patriot-hadoop"
-  s.version     = "0.1.3.alpha"
+  s.version     = "0.1.2"
   s.licenses    = ['Apache-2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
