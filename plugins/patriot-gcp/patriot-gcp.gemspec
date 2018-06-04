@@ -6,7 +6,7 @@ require 'patriot_gcp/version'
 Gem::Specification.new do |s|
   s.name        = VERSION::PROJECT_NAME
   s.version     = VERSION::VERSION
-  s.licenses    = ['Apache License, Version 2.0']
+  s.licenses    = ['Apache-2.0']
   s.authors     = ["Hitoshi Tsuda"]
   s.email       = ["tsuda_hitoshi@cyberagent.co.jp"]
   s.homepage    = "https://github.com/CyberAgent/patriot-workflow-scheduler/tree/master/plugins/patriot-gcp"
@@ -19,6 +19,6 @@ Gem::Specification.new do |s|
   s.files         = Dir.glob("lib/**/*") | ["init.rb"]
   s.require_paths = ["lib"]
 
-  s.add_dependency 'google-api-client', '~>0.8.7', '<0.9.0'
-  s.add_dependency 'patriot-workflow-scheduler', '~>0.7'
+  s.add_dependency 'google-cloud-bigquery', '~>1.3'
+  s.add_dependency 'patriot-workflow-scheduler', '>=0.8.7'
 end
