@@ -30,16 +30,18 @@ module PatriotGCP
 
         bigquery_keyfile  = ini["gcp"]["bigquery_keyfile"]
 
-        unless File.exist?(@input_file)
-          raise Exception, "The given file doesn't exist."
+        unless @input_file.start_with? 'gs://'
+          unless File.exist?(@input_file)
+            raise Exception, "The given file doesn't exist."
+          end
+
+          unless File.size?(@input_file)
+            @logger.warn "The target file is empty"
+            return
+          end
         end
 
-        unless File.size?(@input_file)
-          @logger.warn "The target file is empty"
-          return
-        end
-
-        @logger.info "start uploading"
+        @logger.info "start loading"
         stat_info = bq_load(@input_file,
                             bigquery_keyfile,
                             @project_id,
@@ -49,7 +51,7 @@ module PatriotGCP
                             @options,
                             @polling_interval)
 
-        @logger.info "upload succeeded: #{stat_info}"
+        @logger.info "load succeeded: #{stat_info}"
         @logger.info "end load_to_bigquery"
       end
     end
