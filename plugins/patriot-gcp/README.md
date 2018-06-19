@@ -120,3 +120,70 @@ statement "DELETE FROM `dataset1.partitioned_table1` WHERE _PARTITIONTIME = '201
 ```
 
 * It is not allowed to use decoration characters like "$". Please set `_PARTITIONTIME` to use partitioned table.
+
+---
+
+### gcs
+
+This command enables you to upload, download, delete data to/from Google Cloud Storage.
+
+
+Option Name | Required | Description
+----------- | :------: | ------------
+inifile | yes | Location of the ini file. Assumed format is described below.
+project_id | yes | Project ID to use.
+name_suffix | yes | Suffix of Job ID. To set only _date_ is not allowed to avoid job name duplicate.
+bucket | yes | Bucket ID to use.
+command | yes | `create_file` / `download` / `delete` ( use `create_file` to upload files. )
+source_file | no | Source file.
+dest_file | no | Destination file.
+
+
+#### inifile
+
+An ini file for this plugin should have the following directives:
+
+```
+[gcp]
+gcs_keyfile = <path to json credential file>
+```
+
+
+#### Example
+
+You can use `gcs` command in your PBC file as follows.
+
+##### create_file
+
+```
+gcs {
+  name_suffix "test_#{_date_}"
+  inifile '/path/to/inifile'
+  project_id 'test_project_id'
+  bucket 'test_bucket'
+  command 'create_file'
+  source_file '/path/to/source_file'
+  dest_file '/path/to/dest_file'
+}
+```
+
+##### download
+
+```
+gcs {
+  ...
+  command 'download'
+  source_file '/path/to/source_file'
+  dest_file '/path/to/dest_file'
+}
+```
+
+##### delete
+
+```
+gcs {
+  ...
+  command 'delete'
+  source_file '/path/to/source_file'
+}
+```
