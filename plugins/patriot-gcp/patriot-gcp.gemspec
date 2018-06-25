@@ -20,5 +20,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'google-cloud-bigquery', '~>1.3'
+  s.add_dependency 'google-cloud-storage', '~>1.12'
   s.add_dependency 'patriot-workflow-scheduler', '>=0.8.7'
 end
