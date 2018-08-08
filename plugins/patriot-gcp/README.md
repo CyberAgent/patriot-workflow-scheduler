@@ -93,9 +93,9 @@ You can use `bq` command in your PBC file like the following.
 
 ```
 bq {
-  input_file "/tmp/data_#{_date_}.tsv"
   inifile '/home/foo/.gcp.ini'
   name_suffix "insert_some_data_#{_date_}"
+  project_id 'your-project'
   statement "INSERT INTO `dataset1.table1` (column1) SELECT dt FROM `dataset2.table2` WHERE dt = '2018-05-21'"
 }
 ```
