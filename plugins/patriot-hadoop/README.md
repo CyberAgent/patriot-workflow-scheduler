@@ -16,6 +16,7 @@ Option Name | Description
 ----------- | ------------
 hive_ql | Set the hive query you want to execute.
 output_prefix | Set the directory prefix where the result and the query should be stored. They are saved as _output_prefix_.tsv and _output_prefix_.hql. If this directive isn't provided, `hive` command would save them as `/tmp/<job_id>.hql` and `/tmp/<job_id>.tsv`.
+compression | Set true / "gzip" / "bzip2" to compress output file.
 exec_user | Set the user name who executes the query if needed. For example, this directive could be used when the query inserts data into Hive table and its operation needs specific authentication.
 props | Provide Hive configuration properties if needed. These properties are stored within the query file.
 name_suffix | Set a name suffix for job_id if needed.

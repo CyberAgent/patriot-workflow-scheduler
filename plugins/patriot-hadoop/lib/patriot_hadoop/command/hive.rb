@@ -4,7 +4,7 @@ module PatriotHadoop
       declare_command_name :hive
       include PatriotHadoop::Ext::Hive
 
-      command_attr :hive_ql, :output_prefix, :exec_user, :props, :name_suffix
+      command_attr :hive_ql, :output_prefix, :compression, :exec_user, :props, :name_suffix
 
       def job_id
         job_id = "#{command_name}"
@@ -28,8 +28,8 @@ module PatriotHadoop
 
         tmpfile = output_prefix + '.hql'
         _create_hivequery_tmpfile(@hive_ql, tmpfile, opt)
+        output_file = _create_output_filename(output_prefix, @compression)
 
-        output_file = output_prefix + '.tsv'
         execute_hivequery(tmpfile, output_file, @exec_user)
 
         if File.zero?(output_file)
@@ -38,6 +38,19 @@ module PatriotHadoop
         end
 
         @logger.info "end hive"
+      end
+
+
+      # true / 'gzip' / 'bzip2' are available.
+      def _create_output_filename(output_prefix, compression)
+        output_file = output_prefix + '.tsv'
+        case compression
+        when true, 'gzip'
+          output_file += '.gz'
+        when 'bzip2'
+          output_file += '.bz2'
+        end
+        return output_file
       end
 
 

@@ -5,7 +5,7 @@ require 'patriot/version'
 $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new "patriot-workflow-scheduler", Patriot::VERSION do |s|
-  s.licenses    = ['Apache License, Version 2.0']
+  s.licenses    = ['Apache-2.0']
   s.authors     = ["Teruyoshi Zenmyo"]
   s.email       = ["zenmyo_teruyoshi@cyberagent.co.jp"]
   s.homepage    = "http://github.com/CyberAgent/patriot-workflow-scheduler"
@@ -25,7 +25,7 @@ Gem::Specification.new "patriot-workflow-scheduler", Patriot::VERSION do |s|
   s.add_dependency 'json', '~>1.8'
   s.add_dependency 'inifile', '~>2.0'
   s.add_dependency 'thor', '~>0.18'
-  s.add_dependency 'rest-client', '~>1.6'
+  s.add_dependency 'rest-client', '~>2.0'
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-contrib', '~>1.4'
   s.add_dependency 'mail', '~>2.6'

@@ -4,6 +4,8 @@ include PatriotHadoop::Ext::Hive
 
 HQL_FILE = "/path/to/tmpfile.hql"
 OUTPUT_FILE = "/path/to/output.tsv"
+OUTPUT_FILE_GZIP = "/path/to/output.tsv.gz"
+OUTPUT_FILE_BZIP2 = "/path/to/output.tsv.bz2"
 STATUS = "status"
 SOUT = "stdout"
 SERR = "stderr"
@@ -27,6 +29,32 @@ describe PatriotHadoop::Ext::Hive do
       expect_any_instance_of(Patriot::Util::System).to receive(:execute_command).with("sudo -u #{exec_user} hive -f \"#{HQL_FILE}\"")
       expect(File).to receive(:rename).with(SOUT, OUTPUT_FILE)
       execute_hivequery(HQL_FILE, OUTPUT_FILE, exec_user)
+    end
+
+    it "should execute hivequery with gzip option" do
+      expect_any_instance_of(Patriot::Util::System).to receive(:execute_command).with("hive -f \"#{HQL_FILE}\" | gzip --stdout --force")
+      expect(File).to receive(:rename).with(SOUT, OUTPUT_FILE_GZIP)
+      execute_hivequery(HQL_FILE, OUTPUT_FILE_GZIP)
+    end
+
+    it "should execute hivequery with specific user and gzip option" do
+      exec_user = "user1"
+      expect_any_instance_of(Patriot::Util::System).to receive(:execute_command).with("sudo -u #{exec_user} hive -f \"#{HQL_FILE}\" | gzip --stdout --force")
+      expect(File).to receive(:rename).with(SOUT, OUTPUT_FILE_GZIP)
+      execute_hivequery(HQL_FILE, OUTPUT_FILE_GZIP, exec_user)
+    end
+
+    it "should execute hivequery with bzip2 option" do
+      expect_any_instance_of(Patriot::Util::System).to receive(:execute_command).with("hive -f \"#{HQL_FILE}\" | bzip2 --stdout --force")
+      expect(File).to receive(:rename).with(SOUT, OUTPUT_FILE_BZIP2)
+      execute_hivequery(HQL_FILE, OUTPUT_FILE_BZIP2)
+    end
+
+    it "should execute hivequery with specific user and bzip2 option" do
+      exec_user = "user1"
+      expect_any_instance_of(Patriot::Util::System).to receive(:execute_command).with("sudo -u #{exec_user} hive -f \"#{HQL_FILE}\" | bzip2 --stdout --force")
+      expect(File).to receive(:rename).with(SOUT, OUTPUT_FILE_BZIP2)
+      execute_hivequery(HQL_FILE, OUTPUT_FILE_BZIP2, exec_user)
     end
 
     it "should execute hivequery but raise an error" do

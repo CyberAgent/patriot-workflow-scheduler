@@ -21,7 +21,7 @@ module Patriot
             found = true
             # count first attempt in
             pp.props[COUNT_PROP_KEY] = pp.props[COUNT_PROP_KEY] - 1
-            return if pp.props[COUNT_PROP_KEY] == 0
+            return true if pp.props[COUNT_PROP_KEY] < 1
             cmd.start_datetime = Time.now + pp.props[INTERVAL_PROP_KEY]
           end
           job = cmd.to_job
@@ -30,6 +30,7 @@ module Patriot
           job[Patriot::Command::REQUISITES_ATTR] = current_config[Patriot::Command::REQUISITES_ATTR]
           job[Patriot::Command::STATE_ATTR] = Patriot::JobStore::JobState::WAIT
           worker.job_store.register(Time.now.to_i, [job])
+          return false
         end
 
       end

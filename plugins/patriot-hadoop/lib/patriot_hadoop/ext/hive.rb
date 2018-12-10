@@ -16,7 +16,7 @@ module PatriotHadoop
 
 
       def execute_hivequery(hql_file, output_file=nil, user=nil)
-        command = "hive -f \"#{hql_file}\""
+        command = "hive -f \"#{hql_file}\"#{_compress_option(File.extname(output_file))}"
         unless user.nil?
           if user !~ /^[a-z_][a-z0-9_]{0,30}$/
             raise HiveException, "Invalid username" 
@@ -27,8 +27,17 @@ module PatriotHadoop
       end
 
 
+      def _compress_option(extension)
+        return case extension
+          when '.gz'  then ' | gzip --stdout --force'
+          when '.bz2' then ' | bzip2 --stdout --force'
+          else ''
+        end
+      end
+
+
       def _execute_hivequery_internal(command, output_file)
-        so = execute_command(command) do |status, so, se|
+        res = execute_command(command) do |status, so, se|
           err_size = File.stat(se).size
           err_msg  = ""
           max_err_size = HIVE_MAX_ERROR_MSG_SIZE
@@ -41,7 +50,7 @@ module PatriotHadoop
           end
           raise HiveException, "#{command}\n#{err_msg}"
         end
-        File.rename(so, output_file) unless output_file.nil?
+        File.rename(res, output_file) unless output_file.nil?
       end
 
     end

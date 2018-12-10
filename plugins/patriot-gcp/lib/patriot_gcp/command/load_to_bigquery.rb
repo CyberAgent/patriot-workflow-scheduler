@@ -28,28 +28,22 @@ module PatriotGCP
           raise Exception, "inifile not found"
         end
 
-        service_account  = ini["gcp"]["service_account"]
-        private_key      = ini["gcp"]["private_key"]
-        key_pass         = ini["gcp"]["key_pass"]
+        bigquery_keyfile  = ini["gcp"]["bigquery_keyfile"]
 
-        unless File.exist?(@input_file)
-          raise Exception, "The given file doesn't exist."
+        unless @input_file.start_with? 'gs://'
+          unless File.exist?(@input_file)
+            raise Exception, "The given file doesn't exist."
+          end
+
+          unless File.size?(@input_file)
+            @logger.warn "The target file is empty"
+            return
+          end
         end
 
-        unless File.size?(@input_file)
-          @logger.warn "The target file is empty"
-          return
-        end
-
-        if service_account.nil? or private_key.nil?
-          raise GoogleCloudPlatformException, "configuration for GCP is not enough."
-        end
-
-        @logger.info "start uploading"
+        @logger.info "start loading"
         stat_info = bq_load(@input_file,
-                            private_key,
-                            key_pass,
-                            service_account,
+                            bigquery_keyfile,
                             @project_id,
                             @dataset,
                             @table,
@@ -57,7 +51,7 @@ module PatriotGCP
                             @options,
                             @polling_interval)
 
-        @logger.info "upload succeeded: #{stat_info}"
+        @logger.info "load succeeded: #{stat_info}"
         @logger.info "end load_to_bigquery"
       end
     end

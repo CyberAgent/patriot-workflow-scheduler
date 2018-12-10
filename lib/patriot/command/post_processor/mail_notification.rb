@@ -19,11 +19,12 @@ module Patriot
           on = [on] unless on.is_a?(Array)
           on = on.map{|o| Patriot::Command::ExitCode.value_of(o)}
           exit_code = job_ticket.exit_code
-          return unless on.include?(exit_code)
+          return true unless on.include?(exit_code)
           case exit_code
           when Patriot::Command::ExitCode::SUCCEEDED then process_success(cmd, worker, job_ticket)
           when Patriot::Command::ExitCode::FAILED    then process_failure(cmd, worker, job_ticket)
           end
+          return true
         end
 
         def process_success(cmd, worker, job_ticket)

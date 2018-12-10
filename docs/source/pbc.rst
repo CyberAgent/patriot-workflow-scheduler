@@ -350,8 +350,6 @@ Therefore, jobs with lower priority value are preferentially fetched.
     commands ["echo 'lower priority'"]
   }
 
-::
-
 Skip / Suspend
 ----------------
 
@@ -370,8 +368,6 @@ Each state can be set by putting **skip** or **suspend**, respectively
     name 'suspend'
     commands ["echo 'suspended'"]
   }
-
-::
 
 Limiting Node/Host
 ----------------------
@@ -393,8 +389,6 @@ Jobs with **exec_node** are only executed by threads labeled with the configured
     commands ["echo 'execute by a thread labeled with node1'"]
   }
 
-::
-
 Retry
 ----------------------
 
@@ -408,8 +402,6 @@ In the retry configuration, retry interval and the number of retries can be conf
     name 'retry'
     commands ["echo 'retry 3 time at intervals of 1 hour'"]
   }
-
-::
 
 Mail Notification
 ----------------------
@@ -430,4 +422,34 @@ For using this functionality, SMTP should be configured on the host where the wo
     commands ["echo 'notify success'"]
   }
 
-::
+Slack Notification
+----------------------
+
+To send a slack message when a job finished, **slack_notification** should be set to the job.
+
+.. code-block:: ruby
+
+  vi ${INSTALL_DIR}/config/patriot.ini
+  ...
+  slack.notification.somename.url=https://hooks.slack.com/services/xxx/xxx/xxxxxx
+  ...
+
+  sh{
+    slack_notification \
+      'api_key' => 'somename',
+      'channel' => slack_channel,
+      'username' => username(any),
+      'on' => 'failed'
+    name 'slack_notification'
+    commands ["echo 'notify failure'"]
+  }
+  sh{
+    slack_notification \
+      'api_key' => 'somename',
+      'channel' => slack_channel,
+      'username' => username(any),
+      'on' => ['succeeded', 'failed']
+    retrial 'count' => 3, 'interval' => 1800
+    name 'slack_notification'
+    commands ["echo 'notify success or failure'"]
+  }
