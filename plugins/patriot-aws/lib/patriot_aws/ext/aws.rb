@@ -9,15 +9,17 @@ module PatriotAWS
 
       def config_aws(options)
         options.symbolize_keys
-        Aws.config.update(
-          access_key_id: options[:access_key_id],
-          secret_access_key: options[:secret_access_key]
-        )
+        Aws.config.update({
+          credentials: Aws::Credentials.new(
+            options[:access_key_id],
+            options[:secret_access_key]
+          )
+        })
 
         if options[:region]
-          Aws.config.update(
+          Aws.config.update({
             region: options[:region]
-          )
+          })
         end
       end
     end
