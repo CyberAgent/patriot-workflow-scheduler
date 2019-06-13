@@ -9,8 +9,11 @@ describe PatriotAWS::Ext::AWS do
         secret_access_key: 'test_secret_access_key'
       }
 
-      expect(Aws.config).to receive(:update)
-        .once.with(options.symbolize_keys)
+      expect(Aws.config).to receive(:update).once
+      expect(Aws::Credentials).to receive(:new).once.with(
+        options[:access_key_id],
+        options[:secret_access_key]
+      )
 
       config_aws(options)
     end
@@ -28,7 +31,13 @@ describe PatriotAWS::Ext::AWS do
       }
       options2 = { region: 'test_region' }
 
-      expect(Aws.config).to receive(:update).once.with(options1)
+      expect(Aws::Credentials).to receive(:new).once.with(
+        options1[:access_key_id],
+        options1[:secret_access_key]
+      )
+      expect(Aws.config).to receive(:update).once.with({
+        :credentials => anything
+      })
       expect(Aws.config).to receive(:update).once.with(options2)
 
       config_aws(options)

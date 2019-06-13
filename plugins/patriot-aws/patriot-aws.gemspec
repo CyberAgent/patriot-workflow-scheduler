@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.files         = Dir.glob('lib/**/*') | ['init.rb']
   s.require_paths = ['lib']
 
-  s.add_dependency 'aws-sdk', '~>2'
+  s.add_dependency 'aws-sdk', '~>3'
   s.add_dependency 'pg', '0.18.4'
   s.add_dependency 'patriot-workflow-scheduler', '~>0.7'
 end
