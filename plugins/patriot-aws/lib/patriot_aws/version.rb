@@ -1,4 +1,4 @@
 class VERSION
-  VERSION = "0.3.0.alpa"
+  VERSION = "0.3.0"
   PROJECT_NAME = "patriot-aws"
 end
